@@ -2,8 +2,15 @@
 bin
 src/antlr
 
-#ignore Java class files
+target
 *.class
+*.iml
+*.ipr
+.idea
+.classpath
+.settings
+.project
+.DS_Store
 
 #ignore other junk files
 *~
