@@ -1,0 +1,11 @@
+
+  
+compile-job:
+  stage: build
+  script:
+    - make
+
+test-job:
+  stage: test
+  script:
+    - mvn test
