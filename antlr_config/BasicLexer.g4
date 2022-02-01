@@ -23,9 +23,14 @@ GREATER_THAN_OR_EQUAL: '>=' ;
 LESS_THAN: '<' ;
 LESS_THAN_OR_EQUAL: '<=' ;
 EQUAL: '==' ;
-NOT_EQUAL: '!=' ;
+NOTEQUAL: '!=' ;
 AND: '&&' ;
 OR: '||' ;
+
+//ident
+UNDERSCORE: '' ;
+LOWER_CASE: 'a..z' ;
+UPPER_CASE: 'A..Z' ;
 
 //brackets
 OPEN_PARENTHESES: '(';
@@ -33,7 +38,6 @@ CLOSE_PARENTHESES: ')';
 
 //numbers
 fragment DIGIT: '0'..'9' ;
-
 INTEGER: DIGIT+ ;
 
 //bool-liter
@@ -51,5 +55,5 @@ GIVE_A_NAME_FOR_R: 'r' ;
 DOUBLE_QUOTE: '"' ;
 
 //pair-liter
-NULL: 'NULL' ;
+NULL: 'null' ;
 
