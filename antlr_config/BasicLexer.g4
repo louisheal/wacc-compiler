@@ -28,7 +28,7 @@ AND: '&&' ;
 OR: '||' ;
 
 //ident
-UNDERSCORE: '' ;
+UNDERSCORE: '_' ;
 LOWER_CASE: 'a..z' ;
 UPPER_CASE: 'A..Z' ;
 
