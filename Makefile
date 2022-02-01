@@ -3,7 +3,7 @@
 # Useful locations
 
 ANTLR_DIR	 := antlr_config
-SOURCE_DIR	 := src/main/java/
+SOURCE_DIR	 := src/main/java
 ANTLR_SOURCE_DIR := $(SOURCE_DIR)/antlr
 OUTPUT_DIR	 := bin
 
