@@ -45,14 +45,11 @@ ZERO: '0' ;
 BACK: 'b' ;
 TAB: 't' ;
 NEWLINE: 'n' ;
-FORM_FEED: 'F' ;
-GIVE_A_NAME_FOR_R: 'R' ;
-DOUBLE_QUOTE: '"' ;
-SINGLE_QUOTE: ''' ;   //ask
-FORWARD_SLASH: '\' ; //ask
 
+FORM_FEED: 'f' ;
+GIVE_A_NAME_FOR_R: 'r' ;
+DOUBLE_QUOTE: '"' ;
 
 //pair-liter
-NULL: 'null' ;
-
+NULL: 'NULL' ;
 
