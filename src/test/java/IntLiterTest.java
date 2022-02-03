@@ -34,7 +34,6 @@ public class IntLiterTest {
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     BasicParser parser = new BasicParser(tokens);
     ParseTree tree = parser.prog();
-    System.out.println(tree.toStringTree(parser));
     assertTrue(tree.toStringTree(parser).equals("(prog (expr (intLiter (intSign +) 5)) <EOF>)"));
 
   }
