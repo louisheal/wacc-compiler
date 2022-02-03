@@ -101,7 +101,7 @@ BACKSLASH: '\\' ;
 NULL: 'null' ;
 
 //character
-CHARACTER: [^'"] ;
+CHARACTER: [^\\'"] ;
 
 //whitespace
 EOL: '\n';

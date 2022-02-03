@@ -25,7 +25,7 @@ charLiter: SINGLE_QUOTE character SINGLE_QUOTE;
 strLiter: DOUBLE_QUOTE character* DOUBLE_QUOTE;
 
 character: CHARACTER 
-| escapedChar;
+| BACKSLASH escapedChar;
 
 escapedChar: ZERO | BACK | TAB | NEWLINE | FORM_FEED | GIVE_A_NAME_FOR_R | DOUBLE_QUOTE | SINGLE_QUOTE | BACKSLASH;
 
