@@ -12,9 +12,9 @@ intLiter: intSign? INTEGER;
 
 intSign: PLUS | MINUS;
 
-expr: unaryOper expr
+expr: intLiter
+| unaryOper expr
 | expr binaryOper expr
-| intLiter
 | OPEN_PARENTHESES expr CLOSE_PARENTHESES
 ;
 
