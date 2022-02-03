@@ -49,10 +49,11 @@ ZERO: '0' ;
 BACK: 'b' ;
 TAB: 't' ;
 NEWLINE: 'n' ;
-
 FORM_FEED: 'f' ;
 GIVE_A_NAME_FOR_R: 'r' ;
 DOUBLE_QUOTE: '"' ;
+SINGLE_QUOTE: '\'';
+BACKSLASH: '\\'
 
 //pair-liter
 NULL: 'null' ;
