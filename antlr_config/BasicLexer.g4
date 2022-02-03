@@ -1,16 +1,65 @@
 lexer grammar BasicLexer;
 
+//comment
+COMMENT: '#'~[\n]* '\n' -> skip ;
+
+//func
+IS: 'is' ;
+
+//commands
+S_SKIP: 'skip' ;
+READ: 'read' ;
+FREE: 'free' ;
+RETURN: 'return' ;
+EXIT: 'exit' ;
+PRINT: 'print' ;
+PRINTLN: 'println' ;
+IF: 'if' ;
+THEN: 'then' ;
+ELSE: 'else' ;
+FI: 'fi' ;
+WHILE: 'while' ;
+DO: 'do' ;
+DONE: 'done' ;
+BEGIN: 'begin' ;
+END: 'end' ;
+
+//assign-rhs
+CALL: 'call' ;
+
+//numbers
+fragment DIGIT: '0'..'9' ;
+
+//pair-type
+PAIR: 'pair' ;
+NEW_PAIR: 'newpair' ;
+
+//pair-elem
+FST: 'fst' ;
+SND: 'snd' ;
+
 //base-type
 INT: 'int' ;
 BOOL: 'bool' ;
 CHAR: 'char' ;
 STRING: 'string' ;
 
+//brackets
+P_OPEN: '(';
+P_CLOSE: ')';
+
+//array-type
+SB_OPEN: '[' ;
+SB_CLOSE: ']' ;
+
 //uni-operators
 NOT: '!' ;
 LEN: 'len' ;
 ORD: 'ord' ;
 CHR: 'chr' ;
+
+//assign
+ASSIGN: '=' ;
 
 //bin-operators
 PLUS: '+' ;
@@ -27,84 +76,40 @@ NOT_EQUAL: '!=' ;
 AND: '&&' ;
 OR: '||' ;
 
-//func
-IS: 'is' ;
-
-
-//commands
-S_SKIP: 'skip' ;
-ASSIGN: '=' ;
-READ: 'read' ;
-FREE: 'free' ;
-RETURN: 'return' ;
-EXIT: 'exit' ;
-PRINT: 'print' ;
-PRINTLN: 'println' ;
-IF: 'if' ;
-THEN: 'then' ;
-ELSE: 'else' ;
-FI: 'fi' ;
-WHILE: 'while' ;
-DO: 'do' ;
-DONE: 'done' ;
-BEGIN: 'begin' ;
-END: 'end' ;
+//semicolon
 SEMI_COLON: ';' ;
-
-//assign-rhs
-NEW_PAIR: 'newpair' ;
-CALL: 'call' ;
-
-//pair-type
-PAIR: 'pair' ;
-
-//pair-elem
-FIRST: 'fst' ;
-SECOND: 'snd' ;
 
 //comma
 COMMA: ',' ;
 
-//ident
-UNDERSCORE: '_' ;
-LOWER_CASE: 'a..z' ;
-UPPER_CASE: 'A..Z' ;
-
-//brackets
-OPEN_PARENTHESES: '(';
-CLOSE_PARENTHESES: ')';
-
-//array-type
-OPEN_SQUARE_BRACKETS: '[' ;
-CLOSED_SQUARE_BRACKETS: ']' ;
-
-//numbers
-fragment DIGIT: '0'..'9' ;
-INTEGER: DIGIT+ ;
-
-//bool-liter
-TRUE: 'true' ;
-FALSE: 'false' ;
+//whitespace
+EOL: [ \n\t\r]+ -> skip ;
 
 //escaped-char
-ZERO: '0' ;
-BACK: 'b' ;
-TAB: 't' ;
-NEWLINE: 'n' ;
-FORM_FEED: 'f' ;
-GIVE_A_NAME_FOR_R: 'r' ;
-DOUBLE_QUOTE: '"' ;
-SINGLE_QUOTE: '\'';
-BACKSLASH: '\\' ;
+fragment ESC_CHAR: '0'
+                 | 'b'
+                 | 't'
+                 | 'n'
+                 | 'f'
+                 | 'r'
+                 | '"'
+                 | '\''
+                 | '\\' ;
+
+//character
+fragment CHARACTER: ~['"]
+                  | '\\' ESC_CHAR ;
+
+STR_LITER: '"' CHARACTER* '"' ;
+
+CHAR_LITER: '\'' CHARACTER '\'' ;
+
+BOOL_LITER: 'true'
+          | 'false' ;
+
+INT_LITER: ('+' | '-')? DIGIT+ ;
 
 //pair-liter
 NULL: 'null' ;
 
-//character
-CHARACTER: [^\\'"] ;
-
-//whitespace
-EOL: '\n';
-
-//comment
-COMMENT: '#'CHARACTER*NEWLINE ;
+IDENT: [_a-zA-Z] [_a-zA-Z0-9]* ;
