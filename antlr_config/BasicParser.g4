@@ -18,7 +18,7 @@ intLiter: intSign? INTEGER;
 
 intSign: PLUS | MINUS;
 
-boolLiter TRUE | FALSE;
+boolLiter: TRUE | FALSE;
 
 charLiter: SINGLE_QUOTE character SINGLE_QUOTE;
 
@@ -29,7 +29,7 @@ character: CHARACTER
 
 escapedChar: ZERO | BACK | TAB | NEWLINE | FORM_FEED | GIVE_A_NAME_FOR_R | DOUBLE_QUOTE | SINGLE_QUOTE | BACKSLASH;
 
-arrayLiter: OPEN_SQUARE_BRACKETS (expr (COMMA expr)*)? CLOSED_SQUARE_BRACKETS
+arrayLiter: OPEN_SQUARE_BRACKETS (expr (COMMA expr)*)? CLOSED_SQUARE_BRACKETS;
 
 // EOF indicates that the program must consume to the end of the input.
 prog: (expr)*  EOF ;
