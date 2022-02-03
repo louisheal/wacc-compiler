@@ -12,6 +12,11 @@ intLiter: intSign? INTEGER;
 
 intSign: PLUS | MINUS;
 
+character: CHARACTER 
+| escapedChar;
+
+escapedChar: ZERO | BACK | TAB | NEWLINE | FORM_FEED | GIVE_A_NAME_FOR_R | DOUBLE_QUOTE | SINGLE_QUOTE | BACKSLASH;
+
 expr: intLiter
 | unaryOper expr
 | expr binaryOper expr
