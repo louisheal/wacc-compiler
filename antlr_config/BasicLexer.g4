@@ -27,6 +27,44 @@ NOT_EQUAL: '!=' ;
 AND: '&&' ;
 OR: '||' ;
 
+//func
+IS: 'is' ;
+
+
+//commands
+S_SKIP: 'skip' ;
+ASSIGN: '=' ;
+READ: 'read' ;
+FREE: 'free' ;
+RETURN: 'return' ;
+EXIT: 'exit' ;
+PRINT: 'print' ;
+PRINTLN: 'println' ;
+IF: 'if' ;
+THEN: 'then' ;
+ELSE: 'else' ;
+FI: 'fi' ;
+WHILE: 'while' ;
+DO: 'do' ;
+DONE: 'done' ;
+BEGIN: 'begin' ;
+END: 'end' ;
+SEMI_COLON: ';' ;
+
+//assign-rhs
+NEW_PAIR: 'newpair' ;
+CALL: 'call' ;
+
+//pair-type
+PAIR: 'pair' ;
+
+//pair-elem
+FIRST: 'fst' ;
+SECOND: 'snd' ;
+
+//comma
+COMMA: ',' ;
+
 //ident
 UNDERSCORE: '_' ;
 LOWER_CASE: 'a..z' ;
@@ -35,6 +73,8 @@ UPPER_CASE: 'A..Z' ;
 //brackets
 OPEN_PARENTHESES: '(';
 CLOSE_PARENTHESES: ')';
+
+//array-type
 OPEN_SQUARE_BRACKETS: '[' ;
 CLOSED_SQUARE_BRACKETS: ']' ;
 
@@ -45,9 +85,6 @@ INTEGER: DIGIT+ ;
 //bool-liter
 TRUE: 'true' ;
 FALSE: 'false' ;
-
-//character
-fragment CHARACTER: [^'"] ;
 
 //escaped-char
 ZERO: '0' ;
@@ -62,6 +99,9 @@ BACKSLASH: '\\' ;
 
 //pair-liter
 NULL: 'null' ;
+
+//character
+CHARACTER: [^'"] ;
 
 //comment
 COMMENT: '#'CHARACTER*NEWLINE ;
