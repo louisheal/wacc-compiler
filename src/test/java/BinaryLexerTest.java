@@ -7,15 +7,22 @@ import org.junit.Test;
 
 public class BinaryLexerTest {
 
+  String additionTree = "(prog begin (stat (type (baseType int)) x = (assignRHS (expr (expr 3) "
+                      + "(binaryOper +) (expr 5)))) end <EOF>)";
+  String additionProgram = """
+      begin
+      int x = 3 + 5
+      end""";
+
   @Test
   public void addition_test(){
-    CharStream input = CharStreams.fromString("3+5");
+    CharStream input = CharStreams.fromString(additionProgram);
     BasicLexer lexer = new BasicLexer(input);
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     BasicParser parser = new BasicParser(tokens);
     ParseTree tree = parser.prog();
-    assertTrue(tree.toStringTree(parser).equals("(prog (expr (expr (intLiter 3)) (binaryOper +) "
-        + "(expr (intLiter 5))) <EOF>)"));
+    System.out.println(tree.toStringTree(parser));
+    assertTrue(tree.toStringTree(parser).equals(additionTree));
   }
 
   @Test

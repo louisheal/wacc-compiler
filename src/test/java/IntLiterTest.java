@@ -9,12 +9,15 @@ public class IntLiterTest {
 
   @Test
   public void numberWithoutSignTokenisedAndParsedCorrectly(){
-    CharStream input = CharStreams.fromString("5");
+    String testString = "begin"
+        + "int 5";
+    CharStream input = CharStreams.fromString("5\n");
     BasicLexer lexer = new BasicLexer(input);
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     BasicParser parser = new BasicParser(tokens);
     ParseTree tree = parser.prog();
-    assertTrue(tree.toStringTree(parser).equals("(prog (expr (intLiter 5)) <EOF>)"));
+    System.out.println(tree.toStringTree(parser));
+    assertTrue(tree.toStringTree(parser).equals("(prog (expr (intLiter 5)) \\n <EOF>)"));
   }
 
   @Test
