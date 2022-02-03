@@ -35,6 +35,8 @@ UPPER_CASE: 'A..Z' ;
 //brackets
 OPEN_PARENTHESES: '(';
 CLOSE_PARENTHESES: ')';
+OPEN_SQUARE_BRACKETS: '[' ;
+CLOSED_SQUARE_BRACKETS: ']' ;
 
 //numbers
 fragment DIGIT: '0'..'9' ;
@@ -43,6 +45,9 @@ INTEGER: DIGIT+ ;
 //bool-liter
 TRUE: 'true' ;
 FALSE: 'false' ;
+
+//character
+fragment CHARACTER: [^'"] ;
 
 //escaped-char
 ZERO: '0' ;
@@ -53,8 +58,10 @@ FORM_FEED: 'f' ;
 GIVE_A_NAME_FOR_R: 'r' ;
 DOUBLE_QUOTE: '"' ;
 SINGLE_QUOTE: '\'';
-BACKSLASH: '\\'
+BACKSLASH: '\\' ;
 
 //pair-liter
 NULL: 'null' ;
 
+//comment
+COMMENT: '#'CHARACTER*NEWLINE ;
