@@ -32,4 +32,4 @@ escapedChar: ZERO | BACK | TAB | NEWLINE | FORM_FEED | GIVE_A_NAME_FOR_R | DOUBL
 arrayLiter: OPEN_SQUARE_BRACKETS (expr (COMMA expr)*)? CLOSED_SQUARE_BRACKETS;
 
 // EOF indicates that the program must consume to the end of the input.
-prog: (expr)*  EOF ;
+prog: (expr EOL)*  EOF ;

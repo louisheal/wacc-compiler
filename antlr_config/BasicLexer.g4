@@ -103,5 +103,8 @@ NULL: 'null' ;
 //character
 CHARACTER: [^'"] ;
 
+//whitespace
+EOL: '\n';
+
 //comment
 COMMENT: '#'CHARACTER*NEWLINE ;
