@@ -1,3 +1,4 @@
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import antlr.*;
@@ -7,55 +8,230 @@ import org.junit.Test;
 
 public class StatTest {
 
-  String tree1 = "(prog begin (stat skip) end <EOF>)";
-  String program1 = "begin\n"
-                  + "skip\n"
-                  + "end\n";
-
-  String tree2 = "(prog begin (stat (type (baseType int)) x = (assignRHS (expr 5))) end <EOF>)";
-  String program2 = "begin\n"
-                  + "int x = 5\n"
-                  + "end\n";
-
-  String tree3 = "(prog begin (stat (assignLHS x) = (assignRHS (expr 5))) end <EOF>)";
-  String program3 = "begin\n"
-                  + "x = 5\n"
-                  + "end\n";
-
   @Test
-  public void skipProgramTokenizesAndParsesCorrectly(){
-    CharStream input = CharStreams.fromString(program1);
+  public void skipStatementTokenizesAndParsesCorrectly(){
 
+    String treeResult = "(prog begin (stat skip) end <EOF>)";
+    String program = "begin\n"
+                   + "skip\n"
+                   + "end";
+
+    CharStream input = CharStreams.fromString(program);
     BasicLexer lexer = new BasicLexer(input);
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     BasicParser parser = new BasicParser(tokens);
     ParseTree tree = parser.prog();
 
-    assertTrue(tree.toStringTree(parser).equals(tree1));
+    assertEquals(tree.toStringTree(parser), treeResult);
   }
 
   @Test
-  public void typeIdentProgramTokenizesAndParsesCorrectly(){
-    CharStream input = CharStreams.fromString(program2);
+  public void typeIdentStatementTokenizesAndParsesCorrectly(){
 
+    String treeResult = "(prog begin (stat (type (baseType int)) x = (assignRHS (expr 5))) end <EOF>)";
+    String program = "begin\n"
+                   + "int x = 5\n"
+                   + "end";
+
+    CharStream input = CharStreams.fromString(program);
     BasicLexer lexer = new BasicLexer(input);
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     BasicParser parser = new BasicParser(tokens);
     ParseTree tree = parser.prog();
 
-    assertTrue(tree.toStringTree(parser).equals(tree2));
+    assertEquals(tree.toStringTree(parser), treeResult);
   }
 
   @Test
-  public void assignLHSRHSProgramTokenizesAndParsesCorrectly(){
-    CharStream input = CharStreams.fromString(program3);
+  public void assignLHSRHSStatementTokenizesAndParsesCorrectly(){
 
+    String treeResult = "(prog begin (stat (assignLHS x) = (assignRHS (expr 5))) end <EOF>)";
+    String program = "begin\n"
+                   + "x = 5\n"
+                   + "end";
+
+    CharStream input = CharStreams.fromString(program);
     BasicLexer lexer = new BasicLexer(input);
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     BasicParser parser = new BasicParser(tokens);
     ParseTree tree = parser.prog();
 
-    assertTrue(tree.toStringTree(parser).equals(tree3));
+    assertEquals(tree.toStringTree(parser), treeResult);
+  }
+
+  @Test
+  public void readStatementTokenizesAndParsesCorrectly(){
+
+    String treeResult = "(prog begin (stat read (assignLHS x)) end <EOF>)";
+    String program = "begin\n"
+                   + "read x\n"
+                   + "end";
+
+    CharStream input = CharStreams.fromString(program);
+    BasicLexer lexer = new BasicLexer(input);
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    BasicParser parser = new BasicParser(tokens);
+    ParseTree tree = parser.prog();
+
+    assertEquals(tree.toStringTree(parser), treeResult);
+  }
+
+  @Test
+  public void freeStatementTokenizesAndParsesCorrectly(){
+
+    String treeResult = "(prog begin (stat free (expr x)) end <EOF>)";
+    String program = "begin\n"
+                   + "free x\n"
+                   + "end";
+
+    CharStream input = CharStreams.fromString(program);
+    BasicLexer lexer = new BasicLexer(input);
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    BasicParser parser = new BasicParser(tokens);
+    ParseTree tree = parser.prog();
+
+    assertEquals(tree.toStringTree(parser), treeResult);
+  }
+
+  @Test
+  public void returnStatementTokenizesAndParsesCorrectly(){
+
+    String treeResult = "(prog begin (stat return (expr x)) end <EOF>)";
+    String program = "begin\n"
+                   + "return x\n"
+                   + "end";
+
+    CharStream input = CharStreams.fromString(program);
+    BasicLexer lexer = new BasicLexer(input);
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    BasicParser parser = new BasicParser(tokens);
+    ParseTree tree = parser.prog();
+
+    assertEquals(tree.toStringTree(parser), treeResult);
+  }
+
+  @Test
+  public void exitStatementTokenizesAndParsesCorrectly(){
+
+    String treeResult = "(prog begin (stat exit (expr x)) end <EOF>)";
+    String program = "begin\n"
+                   + "exit x\n"
+                   + "end";
+
+    CharStream input = CharStreams.fromString(program);
+    BasicLexer lexer = new BasicLexer(input);
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    BasicParser parser = new BasicParser(tokens);
+    ParseTree tree = parser.prog();
+
+    assertEquals(tree.toStringTree(parser), treeResult);
+  }
+
+  @Test
+  public void printStatementTokenizesAndParsesCorrectly(){
+
+    String treeResult = "(prog begin (stat print (expr x)) end <EOF>)";
+    String program = "begin\n"
+                   + "print x\n"
+                   + "end";
+
+    CharStream input = CharStreams.fromString(program);
+    BasicLexer lexer = new BasicLexer(input);
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    BasicParser parser = new BasicParser(tokens);
+    ParseTree tree = parser.prog();
+
+    assertEquals(tree.toStringTree(parser), treeResult);
+  }
+
+  @Test
+  public void printlnStatementTokenizesAndParsesCorrectly(){
+
+    String treeResult = "(prog begin (stat println (expr x)) end <EOF>)";
+    String program = "begin\n"
+                   + "println x\n"
+                   + "end";
+
+    CharStream input = CharStreams.fromString(program);
+    BasicLexer lexer = new BasicLexer(input);
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    BasicParser parser = new BasicParser(tokens);
+    ParseTree tree = parser.prog();
+
+    assertEquals(tree.toStringTree(parser), treeResult);
+  }
+
+  @Test
+  public void ifStatementTokenizesAndParsesCorrectly(){
+
+    String treeResult = "(prog begin (stat if (expr x) then "
+                      + "(stat print (expr y)) else "
+                      + "(stat print (expr z)) fi) end <EOF>)";
+    String program = "begin\n"
+            + "if x then print y else print z fi\n"
+            + "end";
+
+    CharStream input = CharStreams.fromString(program);
+    BasicLexer lexer = new BasicLexer(input);
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    BasicParser parser = new BasicParser(tokens);
+    ParseTree tree = parser.prog();
+
+    assertEquals(tree.toStringTree(parser), treeResult);
+  }
+
+  @Test
+  public void whileStatementTokenizesAndParsesCorrectly(){
+
+    String treeResult = "(prog begin (stat while (expr x) do "
+                      + "(stat print (expr y)) done) end <EOF>)";
+    String program = "begin\n"
+                   + "while x do print y done\n"
+                   + "end";
+
+    CharStream input = CharStreams.fromString(program);
+    BasicLexer lexer = new BasicLexer(input);
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    BasicParser parser = new BasicParser(tokens);
+    ParseTree tree = parser.prog();
+
+    assertEquals(tree.toStringTree(parser), treeResult);
+  }
+
+  @Test
+  public void beginStatementTokenizesAndParsesCorrectly(){
+
+    String treeResult = "(prog begin (stat begin (stat print (expr x)) end) end <EOF>)";
+    String program = "begin\n"
+                   + "begin print x end\n"
+                   + "end";
+
+    CharStream input = CharStreams.fromString(program);
+    BasicLexer lexer = new BasicLexer(input);
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    BasicParser parser = new BasicParser(tokens);
+    ParseTree tree = parser.prog();
+
+    assertEquals(tree.toStringTree(parser), treeResult);
+  }
+
+  @Test
+  public void statementRecursionTokenizesAndParsesCorrectly(){
+
+    String treeResult = "(prog begin (stat (stat print (expr x)) ; "
+                      + "(stat print (expr y))) end <EOF>)";
+    String program = "begin\n"
+                   + "print x;\n"
+                   + "print y\n"
+                   + "end";
+
+    CharStream input = CharStreams.fromString(program);
+    BasicLexer lexer = new BasicLexer(input);
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    BasicParser parser = new BasicParser(tokens);
+    ParseTree tree = parser.prog();
+
+    assertEquals(tree.toStringTree(parser), treeResult);
   }
 
 }
