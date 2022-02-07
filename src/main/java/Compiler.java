@@ -44,7 +44,7 @@ public class Compiler {
       exit(100);
     }
 
-    //System.out.println(tree.toStringTree(parser));
+    System.out.println(tree.toStringTree(parser));
 
   }
 
