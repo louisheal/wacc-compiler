@@ -26,7 +26,7 @@ all:
 	cd $(ANTLR_DIR) && ./$(ANTLR) 
 	$(MKDIR) $(OUTPUT_DIR)
 	$(JAVAC) $(JFLAGS) $(ANTLR_SOURCE_DIR)/*.java
-	#mvn package
+	mvn package
 
 # clean up all of the compiled files
 clean:
