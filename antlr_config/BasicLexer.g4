@@ -29,6 +29,7 @@ CALL: 'call' ;
 
 //numbers
 fragment DIGIT: '0'..'9' ;
+INTEGER: DIGIT+ ;
 
 //pair-type
 PAIR: 'pair' ;
@@ -100,14 +101,18 @@ fragment ESC_CHAR: '0'
 fragment CHARACTER: ~['"]
                   | '\\' ESC_CHAR ;
 
-STR_LITER: '"' CHARACTER* '"' ;
-
+//char-liter
 CHAR_LITER: '\'' CHARACTER '\'' ;
 
-BOOL_LITER: 'true'
-          | 'false' ;
 
-INT_LITER: ('+' | '-')? DIGIT+ ;
+//string-liter
+STR_LITER: '"' CHARACTER* '"' ;
+
+
+
+//bool-liter
+TRUE: 'true' ;
+FALSE: 'false' ;
 
 //pair-liter
 NULL: 'null' ;
