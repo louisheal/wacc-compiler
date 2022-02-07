@@ -1,5 +1,8 @@
 import antlr.*;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
@@ -23,7 +26,9 @@ public class Compiler {
 
   public static void main(String[] args) throws IOException {
 
-    CharStream input = CharStreams.fromStream(System.in);
+    Path filename = Path.of(args[0]);
+
+    CharStream input = CharStreams.fromPath(filename);
 
     BasicLexer lexer = new BasicLexer(input);
 
