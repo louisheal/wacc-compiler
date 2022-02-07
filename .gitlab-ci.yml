@@ -1,12 +1,10 @@
 compile-job:
   stage: build
   script:
-    - make clean
     - make
 
 test-job:
   stage: test
   script:
-    - make clean
     - make
     - mvn test
