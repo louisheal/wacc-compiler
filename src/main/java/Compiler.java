@@ -1,6 +1,5 @@
 import antlr.*;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.antlr.v4.runtime.*;
@@ -10,16 +9,9 @@ import static java.lang.System.exit;
 
 public class Compiler {
 
-  public static CommonTokenStream tokenise(CharStream input) {
-    CommonTokenStream tokenStream = null;
-    try {
-      BasicLexer lexer = new BasicLexer(input);
-      tokenStream = new CommonTokenStream(lexer);
-    } catch(Exception e) {
-      System.out.println("#syntax_error#");
-      exit(100);
-    }
-    return tokenStream;
+  public static CommonTokenStream tokenize(CharStream input) {
+    BasicLexer lexer = new BasicLexer(input);
+    return new CommonTokenStream(lexer);
   }
 
   public static String parse(CommonTokenStream tokens) {
@@ -30,7 +22,7 @@ public class Compiler {
   
   public static String lexAnalyse(String program) {
     CharStream input = CharStreams.fromString(program);
-    return parse(tokenise(input));
+    return parse(tokenize(input));
   }
 
   public static void main(String[] args) throws IOException {
@@ -47,7 +39,12 @@ public class Compiler {
 
     ParseTree tree = parser.prog();
 
-    System.out.println(tree.toStringTree(parser));
+    if (parser.getNumberOfSyntaxErrors() > 0) {
+      System.out.println("#syntax_error#");
+      exit(100);
+    }
+
+    //System.out.println(tree.toStringTree(parser));
 
   }
 
