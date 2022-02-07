@@ -13,6 +13,28 @@ paramList: param (COMMA param)* ;
 
 param: type IDENT ;
 
+intLiter: INTEGER ;
+
+boolLiter: TRUE | FALSE ;
+
+charLiter: CHAR_LITER ;
+
+stringLiter: STR_LITER ;
+
+binaryOper: PLUS
+          | MINUS
+          | MULTIPLY
+          | DIVIDE
+          | MODULO
+          | GREATER_THAN
+          | GREATER_THAN_OR_EQUAL
+          | LESS_THAN
+          | LESS_THAN_OR_EQUAL
+          | EQUAL
+          | NOT_EQUAL
+          | AND
+          | OR ;
+
 stat: S_SKIP
     | type IDENT ASSIGN assignRHS
     | assignLHS ASSIGN assignRHS
@@ -31,13 +53,26 @@ assignLHS: IDENT
           | arrayElem
           | pairElem ;
 
+expr: intLiter
+    | boolLiter
+    | charLiter
+    | stringLiter
+    | pairLiter
+    | IDENT
+    | arrayElem
+    | unaryOper expr
+    | expr binaryOper expr
+    | P_OPEN expr P_CLOSE
+    ;
+
+
 assignRHS: expr
           | arrayLiter
           | NEW_PAIR P_OPEN expr COMMA expr P_CLOSE
           | pairElem
-          | CALL IDENT P_OPEN ;
+          | CALL IDENT P_OPEN argList P_CLOSE ;
 
-argList: expr (COMMA expr)* ;
+argList: expr (COMMA expr)* | ; // second empty in case no args taken
 
 pairElem: FST expr
         | SND expr ;
@@ -59,17 +94,6 @@ pairElemType: baseType
             | arrayType
             | PAIR ;
 
-expr: INT_LITER
-    | BOOL_LITER
-    | CHAR_LITER
-    | STR_LITER
-    | pairLiter
-    | IDENT
-    | arrayElem
-    | unaryOper expr
-    | expr binaryOper expr
-    | P_OPEN expr P_CLOSE
-    ;
 
 unaryOper: NOT
          | MINUS
@@ -77,19 +101,6 @@ unaryOper: NOT
          | ORD
          | CHR ;
 
-binaryOper: PLUS
-          | MINUS
-          | MULTIPLY
-          | DIVIDE
-          | MODULO
-          | GREATER_THAN
-          | GREATER_THAN_OR_EQUAL
-          | LESS_THAN
-          | LESS_THAN_OR_EQUAL
-          | EQUAL
-          | NOT_EQUAL
-          | AND
-          | OR ;
 
 arrayElem: IDENT (SB_OPEN expr SB_CLOSE)+ ;
 
