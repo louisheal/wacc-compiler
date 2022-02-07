@@ -1,9 +1,6 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import antlr.*;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
 import org.junit.Test;
 
 public class IntLiterTest {
@@ -17,13 +14,7 @@ public class IntLiterTest {
                    + "int x = 5\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -35,13 +26,7 @@ public class IntLiterTest {
                    + "int x = -5\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -53,13 +38,7 @@ public class IntLiterTest {
                    + "int x = +5\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
 }

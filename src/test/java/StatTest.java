@@ -1,9 +1,6 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import antlr.*;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
 import org.junit.Test;
 
 public class StatTest {
@@ -16,13 +13,7 @@ public class StatTest {
                    + "skip\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -33,13 +24,7 @@ public class StatTest {
                    + "int x = 5\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -50,13 +35,7 @@ public class StatTest {
                    + "x = 5\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -67,13 +46,7 @@ public class StatTest {
                    + "read x\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -84,13 +57,7 @@ public class StatTest {
                    + "free x\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -101,13 +68,7 @@ public class StatTest {
                    + "return x\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -118,13 +79,7 @@ public class StatTest {
                    + "exit x\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -135,13 +90,7 @@ public class StatTest {
                    + "print x\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -152,13 +101,7 @@ public class StatTest {
                    + "println x\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -171,13 +114,7 @@ public class StatTest {
             + "if x then print y else print z fi\n"
             + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -189,13 +126,7 @@ public class StatTest {
                    + "while x do print y done\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -206,13 +137,7 @@ public class StatTest {
                    + "begin print x end\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -225,13 +150,7 @@ public class StatTest {
                    + "print y\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
 }

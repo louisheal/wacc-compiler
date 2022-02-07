@@ -5,9 +5,20 @@ import org.antlr.v4.runtime.tree.*;
 
 public class Compiler {
 
-  public CommonTokenStream tokenise(CharStream input) {
+  public static CommonTokenStream tokenise(CharStream input) {
     BasicLexer lexer = new BasicLexer(input);
     return new CommonTokenStream(lexer);
+  }
+
+  public static String parse(CommonTokenStream tokens) {
+    BasicParser parser = new BasicParser(tokens);
+    ParseTree tree = parser.prog();
+    return tree.toStringTree(parser);
+  }
+  
+  public static String lexAnalyse(String program) {
+    CharStream input = CharStreams.fromString(program);
+    return parse(tokenise(input));
   }
 
   public static void main(String[] args) throws IOException {

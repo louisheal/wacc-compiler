@@ -1,9 +1,6 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import antlr.*;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
 import org.junit.Test;
 
 public class BinaryLexerTest {
@@ -17,13 +14,7 @@ public class BinaryLexerTest {
                    + "int x = 3 + 5\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -36,13 +27,7 @@ public class BinaryLexerTest {
                    + "int x = 5 + 4 + 2\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -54,13 +39,7 @@ public class BinaryLexerTest {
                    + "int x = 5 - 2\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -73,13 +52,7 @@ public class BinaryLexerTest {
                    + "int x = 9 - 4 - 3\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -91,13 +64,7 @@ public class BinaryLexerTest {
                    + "int x = 2 * 6\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -110,13 +77,7 @@ public class BinaryLexerTest {
                    + "int x = 5 * 3 * 4\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
 
@@ -129,13 +90,7 @@ public class BinaryLexerTest {
                    + "int x = 8 / 4\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -148,13 +103,7 @@ public class BinaryLexerTest {
                    + "int x = 8 / 4 / 2\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -166,13 +115,7 @@ public class BinaryLexerTest {
                    + "int x = 7 % 3\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -184,13 +127,7 @@ public class BinaryLexerTest {
                    + "int x = 200 % 3\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -202,13 +139,7 @@ public class BinaryLexerTest {
                    + "bool x = 9 > 8\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -220,13 +151,7 @@ public class BinaryLexerTest {
                    + "bool x = 1 > 2\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -238,13 +163,7 @@ public class BinaryLexerTest {
                    + "bool x = 5 >= 5\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -256,13 +175,7 @@ public class BinaryLexerTest {
                    + "bool x = 4 >= 5\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -274,13 +187,7 @@ public class BinaryLexerTest {
                    + "bool x = 6 < 9\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -292,13 +199,7 @@ public class BinaryLexerTest {
                    + "bool x = 10 < 9\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -310,13 +211,7 @@ public class BinaryLexerTest {
                    + "bool x = 3 <= 4\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -328,13 +223,7 @@ public class BinaryLexerTest {
                    + "bool x = 9 <= 4\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -346,13 +235,7 @@ public class BinaryLexerTest {
                    + "bool x = 4 == 4\n"
                    + "end\n";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -364,13 +247,7 @@ public class BinaryLexerTest {
                    + "bool x = 2 == 1\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -382,13 +259,7 @@ public class BinaryLexerTest {
                    + "bool x = 1 != 2\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
   @Test
@@ -400,13 +271,7 @@ public class BinaryLexerTest {
                    + "bool x = 2 != 2\n"
                    + "end";
 
-    CharStream input = CharStreams.fromString(program);
-    BasicLexer lexer = new BasicLexer(input);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    BasicParser parser = new BasicParser(tokens);
-    ParseTree tree = parser.prog();
-
-    assertEquals(tree.toStringTree(parser), treeResult);
+    assertEquals(Compiler.lexAnalyse(program), treeResult);
   }
 
 }
