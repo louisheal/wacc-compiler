@@ -70,9 +70,9 @@ assignRHS: expr
           | arrayLiter
           | NEW_PAIR P_OPEN expr COMMA expr P_CLOSE
           | pairElem
-          | CALL IDENT P_OPEN ;
+          | CALL IDENT P_OPEN argList P_CLOSE ;
 
-argList: expr (COMMA expr)* ;
+argList: expr (COMMA expr)* | ; // second empty in case no args taken
 
 pairElem: FST expr
         | SND expr ;
