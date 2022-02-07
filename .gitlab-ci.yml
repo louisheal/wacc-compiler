@@ -8,4 +8,4 @@ test-job:
   script:
     - make
     - mvn test
-    - ./compile wacc_examples/valid/basic/exit/exit-1.wacc
+    - sh compile wacc_examples/valid/basic/exit/exit-1.wacc

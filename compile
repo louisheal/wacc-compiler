@@ -3,4 +3,4 @@
 # You are free to change the language used for this script,
 # but do *not* change its name.
 
-./target/bin/compile $1
+sh target/bin/compile $1
