@@ -8,8 +8,8 @@ public class IntLiterTest {
   @Test
   public void numberWithoutSignTokenisedAndParsedCorrectly(){
 
-    String treeResult = "(prog begin (stat (type (baseType int)) x = (assignRHS (expr 5)))"
-                      + " end <EOF>)";
+    String treeResult = "(prog begin (stat (type (baseType int)) x = " +
+        "(assignRHS (expr (intLiter 5)))) end <EOF>)";
     String program = "begin\n"
                    + "int x = 5\n"
                    + "end";
@@ -20,8 +20,8 @@ public class IntLiterTest {
   @Test
   public void numberWithNegativeSignTokenisedAndParsedCorrectly(){
 
-    String treeResult = "(prog begin (stat (type (baseType int)) x = "
-                      + "(assignRHS (expr -5))) end <EOF>)";
+    String treeResult = "(prog begin (stat (type (baseType int)) x = " +
+        "(assignRHS (expr (intLiter -5)))) end <EOF>)";
     String program = "begin\n"
                    + "int x = -5\n"
                    + "end";
@@ -32,8 +32,8 @@ public class IntLiterTest {
   @Test
   public void numberWithPositiveSignTokenisedAndParsedCorrectly(){
 
-    String treeResult = "(prog begin (stat (type (baseType int)) x = "
-                      + "(assignRHS (expr +5))) end <EOF>)";
+    String treeResult = "(prog begin (stat (type (baseType int)) x = " +
+        "(assignRHS (expr (intLiter +5)))) end <EOF>)";
     String program = "begin\n"
                    + "int x = +5\n"
                    + "end";

@@ -19,7 +19,8 @@ public class StatTest {
   @Test
   public void typeIdentStatementTokenizesAndParsesCorrectly(){
 
-    String treeResult = "(prog begin (stat (type (baseType int)) x = (assignRHS (expr 5))) end <EOF>)";
+    String treeResult = "(prog begin (stat (type (baseType int)) x = " +
+        "(assignRHS (expr (intLiter 5)))) end <EOF>)";
     String program = "begin\n"
                    + "int x = 5\n"
                    + "end";
@@ -30,7 +31,8 @@ public class StatTest {
   @Test
   public void assignLHSRHSStatementTokenizesAndParsesCorrectly(){
 
-    String treeResult = "(prog begin (stat (assignLHS x) = (assignRHS (expr 5))) end <EOF>)";
+    String treeResult = "(prog begin (stat (assignLHS x) = " +
+        "(assignRHS (expr (intLiter 5)))) end <EOF>)";
     String program = "begin\n"
                    + "x = 5\n"
                    + "end";
