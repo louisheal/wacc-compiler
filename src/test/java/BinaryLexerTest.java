@@ -66,12 +66,12 @@ public class BinaryLexerTest {
   @Test
   public void subtraction_test2(){
 
-    String treeResult = "(prog begin (stat (type (baseType int)) x = " +
-                        "(assignRHS (expr (expr (expr 9) (binaryOper -) (expr 4)) (binaryOper -)" +
-                        " (expr 3)))) end <EOF>)";
-    String program =  "begin\n" +
-                      "int x = 9 - 4 - 3\n" +
-                      "end";
+    String treeResult = "(prog begin (stat (type (baseType int)) x = "
+                      + "(assignRHS (expr (expr (expr 9) (binaryOper -) (expr 4)) (binaryOper -)"
+                      + " (expr 3)))) end <EOF>)";
+    String program = "begin\n"
+                   + "int x = 9 - 4 - 3\n"
+                   + "end";
 
     CharStream input = CharStreams.fromString(program);
     BasicLexer lexer = new BasicLexer(input);
