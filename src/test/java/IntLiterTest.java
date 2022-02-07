@@ -9,35 +9,51 @@ public class IntLiterTest {
 
   @Test
   public void numberWithoutSignTokenisedAndParsedCorrectly(){
-    String testString = "begin"
-        + "int 5";
-    CharStream input = CharStreams.fromString("5\n");
+    String program = "begin\n" +
+        "int x = 5\n" +
+        "end\n";
+    String treeResult = "(prog begin (stat (type (baseType int)) x = (assignRHS (expr 5)))" +
+                        " end <EOF>)";
+
+    CharStream input = CharStreams.fromString(program);
     BasicLexer lexer = new BasicLexer(input);
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     BasicParser parser = new BasicParser(tokens);
     ParseTree tree = parser.prog();
     System.out.println(tree.toStringTree(parser));
-    assertTrue(tree.toStringTree(parser).equals("(prog (expr (intLiter 5)) \\n <EOF>)"));
+    assertTrue(tree.toStringTree(parser).equals(treeResult));
   }
 
   @Test
   public void numberWithNegativeSignTokenisedAndParsedCorrectly(){
-    CharStream input = CharStreams.fromString("-5");
+    String program = "begin\n" +
+        "int x = -5\n" +
+        "end\n";
+    String treeResult = "(prog begin (stat (type (baseType int)) x = (assignRHS (expr -5))) " +
+                        "end <EOF>)";
+    CharStream input = CharStreams.fromString(program);
     BasicLexer lexer = new BasicLexer(input);
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     BasicParser parser = new BasicParser(tokens);
     ParseTree tree = parser.prog();
-    assertTrue(tree.toStringTree(parser).equals("(prog (expr (intLiter (intSign -) 5)) <EOF>)"));
+    assertTrue(tree.toStringTree(parser).equals(treeResult));
+//    assertTrue(tree.toStringTree(parser).equals("(prog (expr (intLiter (intSign -) 5)) <EOF>)"));
   }
 
   @Test
   public void numberWithPositiveSignTokenisedAndParsedCorrectly(){
-    CharStream input = CharStreams.fromString("+5");
+    String program = "begin\n" +
+        "int x = +5\n" +
+        "end\n";
+    String treeResult = "(prog begin (stat (type (baseType int)) x = (assignRHS (expr +5))) " +
+                        "end <EOF>)";
+    CharStream input = CharStreams.fromString(program);
     BasicLexer lexer = new BasicLexer(input);
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     BasicParser parser = new BasicParser(tokens);
     ParseTree tree = parser.prog();
-    assertTrue(tree.toStringTree(parser).equals("(prog (expr (intLiter (intSign +) 5)) <EOF>)"));
+    assertTrue(tree.toStringTree(parser).equals(treeResult));
+//    assertTrue(tree.toStringTree(parser).equals("(prog (expr (intLiter (intSign +) 5)) <EOF>)"));
 
   }
 
