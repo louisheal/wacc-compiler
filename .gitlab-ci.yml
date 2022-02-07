@@ -1,15 +1,11 @@
 compile-job:
   stage: build
   script:
-    - cd antlr_config && ./antlrBuild
-    - mkdir -p bin
-    - javac -sourcepath src/main/java -d bin -cp lib/antlr-4.9.3-complete.jar  src/main/java/antlr/*.java
-    - mvn compile
+    - make
 
 test-job:
   stage: test
   script:
-    - cd antlr_config && ./antlrBuild
-    - mkdir -p bin
-    - javac -sourcepath src/main/java -d bin -cp lib/antlr-4.9.3-complete.jar  src/main/java/antlr/*.java
+    - make
     - mvn test
+    - sh compile wacc_examples/valid/basic/exit/exit-1.wacc
