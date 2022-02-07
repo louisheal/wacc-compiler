@@ -29,7 +29,7 @@ CALL: 'call' ;
 
 //numbers
 fragment DIGIT: '0'..'9' ;
-INTEGER: ('+' | '-')? DIGIT+ ;
+INTEGER: DIGIT+ ;
 
 //pair-type
 PAIR: 'pair' ;

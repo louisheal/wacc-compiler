@@ -14,6 +14,7 @@ paramList: param (COMMA param)* ;
 param: type IDENT ;
 
 intLiter: INTEGER ;
+signedIntLiter: PLUS INTEGER | MINUS INTEGER ;
 
 boolLiter: TRUE | FALSE ;
 
@@ -54,6 +55,7 @@ assignLHS: IDENT
           | pairElem ;
 
 expr: intLiter
+    | signedIntLiter
     | boolLiter
     | charLiter
     | stringLiter
@@ -64,7 +66,6 @@ expr: intLiter
     | expr binaryOper expr
     | P_OPEN expr P_CLOSE
     ;
-
 
 assignRHS: expr
           | arrayLiter
