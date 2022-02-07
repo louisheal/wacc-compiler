@@ -9,9 +9,9 @@ public class BinaryLexerTest {
 
   String additionTree = "(prog begin (stat (type (baseType int)) x = (assignRHS (expr (expr 3) "
                       + "(binaryOper +) (expr 5)))) end <EOF>)";
-  String additionProgram = "begin"
-                         + "int x = 3 + 5"
-                         + "end";
+  String additionProgram = "begin\n"
+                         + "int x = 3 + 5\n"
+                         + "end\n";
 
   @Test
   public void addition_test(){
