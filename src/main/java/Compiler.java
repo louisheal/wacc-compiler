@@ -6,11 +6,20 @@ import java.nio.file.Path;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
+import static java.lang.System.exit;
+
 public class Compiler {
 
   public static CommonTokenStream tokenise(CharStream input) {
-    BasicLexer lexer = new BasicLexer(input);
-    return new CommonTokenStream(lexer);
+    CommonTokenStream tokenStream = null;
+    try {
+      BasicLexer lexer = new BasicLexer(input);
+      tokenStream = new CommonTokenStream(lexer);
+    } catch(Exception e) {
+      System.out.println("#syntax_error#");
+      exit(100);
+    }
+    return tokenStream;
   }
 
   public static String parse(CommonTokenStream tokens) {
