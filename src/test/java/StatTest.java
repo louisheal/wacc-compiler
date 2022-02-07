@@ -8,22 +8,19 @@ import org.junit.Test;
 public class StatTest {
 
   String tree1 = "(prog begin (stat skip) end <EOF>)";
-  String program1 = """
-        begin
-        skip
-        end""";
+  String program1 = "begin"
+                  + "skip"
+                  + "end";
 
   String tree2 = "(prog begin (stat (type (baseType int)) x = (assignRHS (expr 5))) end <EOF>)";
-  String program2 = """
-        begin
-        int x = 5
-        end""";
+  String program2 = "begin"
+                  + "int x = 5"
+                  + "end";
 
   String tree3 = "(prog begin (stat (assignLHS x) = (assignRHS (expr 5))) end <EOF>)";
-  String program3 = """
-        begin
-        x = 5
-        end""";
+  String program3 = "begin"
+                  + "x = 5"
+                  + "end";
 
   @Test
   public void skipProgramTokenizesAndParsesCorrectly(){
