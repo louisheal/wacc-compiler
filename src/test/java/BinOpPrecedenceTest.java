@@ -8,8 +8,8 @@ public class BinOpPrecedenceTest {
   public void addThenMultiplyHasCorrectOrdering() {
 
     String treeResult = "(prog begin (stat (type (baseType int)) x = " +
-            "(assignRHS (expr (expr (intLiter 5)) (binaryOper +) " +
-            "(expr (expr (intLiter 3)) (binaryOper *) (expr (intLiter 9)))" +
+            "(assignRHS (expr (expr (intLiter 5)) + " +
+            "(expr (expr (intLiter 3)) * (expr (intLiter 9)))" +
             "))) end <EOF>)";
     String program = "begin\n"
             + "int x = 5 + 3 * 9\n"
@@ -22,11 +22,11 @@ public class BinOpPrecedenceTest {
   public void subtractThenMultiplyHasCorrectOrdering() {
 
     String treeResult = "(prog begin (stat (type (baseType int)) x = " +
-            "(assignRHS (expr (expr (intLiter 5)) (binaryOper -) " +
-            "(expr (expr (intLiter 3)) (binaryOper *) (expr (intLiter 9)))" +
+            "(assignRHS (expr (expr (intLiter 5)) + " +
+            "(expr (expr (intLiter 3)) * (expr (intLiter 9)))" +
             "))) end <EOF>)";
     String program = "begin\n"
-            + "int x = 5 - 3 * 9\n"
+            + "int x = 5 + 3 * 9\n"
             + "end";
 
     assertEquals(treeResult, Compiler.lexAnalyse(program));
@@ -36,8 +36,8 @@ public class BinOpPrecedenceTest {
   public void addThenDivideHasCorrectOrdering() {
 
     String treeResult = "(prog begin (stat (type (baseType int)) x = " +
-            "(assignRHS (expr (expr (intLiter 5)) (binaryOper +) " +
-            "(expr (expr (intLiter 9)) (binaryOper /) (expr (intLiter 3)))" +
+            "(assignRHS (expr (expr (intLiter 5)) + " +
+            "(expr (expr (intLiter 9)) / (expr (intLiter 3)))" +
             "))) end <EOF>)";
     String program = "begin\n"
             + "int x = 5 + 9 / 3\n"
@@ -50,8 +50,8 @@ public class BinOpPrecedenceTest {
   public void subtractThenDivideHasCorrectOrdering() {
 
     String treeResult = "(prog begin (stat (type (baseType int)) x = " +
-            "(assignRHS (expr (expr (intLiter 5)) (binaryOper -) " +
-            "(expr (expr (intLiter 9)) (binaryOper /) (expr (intLiter 3)))" +
+            "(assignRHS (expr (expr (intLiter 5)) - " +
+            "(expr (expr (intLiter 9)) / (expr (intLiter 3)))" +
             "))) end <EOF>)";
     String program = "begin\n"
             + "int x = 5 - 9 / 3\n"
