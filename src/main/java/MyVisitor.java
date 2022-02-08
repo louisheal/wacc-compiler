@@ -1,6 +1,12 @@
+import static java.lang.System.exit;
+
+
 import antlr.*;
 
 class MyVisitor extends BasicParserBaseVisitor<Object> {
+    String semanticError = "#semantic_error#";
+    String syntaxError = "#syntax_error";
+
     @Override
     public Object visitComment(BasicParser.CommentContext ctx) {
         return visitChildren(ctx);
@@ -37,11 +43,6 @@ class MyVisitor extends BasicParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitPairElemBaseType(BasicParser.PairElemBaseTypeContext ctx) {
-        return visitChildren(ctx);
-    }
-
-    @Override
     public Object visitPairElemType(BasicParser.PairElemTypeContext ctx) {
         return visitChildren(ctx);
     }
@@ -66,12 +67,6 @@ class MyVisitor extends BasicParserBaseVisitor<Object> {
         return visitChildren(ctx);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * <p>The default implementation returns the result of calling
-     * {@link #visitChildren} on {@code ctx}.</p>
-     */
     @Override
     public Object visitPairElem(BasicParser.PairElemContext ctx) {
         return visitChildren(ctx);
@@ -84,6 +79,17 @@ class MyVisitor extends BasicParserBaseVisitor<Object> {
 
     @Override
     public Object visitAssignRHS(BasicParser.AssignRHSContext ctx) {
+        if (!ctx.expr().isEmpty()) { // Checks if the RHS is an expr
+            try {
+                double x = Double.parseDouble(ctx.expr(0).intLiter().INTEGER().toString());
+                double max = (Math.pow(2, 31) - 1);
+                double min = (0 - Math.pow(2, 31));
+                if (x >= max | x <= min) { // This checks if the int of an expression is in range
+                    System.out.println(syntaxError);
+                    exit(100);
+                }
+            } catch (NullPointerException ignored) {}
+        }
         return visitChildren(ctx);
     }
 
