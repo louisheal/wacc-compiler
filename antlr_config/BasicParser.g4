@@ -79,15 +79,17 @@ pairElem: FST expr
         | SND expr ;
 
 type: baseType
-    | type SB_OPEN SB_CLOSE
+    | arrayType
     | pairType ;
+
 
 baseType: INT
         | BOOL
         | CHAR
         | STRING ;
 
-arrayType: type SB_OPEN SB_CLOSE ;
+arrayType: baseType SB_OPEN SB_CLOSE #baseArrayType
+        |  pairType SB_OPEN SB_CLOSE #pairArrayType ;
 
 pairType: PAIR P_OPEN pairElemType COMMA pairElemType P_CLOSE ;
 
