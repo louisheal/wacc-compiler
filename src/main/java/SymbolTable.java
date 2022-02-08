@@ -1,16 +1,23 @@
+import org.antlr.v4.runtime.tree.TerminalNode;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class SemanticChecker {
+public class SymbolTable {
 
-  Map<String, Type> variable = new HashMap<>();
+  SymbolTable parent;
+  Map<String, TerminalNode> variables = new HashMap<>();
 
-  enum Type {
-    INT,
-    CHAR,
-    STRING,
-    BOOL,
-    PAIR,
-    ARRAY
+  public SymbolTable(SymbolTable parent) {
+    this.parent = parent;
   }
+
+  public TerminalNode getType(String ident) {
+    return variables.get(ident);
+  }
+
+  public void newSymbol(String ident, TerminalNode node) {
+    variables.put(ident, node);
+  }
+
 }
