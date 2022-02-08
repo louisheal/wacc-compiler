@@ -13,7 +13,7 @@ public class UnaryOperLexerTest {
                    + "print !x\n"
                    + "end";
 
-    assertEquals(Compiler.lexAnalyse(program), treeResult);
+    assertEquals(treeResult, Compiler.lexAnalyse(program));
   }
 
   @Test
@@ -25,43 +25,43 @@ public class UnaryOperLexerTest {
                    + "print -x\n"
                    + "end";
 
-    assertEquals(Compiler.lexAnalyse(program), treeResult);
+    assertEquals(treeResult, Compiler.lexAnalyse(program));
   }
 
   @Test
   public void unaryOperLenTokenizesCorrectly(){
 
-    String treeResult = "(prog begin (stat print (expr (unaryOper len) " +
-        "(expr (stringLiter \"compiler\")))) end <EOF>)";
+    String treeResult = "(prog begin (stat print (expr (unaryOper len) "
+                      + "(expr (stringLiter \"compiler\")))) end <EOF>)";
     String program = "begin\n"
                    + "print len \"compiler\"\n"
                    + "end";
 
-    assertEquals(Compiler.lexAnalyse(program), treeResult);
+    assertEquals(treeResult, Compiler.lexAnalyse(program));
   }
 
   @Test
   public void unaryOperOrdTokenizesCorrectly(){
 
-    String treeResult = "(prog begin (stat print (expr (unaryOper ord) " +
-        "(expr (charLiter 'c')))) end <EOF>)";
+    String treeResult = "(prog begin (stat print (expr (unaryOper ord) "
+                      + "(expr (charLiter 'c')))) end <EOF>)";
     String program = "begin\n"
                    + "print ord 'c'\n"
                    + "end";
 
-    assertEquals(Compiler.lexAnalyse(program), treeResult);
+    assertEquals(treeResult, Compiler.lexAnalyse(program));
   }
 
   @Test
   public void unaryOperChrTokenizesCorrectly(){
 
-    String treeResult = "(prog begin (stat print (expr (unaryOper chr) " +
-        "(expr (intLiter 99)))) end <EOF>)";
+    String treeResult = "(prog begin (stat print (expr (unaryOper chr) "
+                      + "(expr (intLiter 99)))) end <EOF>)";
     String program = "begin\n"
                    + "print chr 99\n"
                    + "end";
 
-    assertEquals(Compiler.lexAnalyse(program), treeResult);
+    assertEquals(treeResult, Compiler.lexAnalyse(program));
   }
 
 }

@@ -12,7 +12,7 @@ public class StatTest {
                    + "skip\n"
                    + "end";
 
-    assertEquals(Compiler.lexAnalyse(program), treeResult);
+    assertEquals(treeResult, Compiler.lexAnalyse(program));
   }
 
   @Test
@@ -24,7 +24,7 @@ public class StatTest {
                    + "int x = 5\n"
                    + "end";
 
-    assertEquals(Compiler.lexAnalyse(program), treeResult);
+    assertEquals(treeResult, Compiler.lexAnalyse(program));
   }
 
   @Test
@@ -36,7 +36,7 @@ public class StatTest {
                    + "x = 5\n"
                    + "end";
 
-    assertEquals(Compiler.lexAnalyse(program), treeResult);
+    assertEquals(treeResult, Compiler.lexAnalyse(program));
   }
 
   @Test
@@ -47,7 +47,7 @@ public class StatTest {
                    + "read x\n"
                    + "end";
 
-    assertEquals(Compiler.lexAnalyse(program), treeResult);
+    assertEquals(treeResult, Compiler.lexAnalyse(program));
   }
 
   @Test
@@ -58,7 +58,7 @@ public class StatTest {
                    + "free x\n"
                    + "end";
 
-    assertEquals(Compiler.lexAnalyse(program), treeResult);
+    assertEquals(treeResult, Compiler.lexAnalyse(program));
   }
 
   @Test
@@ -69,7 +69,7 @@ public class StatTest {
                    + "return x\n"
                    + "end";
 
-    assertEquals(Compiler.lexAnalyse(program), treeResult);
+    assertEquals(treeResult, Compiler.lexAnalyse(program));
   }
 
   @Test
@@ -80,7 +80,7 @@ public class StatTest {
                    + "exit x\n"
                    + "end";
 
-    assertEquals(Compiler.lexAnalyse(program), treeResult);
+    assertEquals(treeResult, Compiler.lexAnalyse(program));
   }
 
   @Test
@@ -91,7 +91,7 @@ public class StatTest {
                    + "print x\n"
                    + "end";
 
-    assertEquals(Compiler.lexAnalyse(program), treeResult);
+    assertEquals(treeResult, Compiler.lexAnalyse(program));
   }
 
   @Test
@@ -102,7 +102,7 @@ public class StatTest {
                    + "println x\n"
                    + "end";
 
-    assertEquals(Compiler.lexAnalyse(program), treeResult);
+    assertEquals(treeResult, Compiler.lexAnalyse(program));
   }
 
   @Test
@@ -115,7 +115,7 @@ public class StatTest {
             + "if x then print y else print z fi\n"
             + "end";
 
-    assertEquals(Compiler.lexAnalyse(program), treeResult);
+    assertEquals(treeResult, Compiler.lexAnalyse(program));
   }
 
   @Test
@@ -127,7 +127,7 @@ public class StatTest {
                    + "while x do print y done\n"
                    + "end";
 
-    assertEquals(Compiler.lexAnalyse(program), treeResult);
+    assertEquals(treeResult, Compiler.lexAnalyse(program));
   }
 
   @Test
@@ -138,7 +138,7 @@ public class StatTest {
                    + "begin print x end\n"
                    + "end";
 
-    assertEquals(Compiler.lexAnalyse(program), treeResult);
+    assertEquals(treeResult, Compiler.lexAnalyse(program));
   }
 
   @Test
@@ -151,7 +151,7 @@ public class StatTest {
                    + "print y\n"
                    + "end";
 
-    assertEquals(Compiler.lexAnalyse(program), treeResult);
+    assertEquals(treeResult, Compiler.lexAnalyse(program));
   }
 
 }
