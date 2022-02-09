@@ -1,9 +1,11 @@
 import antlr.*;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
+
 import java.io.IOException;
 import java.nio.file.Path;
-
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
 
 import static java.lang.System.exit;
 
@@ -39,12 +41,17 @@ public class Compiler {
 
     ParseTree tree = parser.prog();
 
+    SemanticChecker visitor = new SemanticChecker();
+    visitor.visit(tree);
+    
     if (parser.getNumberOfSyntaxErrors() > 0) {
       System.out.println("#syntax_error#");
       exit(100);
     }
 
-    System.out.println(tree.toStringTree(parser));
+    if (visitor.getNumberOfSemanticErrors() > 0) {
+      exit(200);
+    }
 
   }
 

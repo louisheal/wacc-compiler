@@ -22,19 +22,19 @@ charLiter: CHAR_LITER ;
 
 stringLiter: STR_LITER ;
 
-stat: S_SKIP
-    | type IDENT ASSIGN assignRHS
-    | assignLHS ASSIGN assignRHS
-    | READ assignLHS
-    | FREE expr
-    | RETURN expr
-    | EXIT expr
-    | PRINT expr
-    | PRINTLN expr
-    | IF expr THEN stat ELSE stat FI
-    | WHILE expr DO stat DONE
-    | BEGIN stat END
-    | stat SEMI_COLON stat ;
+stat: S_SKIP                      #skip
+    | type IDENT ASSIGN assignRHS #declaration
+    | assignLHS ASSIGN assignRHS  #reassignment
+    | READ assignLHS              #read
+    | FREE expr                   #free
+    | RETURN expr                 #return
+    | EXIT expr                   #exit
+    | PRINT expr                  #print
+    | PRINTLN expr                #println
+    | IF expr THEN stat ELSE stat FI  #if_then_else_fi
+    | WHILE expr DO stat DONE     #while_do_done
+    | BEGIN stat END              #begin_end
+    | stat SEMI_COLON stat        #semi_colon ;
 
 assignLHS: IDENT
           | arrayElem
@@ -72,15 +72,17 @@ pairElem: FST expr
         | SND expr ;
 
 type: baseType
-    | type SB_OPEN SB_CLOSE
+    | arrayType
     | pairType ;
+
 
 baseType: INT
         | BOOL
         | CHAR
         | STRING ;
 
-arrayType: type SB_OPEN SB_CLOSE ;
+arrayType: baseType SB_OPEN SB_CLOSE #baseArrayType
+        |  pairType SB_OPEN SB_CLOSE #pairArrayType ;
 
 pairType: PAIR P_OPEN pairElemType COMMA pairElemType P_CLOSE ;
 
