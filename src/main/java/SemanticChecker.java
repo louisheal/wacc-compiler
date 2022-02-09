@@ -16,6 +16,20 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         return errors;
     }
 
+    private void printSemanticError(Error error, Type lType, Type rType, Token token) {
+
+        String errorMsg = "Semantic Error at " + token.getLine() + ":" + token.getCharPositionInLine() + " -- ";
+
+        switch (error) {
+            case IncompatibleTypes: errorMsg += "Incompatible type at " + token.getText() +
+                                                " (expected: " + lType + ", actual: " + rType + ")";
+                                                break;
+        }
+
+        System.out.println(errorMsg);
+
+    }
+
     @Override public Object visitProg(BasicParser.ProgContext ctx) { return visitChildren(ctx); }
 
     @Override public Object visitFunc(BasicParser.FuncContext ctx) { return visitChildren(ctx); }
@@ -96,9 +110,7 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
         if (lhsType != rhsType) {
             errors += 1;
-            System.out.println("Semantic Error at " + rhsToken.getLine() + ":" + rhsToken.getCharPositionInLine() +
-                    " -- Incompatible type at " + rhsToken.getText() +
-                    " (expected: " + lhsType + ", actual: " + rhsType + ")");
+            printSemanticError(Error.IncompatibleTypes, lhsType, rhsType, rhsToken);
         }
 
         return visitChildren(ctx);
@@ -167,6 +179,10 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         STRING,
         PAIR,
         ARRAY
+    }
+
+    enum Error {
+        IncompatibleTypes
     }
 
 }
