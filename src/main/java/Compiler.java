@@ -40,14 +40,14 @@ public class Compiler {
     BasicParser parser = new BasicParser(tokens);
 
     ParseTree tree = parser.prog();
-
-    SemanticChecker visitor = new SemanticChecker();
-    visitor.visit(tree);
     
     if (parser.getNumberOfSyntaxErrors() > 0) {
       System.out.println("#syntax_error#");
       exit(100);
     }
+
+    SemanticChecker visitor = new SemanticChecker();
+    visitor.visit(tree);
 
     if (visitor.getNumberOfSemanticErrors() > 0) {
       exit(200);
