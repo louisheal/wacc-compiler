@@ -1,12 +1,9 @@
 compile-job:
   stage: build
   script:
-    - cd antlr_config && sh antlrBuild
-    - mkdir -p bin
-    - javac -sourcepath src/main/java -d bin -cp lib/antlr-4.9.3-complete.jar src/main/java/antlr/*.java
-    - mvn compile
+    - make compile
 
 test-job:
   stage: test
   script:
-    - make
+    - make test
