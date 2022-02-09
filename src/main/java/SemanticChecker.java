@@ -74,7 +74,7 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         if (expr.stringLiter() != null) {
             return Type.STRING;
         }
-        return Type.ERROR;
+        return Type.OTHER;
     }
 
     private Type getTypeContextType(BasicParser.TypeContext type) {
@@ -98,7 +98,7 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         if (type.arrayType() != null) {
             return Type.ARRAY;
         }
-        return Type.ERROR;
+        return Type.OTHER;
     }
 
     private Type getRHSType(BasicParser.AssignRHSContext ctx) {
@@ -122,7 +122,7 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
             return Type.PAIR;
         }
         else {
-            return Type.ERROR;
+            return Type.OTHER;
         }
     }
 
@@ -176,6 +176,10 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         Type lhsType = getTypeContextType(ctx.type());
         Type rhsType = getRHSType(ctx.assignRHS());
         String varName = ctx.IDENT().getText();
+
+        if (lhsType == Type.OTHER || rhsType == Type.OTHER) {
+            return visitChildren(ctx);
+        }
 
         if (lhsType == Type.ARRAY && rhsType == Type.ARRAY) {
             validateArrayType(getArrayType(ctx.type().arrayType()), ctx.assignRHS().arrayLiter());
@@ -263,7 +267,7 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         STRING,
         PAIR,
         ARRAY,
-        ERROR
+        OTHER
     }
 
     enum Error {
