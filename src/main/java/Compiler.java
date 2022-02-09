@@ -41,7 +41,7 @@ public class Compiler {
 
     ParseTree tree = parser.prog();
 
-    MyVisitor visitor = new MyVisitor();
+    SemanticChecker visitor = new SemanticChecker();
     visitor.visit(tree);
     
     if (parser.getNumberOfSyntaxErrors() > 0) {
@@ -49,7 +49,10 @@ public class Compiler {
       exit(100);
     }
 
-    System.out.println(tree.toStringTree(parser));
+    if (visitor.getNumberOfSemanticErrors() > 0) {
+      exit(200);
+    }
+
   }
 
 }

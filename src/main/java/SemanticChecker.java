@@ -1,11 +1,20 @@
 import static java.lang.System.exit;
 
 import antlr.*;
+import org.antlr.v4.runtime.Token;
 
-class MyVisitor extends BasicParserBaseVisitor<Object> {
+class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
     String semanticError = "#semantic_error#";
     String syntaxError = "#syntax_error#";
+
+    SymbolTable currentST = new SymbolTable(null);
+
+    private int errors = 0;
+
+    public int getNumberOfSemanticErrors() {
+        return errors;
+    }
 
     @Override public Object visitProg(BasicParser.ProgContext ctx) { return visitChildren(ctx); }
 
@@ -37,27 +46,59 @@ class MyVisitor extends BasicParserBaseVisitor<Object> {
 
     @Override public Object visitSkip(BasicParser.SkipContext ctx) { return visitChildren(ctx); }
 
-    private boolean declarationTypesValid(BasicParser.DeclarationContext ctx) {
-        if (ctx.type().baseType().INT() != null) {
-            return (ctx.assignRHS().expr(0).intLiter() != null);
+    private Type getTypeContextType(BasicParser.TypeContext type) {
+        if (type.baseType().INT() != null) {
+            return Type.INT;
         }
-        if (ctx.type().baseType().BOOL() != null) {
-            return (ctx.assignRHS().expr(0).boolLiter() != null);
+        if (type.baseType().BOOL() != null) {
+            return Type.BOOL;
         }
-        if (ctx.type().baseType().CHAR() != null) {
-            return (ctx.assignRHS().expr(0).charLiter() != null);
+        if (type.baseType().CHAR() != null) {
+            return Type.CHAR;
         }
-        if (ctx.type().baseType().STRING() != null) {
-            return (ctx.assignRHS().expr(0).stringLiter() != null);
+        if (type.baseType().STRING() != null) {
+            return Type.STRING;
         }
-        return false;
+        return null;
+    }
+
+    private Type getRHSType(BasicParser.AssignRHSContext ctx) {
+        if (ctx.expr(0).intLiter() != null) {
+            return Type.INT;
+        }
+        else if (ctx.expr(0).boolLiter() != null) {
+            return Type.BOOL;
+        }
+        else if (ctx.expr(0).charLiter() != null) {
+            return Type.CHAR;
+        }
+        else {
+            return Type.STRING;
+        }
+    }
+
+    private Token getErrorPos(Type type, BasicParser.AssignRHSContext ctx) {
+        switch (type) {
+            case INT:    return ctx.expr(0).intLiter().INTEGER().getSymbol();
+            case BOOL:   return ctx.expr(0).boolLiter().TRUE().getSymbol();
+            case CHAR:   return ctx.expr(0).charLiter().CHAR_LITER().getSymbol();
+            case STRING: return ctx.expr(0).stringLiter().STR_LITER().getSymbol();
+        }
+        return null;
     }
 
     @Override
     public Object visitDeclaration(BasicParser.DeclarationContext ctx) {
 
-        if (!declarationTypesValid(ctx)) {
-            System.out.println("INVALID");
+        Type lhsType = getTypeContextType(ctx.type());
+        Type rhsType = getRHSType(ctx.assignRHS());
+        Token rhsToken = getErrorPos(rhsType, ctx.assignRHS());
+
+        if (lhsType != rhsType) {
+            errors += 1;
+            System.out.println("Semantic Error at " + rhsToken.getLine() + ":" + rhsToken.getCharPositionInLine() +
+                    " -- Incompatible type at " + rhsToken.getText() +
+                    " (expected: " + lhsType + ", actual: " + rhsType + ")");
         }
 
         return visitChildren(ctx);
@@ -118,4 +159,14 @@ class MyVisitor extends BasicParserBaseVisitor<Object> {
     @Override public Object visitPairLiter(BasicParser.PairLiterContext ctx) { return visitChildren(ctx); }
 
     @Override public Object visitComment(BasicParser.CommentContext ctx) { return visitChildren(ctx); }
+
+    enum Type {
+        INT,
+        BOOL,
+        CHAR,
+        STRING,
+        PAIR,
+        ARRAY
+    }
+
 }

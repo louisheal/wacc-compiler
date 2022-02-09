@@ -5,19 +5,22 @@ import java.util.Map;
 
 public class SymbolTable {
 
-  SymbolTable parent;
-  Map<String, TerminalNode> variables = new HashMap<>();
+  private final SymbolTable parent;
+  private final Map<String, TerminalNode> variables = new HashMap<>();
 
   public SymbolTable(SymbolTable parent) {
     this.parent = parent;
-  }
-
-  public TerminalNode getType(String ident) {
-    return variables.get(ident);
   }
 
   public void newSymbol(String ident, TerminalNode node) {
     variables.put(ident, node);
   }
 
+  public TerminalNode getType(String ident) {
+    return variables.get(ident);
+  }
+
+  public SymbolTable getParent() {
+    return parent;
+  }
 }
