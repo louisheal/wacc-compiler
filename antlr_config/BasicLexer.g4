@@ -111,8 +111,7 @@ STR_LITER: '"' CHARACTER* '"' ;
 
 
 //bool-liter
-TRUE: 'true' ;
-FALSE: 'false' ;
+BOOL_LITER: 'true' | 'false' ;
 
 //pair-liter
 NULL: 'null' ;

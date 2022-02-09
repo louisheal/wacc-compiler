@@ -16,7 +16,7 @@ param: type IDENT ;
 intLiter: INTEGER ;
 signedIntLiter: PLUS INTEGER | MINUS INTEGER ;
 
-boolLiter: TRUE | FALSE ;
+boolLiter: BOOL_LITER ;
 
 charLiter: CHAR_LITER ;
 
