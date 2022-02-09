@@ -109,21 +109,19 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         if (ctx.expr(0).intLiter() != null) {
             return Type.INT;
         }
-        else if (ctx.expr(0).boolLiter() != null) {
+        if (ctx.expr(0).boolLiter() != null) {
             return Type.BOOL;
         }
-        else if (ctx.expr(0).charLiter() != null) {
+        if (ctx.expr(0).charLiter() != null) {
             return Type.CHAR;
         }
-        else if (ctx.expr(0).stringLiter() != null) {
+        if (ctx.expr(0).stringLiter() != null) {
             return Type.STRING;
         }
-        else if (ctx.expr(0).pairLiter() != null) {
+        if (ctx.expr(0).pairLiter() != null) {
             return Type.PAIR;
         }
-        else {
-            return Type.OTHER;
-        }
+        return Type.OTHER;
     }
 
     private Token getErrorPos(Type type, BasicParser.AssignRHSContext ctx) {
