@@ -82,7 +82,8 @@ baseType: INT
         | STRING ;
 
 arrayType: baseType SB_OPEN SB_CLOSE #baseArrayType
-        |  pairType SB_OPEN SB_CLOSE #pairArrayType ;
+        |  pairType SB_OPEN SB_CLOSE #pairArrayType
+        |  arrayType SB_OPEN SB_CLOSE #nestedArrayType;
 
 pairType: PAIR P_OPEN pairElemType COMMA pairElemType P_CLOSE ;
 
