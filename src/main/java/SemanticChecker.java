@@ -175,6 +175,7 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
         Type lhsType = getTypeContextType(ctx.type());
         Type rhsType = getRHSType(ctx.assignRHS());
+        String varName = ctx.IDENT().getText();
 
         if (lhsType == Type.ARRAY && rhsType == Type.ARRAY) {
             validateArrayType(getArrayType(ctx.type().arrayType()), ctx.assignRHS().arrayLiter());
@@ -185,6 +186,7 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
             Token rhsToken = getErrorPos(rhsType, ctx.assignRHS());
             printSemanticError(Error.IncompatibleTypes, lhsType, rhsType, rhsToken);
         }
+        currentST.newSymbol(varName, rhsType);
 
         return visitChildren(ctx);
     }
@@ -230,6 +232,15 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
     @Override public Object visitType(BasicParser.TypeContext ctx) { return visitChildren(ctx); }
 
     @Override public Object visitBaseType(BasicParser.BaseTypeContext ctx) { return visitChildren(ctx); }
+
+    @Override public Object visitBaseArrayType(BasicParser.BaseArrayTypeContext ctx) { return visitChildren(ctx); }
+
+
+    @Override public Object visitNestedArrayType(BasicParser.NestedArrayTypeContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    @Override public Object visitPairArrayType(BasicParser.PairArrayTypeContext ctx) { return visitChildren(ctx); }
 
     @Override public Object visitPairType(BasicParser.PairTypeContext ctx) { return visitChildren(ctx); }
 
