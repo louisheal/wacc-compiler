@@ -1,6 +1,8 @@
 import static java.lang.System.exit;
 
 import antlr.*;
+import antlr.BasicParser.PairElemContext;
+import antlr.BasicParser.PairElemTypeContext;
 import org.antlr.v4.runtime.Token;
 
 import java.awt.*;
@@ -146,6 +148,30 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         return Type.values()[typeNum - 25]; //TODO: Change magic number
     }
 
+  private Type getPairElemType(BasicParser.PairElemTypeContext ctx) {
+    if (ctx.baseType() != null) {
+      if (ctx.baseType().INT() != null) {
+        return Type.INT;
+      }
+      if (ctx.baseType().BOOL() != null) {
+        return Type.BOOL;
+      }
+      if (ctx.baseType().CHAR() != null) {
+        return Type.CHAR;
+      }
+      if (ctx.baseType().STRING() != null) {
+        return Type.STRING;
+      }
+    }
+    if (ctx.arrayType() != null) {
+
+    }
+    if (ctx.PAIR() != null){
+      return Type.PAIR;
+    }
+    return Type.OTHER;
+  }
+
     private boolean matchingTypes(Type type, BasicParser.ExprContext expr) {
         switch (type) {
             case INT:    return expr.intLiter() != null;
@@ -155,6 +181,8 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         }
         return false;
     }
+
+
 
     private void validateArrayType(Type lType, BasicParser.ArrayLiterContext rType) {
         ArrayList<BasicParser.ExprContext> exprs = new ArrayList<>();
@@ -178,7 +206,7 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
             }
         }
     }
-
+    
     @Override
     public Object visitDeclaration(BasicParser.DeclarationContext ctx) {
 
@@ -188,6 +216,13 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
         if (lhsType == Type.OTHER || rhsType == Type.OTHER) {
             return visitChildren(ctx);
+        }
+
+        if (lhsType == Type.PAIR && rhsType == Type.PAIR) {
+            validateFstPairType(ctx.type().pairType().pairElemType(0),
+                ctx.assignRHS().pairElem());
+          validateSndPairType(ctx.type().pairType().pairElemType(1),
+              ctx.assignRHS().pairElem());
         }
 
         if (lhsType == Type.ARRAY && rhsType == Type.ARRAY) {
