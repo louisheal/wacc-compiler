@@ -182,7 +182,35 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         return false;
     }
 
+  public Type getBaseTypeOfArray(String input) {
+    input = input.substring(1, input.length() - 1);
+    StringBuilder extract = new StringBuilder();
 
+    for (char s : input.toCharArray()) {
+      if (s != ',') {
+        extract.append(s);
+      } else {
+        break;
+      }
+    }
+
+    try {
+      Integer.parseInt(extract.toString());
+      return Type.INT;
+    } catch (NumberFormatException e) {
+      if (Boolean.parseBoolean(extract.toString())) {
+        return Type.BOOL;
+      } else if (extract.toString().charAt(0) == '\'') {
+        return Type.CHAR;
+      } else if (extract.toString().charAt(0) == '\"') {
+        return Type.STRING;
+      } else if (extract.toString().charAt(0) == '[') {
+        return Type.ARRAY;
+      }
+    }
+
+    return Type.OTHER;
+  }
 
     private void validateArrayType(Type lType, BasicParser.ArrayLiterContext rType) {
         ArrayList<BasicParser.ExprContext> exprs = new ArrayList<>();
@@ -193,18 +221,32 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
             e = rType.expr(i + 1);
         }
 
-        for (BasicParser.ExprContext expr : exprs) {
-            String ident = expr.getText();
-            if (!matchingTypes(lType, expr)) {
-                if (currentST.contains(ident) & (currentST.getType(ident).equals(lType))) {
+      for (BasicParser.ExprContext expr : exprs) {
+        String ident = expr.getText();
+        if (!matchingTypes(lType, expr)) {
+          String array = currentST.getValue(ident).getText();
+          if (!(currentST.contains(ident) & ((currentST.getType(ident).equals(lType)) |
+              getBaseTypeOfArray(array).equals(lType)))) {
+            if (currentST.contains(ident) & (currentST.getType(ident).equals(lType))) {
 //                    System.out.println("No error");
-                } else {
-                    errors++;
-                    printSemanticError(Error.IncompatibleTypes, lType, getExpressionContextType(expr), expr.start);
-                    break;
-                }
+            } else {
+              errors++;
+              printSemanticError(Error.IncompatibleTypes, lType,
+                  getExpressionContextType(expr), expr.start);
+              printSemanticError(Error.IncompatibleTypes, lType, getExpressionContextType(expr),
+                  expr.start);
+              break;
             }
+          }
         }
+      }
+
+
+
+
+
+
+
     }
     
     @Override
