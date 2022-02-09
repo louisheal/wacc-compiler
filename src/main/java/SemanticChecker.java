@@ -185,10 +185,6 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         }
 
         if (lhsType != rhsType) {
-
-            System.out.println("Expected: " + lhsType);
-            System.out.println("RHS: " + rhsType);
-
             errors += 1;
             Token rhsToken = getErrorPos(rhsType, ctx.assignRHS());
             printSemanticError(Error.IncompatibleTypes, lhsType, rhsType, rhsToken);
