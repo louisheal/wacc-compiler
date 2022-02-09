@@ -48,8 +48,6 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
     @Override public Object visitStringLiter(BasicParser.StringLiterContext ctx) { return visitChildren(ctx); }
 
-    @Override public Object visitBinaryOper(BasicParser.BinaryOperContext ctx) { return visitChildren(ctx); }
-
     @Override public Object visitReassignment(BasicParser.ReassignmentContext ctx) { return visitChildren(ctx); }
 
     @Override public Object visitSemi_colon(BasicParser.Semi_colonContext ctx) { return visitChildren(ctx); }
