@@ -175,6 +175,7 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
         Type lhsType = getTypeContextType(ctx.type());
         Type rhsType = getRHSType(ctx.assignRHS());
+        String varName = ctx.IDENT().getText();
 
         if (lhsType == Type.OTHER || rhsType == Type.OTHER) {
             return visitChildren(ctx);
@@ -189,6 +190,7 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
             Token rhsToken = getErrorPos(rhsType, ctx.assignRHS());
             printSemanticError(Error.IncompatibleTypes, lhsType, rhsType, rhsToken);
         }
+        currentST.newSymbol(varName, rhsType, ctx.assignRHS());
 
         return visitChildren(ctx);
     }
