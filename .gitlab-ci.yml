@@ -3,7 +3,7 @@ compile-job:
   script:
     - cd antlr_config && sh antlrBuild
     - mkdir -p bin
-    - javac -sourcepath $(SOURCE_DIR) -d $(OUTPUT_DIR) -cp lib/antlr-4.9.3-complete.jar src/main/java/antlr/*.java
+    - javac -sourcepath src/main/java -d bin -cp lib/antlr-4.9.3-complete.jar src/main/java/antlr/*.java
     - mvn compile
 
 test-job:
