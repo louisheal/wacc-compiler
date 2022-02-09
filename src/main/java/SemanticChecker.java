@@ -103,6 +103,10 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
     private Type getRHSType(BasicParser.AssignRHSContext ctx) {
 
+        if (ctx.pairElem() != null) {
+            return Type.OTHER;
+        }
+
         if (ctx.arrayLiter() != null) {
             return Type.ARRAY;
         }
