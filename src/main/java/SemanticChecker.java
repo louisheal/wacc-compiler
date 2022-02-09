@@ -162,10 +162,15 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         }
 
         for (BasicParser.ExprContext expr : exprs) {
+            String ident = expr.getText();
             if (!matchingTypes(lType, expr)) {
-                errors++;
-                printSemanticError(Error.IncompatibleTypes, lType, getExpressionContextType(expr), expr.start);
-                break;
+                if (currentST.contains(ident) & (currentST.getType(ident).equals(lType))) {
+//                    System.out.println("No error");
+                } else {
+                    errors++;
+                    printSemanticError(Error.IncompatibleTypes, lType, getExpressionContextType(expr), expr.start);
+                    break;
+                }
             }
         }
     }
