@@ -142,44 +142,14 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         return Type.values()[typeNum - 25]; //TODO: Change magic number
     }
 
-    private void validateExprsAreInts(Type type, ArrayList<BasicParser.ExprContext> exprs) {
-        for (BasicParser.ExprContext expr : exprs) {
-            if (expr.intLiter() == null) {
-                errors++;
-                printSemanticError(Error.IncompatibleTypes, type, getExpressionContextType(expr), expr.start);
-                break;
-            }
+    private boolean matchingTypes(Type type, BasicParser.ExprContext expr) {
+        switch (type) {
+            case INT:    return expr.intLiter() != null;
+            case BOOL:   return expr.boolLiter() != null;
+            case CHAR:   return expr.charLiter() != null;
+            case STRING: return expr.stringLiter() != null;
         }
-    }
-
-    private void validateExprsAreBools(Type type, ArrayList<BasicParser.ExprContext> exprs) {
-        for (BasicParser.ExprContext expr : exprs) {
-            if (expr.boolLiter() == null) {
-                errors++;
-                printSemanticError(Error.IncompatibleTypes, type, getExpressionContextType(expr), expr.start);
-                break;
-            }
-        }
-    }
-
-    private void validateExprsAreChars(Type type, ArrayList<BasicParser.ExprContext> exprs) {
-        for (BasicParser.ExprContext expr : exprs) {
-            if (expr.charLiter() == null) {
-                errors++;
-                printSemanticError(Error.IncompatibleTypes, type, getExpressionContextType(expr), expr.start);
-                break;
-            }
-        }
-    }
-
-    private void validateExprsAreStrings(Type type, ArrayList<BasicParser.ExprContext> exprs) {
-        for (BasicParser.ExprContext expr : exprs) {
-            if (expr.stringLiter() == null) {
-                errors++;
-                printSemanticError(Error.IncompatibleTypes, type, getExpressionContextType(expr), expr.start);
-                break;
-            }
-        }
+        return false;
     }
 
     private void validateArrayType(Type lType, BasicParser.ArrayLiterContext rType) {
@@ -191,15 +161,12 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
             e = rType.expr(i + 1);
         }
 
-        switch (lType) {
-            case INT:    validateExprsAreInts(lType, exprs);
-                         break;
-            case BOOL:   validateExprsAreBools(lType, exprs);
-                         break;
-            case CHAR:   validateExprsAreChars(lType, exprs);
-                         break;
-            case STRING: validateExprsAreStrings(lType, exprs);
-                         break;
+        for (BasicParser.ExprContext expr : exprs) {
+            if (!matchingTypes(lType, expr)) {
+                errors++;
+                printSemanticError(Error.IncompatibleTypes, lType, getExpressionContextType(expr), expr.start);
+                break;
+            }
         }
     }
 
