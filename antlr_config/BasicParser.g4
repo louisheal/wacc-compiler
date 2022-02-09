@@ -22,20 +22,6 @@ charLiter: CHAR_LITER ;
 
 stringLiter: STR_LITER ;
 
-binaryOper: PLUS
-          | MINUS
-          | MULTIPLY
-          | DIVIDE
-          | MODULO
-          | GREATER_THAN
-          | GREATER_THAN_OR_EQUAL
-          | LESS_THAN
-          | LESS_THAN_OR_EQUAL
-          | EQUAL
-          | NOT_EQUAL
-          | AND
-          | OR ;
-
 stat: S_SKIP                      #skip
     | type IDENT ASSIGN assignRHS #declaration
     | assignLHS ASSIGN assignRHS  #reassignment
@@ -63,7 +49,14 @@ expr: intLiter
     | IDENT
     | arrayElem
     | unaryOper expr
-    | expr binaryOper expr
+    | expr DIVIDE expr
+    | expr MULTIPLY expr
+    | expr MODULO expr
+    | expr (PLUS | MINUS) expr
+    | expr (GREATER_THAN | GREATER_THAN_OR_EQUAL | LESS_THAN | LESS_THAN_OR_EQUAL) expr
+    | expr (EQUAL | NOT_EQUAL) expr
+    | expr AND expr
+    | expr OR expr
     | P_OPEN expr P_CLOSE
     ;
 
