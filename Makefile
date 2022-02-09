@@ -22,16 +22,13 @@ JFLAGS	:= -sourcepath $(SOURCE_DIR) -d $(OUTPUT_DIR) -cp lib/antlr-4.9.3-complet
 # The make rules:
 
 # run the antlr build script then attempts to compile all .java files within src/antlr
-all:
-	antlr
+all: antlr
 	mvn package
 
-compile:
-	antlr
+compile: antlr
 	mvn compile
 
-test:
-	antlr
+test: antlr
 	mvn test
 
 antlr:
@@ -43,4 +40,4 @@ antlr:
 clean:
 	$(RM) $(OUTPUT_DIR) $(SOURCE_DIR)/antlr target
 
-.PHONY: all clean
+.PHONY: all compile test antlr clean 
