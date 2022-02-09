@@ -3,6 +3,9 @@ import static java.lang.System.exit;
 import antlr.*;
 import org.antlr.v4.runtime.Token;
 
+import java.awt.*;
+import java.util.ArrayList;
+
 class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
     String semanticError = "#semantic_error#";
@@ -58,23 +61,51 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
     @Override public Object visitSkip(BasicParser.SkipContext ctx) { return visitChildren(ctx); }
 
-    private Type getTypeContextType(BasicParser.TypeContext type) {
-        if (type.baseType().INT() != null) {
+    private Type getExpressionContextType(BasicParser.ExprContext expr) {
+        if (expr.intLiter() != null) {
             return Type.INT;
         }
-        if (type.baseType().BOOL() != null) {
+        if (expr.boolLiter() != null) {
             return Type.BOOL;
         }
-        if (type.baseType().CHAR() != null) {
+        if (expr.charLiter() != null) {
             return Type.CHAR;
         }
-        if (type.baseType().STRING() != null) {
+        if (expr.stringLiter() != null) {
             return Type.STRING;
         }
-        return null;
+        return Type.ERROR;
+    }
+
+    private Type getTypeContextType(BasicParser.TypeContext type) {
+        if (type.baseType() != null) {
+            if (type.baseType().INT() != null) {
+                return Type.INT;
+            }
+            if (type.baseType().BOOL() != null) {
+                return Type.BOOL;
+            }
+            if (type.baseType().CHAR() != null) {
+                return Type.CHAR;
+            }
+            if (type.baseType().STRING() != null) {
+                return Type.STRING;
+            }
+        }
+        if (type.pairType() != null) {
+            return Type.PAIR;
+        }
+        if (type.arrayType() != null) {
+            return Type.ARRAY;
+        }
+        return Type.ERROR;
     }
 
     private Type getRHSType(BasicParser.AssignRHSContext ctx) {
+
+        if (ctx.arrayLiter() != null) {
+            return Type.ARRAY;
+        }
         if (ctx.expr(0).intLiter() != null) {
             return Type.INT;
         }
@@ -84,19 +115,92 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         else if (ctx.expr(0).charLiter() != null) {
             return Type.CHAR;
         }
-        else {
+        else if (ctx.expr(0).stringLiter() != null) {
             return Type.STRING;
+        }
+        else if (ctx.expr(0).pairLiter() != null) {
+            return Type.PAIR;
+        }
+        else {
+            return Type.ERROR;
         }
     }
 
     private Token getErrorPos(Type type, BasicParser.AssignRHSContext ctx) {
         switch (type) {
             case INT:    return ctx.expr(0).intLiter().INTEGER().getSymbol();
-            case BOOL:   return ctx.expr(0).boolLiter().TRUE().getSymbol();
+            case BOOL:   return ctx.expr(0).boolLiter().BOOL_LITER().getSymbol();
             case CHAR:   return ctx.expr(0).charLiter().CHAR_LITER().getSymbol();
             case STRING: return ctx.expr(0).stringLiter().STR_LITER().getSymbol();
+            case PAIR:   return ctx.expr(0).pairLiter().NULL().getSymbol();
         }
         return null;
+    }
+
+    private Type getArrayType(BasicParser.ArrayTypeContext ctx) {
+        int typeNum = ctx.getStart().getType();
+        return Type.values()[typeNum - 25]; //TODO: Change magic number
+    }
+
+    private void validateExprsAreInts(Type type, ArrayList<BasicParser.ExprContext> exprs) {
+        for (BasicParser.ExprContext expr : exprs) {
+            if (expr.intLiter() == null) {
+                errors++;
+                printSemanticError(Error.IncompatibleTypes, type, getExpressionContextType(expr), expr.start);
+                break;
+            }
+        }
+    }
+
+    private void validateExprsAreBools(Type type, ArrayList<BasicParser.ExprContext> exprs) {
+        for (BasicParser.ExprContext expr : exprs) {
+            if (expr.boolLiter() == null) {
+                errors++;
+                printSemanticError(Error.IncompatibleTypes, type, getExpressionContextType(expr), expr.start);
+                break;
+            }
+        }
+    }
+
+    private void validateExprsAreChars(Type type, ArrayList<BasicParser.ExprContext> exprs) {
+        for (BasicParser.ExprContext expr : exprs) {
+            if (expr.charLiter() == null) {
+                errors++;
+                printSemanticError(Error.IncompatibleTypes, type, getExpressionContextType(expr), expr.start);
+                break;
+            }
+        }
+    }
+
+    private void validateExprsAreStrings(Type type, ArrayList<BasicParser.ExprContext> exprs) {
+        for (BasicParser.ExprContext expr : exprs) {
+            if (expr.stringLiter() == null) {
+                errors++;
+                printSemanticError(Error.IncompatibleTypes, type, getExpressionContextType(expr), expr.start);
+                break;
+            }
+        }
+    }
+
+    private void validateArrayType(Type lType, BasicParser.ArrayLiterContext rType) {
+        ArrayList<BasicParser.ExprContext> exprs = new ArrayList<>();
+        BasicParser.ExprContext e = rType.expr(0);
+
+        for (int i = 0; e != null; i++) {
+            exprs.add(e);
+            e = rType.expr(i + 1);
+        }
+
+        switch (lType) {
+            case INT:    validateExprsAreInts(lType, exprs);
+                         break;
+            case BOOL:   validateExprsAreBools(lType, exprs);
+                         break;
+            case CHAR:   validateExprsAreChars(lType, exprs);
+                         break;
+            case STRING: validateExprsAreStrings(lType, exprs);
+                         break;
+        }
     }
 
     @Override
@@ -104,10 +208,14 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
         Type lhsType = getTypeContextType(ctx.type());
         Type rhsType = getRHSType(ctx.assignRHS());
-        Token rhsToken = getErrorPos(rhsType, ctx.assignRHS());
+
+        if (lhsType == Type.ARRAY && rhsType == Type.ARRAY) {
+            validateArrayType(getArrayType(ctx.type().arrayType()), ctx.assignRHS().arrayLiter());
+        }
 
         if (lhsType != rhsType) {
             errors += 1;
+            Token rhsToken = getErrorPos(rhsType, ctx.assignRHS());
             printSemanticError(Error.IncompatibleTypes, lhsType, rhsType, rhsToken);
         }
 
@@ -176,7 +284,8 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         CHAR,
         STRING,
         PAIR,
-        ARRAY
+        ARRAY,
+        ERROR
     }
 
     enum Error {
