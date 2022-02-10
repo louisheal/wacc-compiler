@@ -32,6 +32,102 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
   }
 
   @Override
+  public Statement visitSkip(BasicParser.SkipContext ctx) {
+    return new Statement(Statement.StatType.SKIP);
+  }
+
+  @Override
+  public Statement visitDeclaration(BasicParser.DeclarationContext ctx) {
+    Type type = (Type) this.visit(ctx.type());
+    String ident = (String) this.visit(ctx.IDENT());
+    AssignRHS rhs = (AssignRHS) this.visit(ctx.assignRHS());
+
+    return new Statement(Statement.StatType.DECLARATION, type, ident, rhs);
+  }
+
+  @Override
+  public Statement visitReassignment(BasicParser.ReassignmentContext ctx) {
+    AssignLHS lhs = (AssignLHS) this.visit(ctx.assignLHS());
+    AssignRHS rhs = (AssignRHS) this.visit(ctx.assignRHS());
+
+    return new Statement(Statement.StatType.REASSIGNMENT, lhs, rhs);
+  }
+
+  @Override
+  public Statement visitRead(BasicParser.ReadContext ctx) {
+    AssignLHS lhs = (AssignLHS) this.visit(ctx.assignLHS());
+
+    return new Statement(Statement.StatType.READ, lhs);
+  }
+
+  @Override
+  public Statement visitFree(BasicParser.FreeContext ctx) {
+    Expression expression = (Expression) this.visit(ctx.expr());
+
+    return new Statement(Statement.StatType.FREE, expression);
+  }
+
+  @Override
+  public Statement visitReturn(BasicParser.ReturnContext ctx) {
+    Expression expression = (Expression) this.visit(ctx.expr());
+
+    return new Statement(Statement.StatType.RETURN, expression);
+  }
+
+  @Override
+  public Statement visitExit(BasicParser.ExitContext ctx) {
+    Expression expression = (Expression) this.visit(ctx.expr());
+
+    return new Statement(Statement.StatType.EXIT, expression);
+  }
+
+  @Override
+  public Statement visitPrint(BasicParser.PrintContext ctx) {
+    Expression expression = (Expression) this.visit(ctx.expr());
+
+    return new Statement(Statement.StatType.PRINT, expression);
+  }
+
+  @Override
+  public Statement visitPrintln(BasicParser.PrintlnContext ctx) {
+    Expression expression = (Expression) this.visit(ctx.expr());
+
+    return new Statement(Statement.StatType.PRINTLN, expression);
+  }
+
+  @Override
+  public Statement visitIf_then_else_fi(BasicParser.If_then_else_fiContext ctx) {
+    Expression expression = (Expression) this.visit(ctx.expr());
+    Statement sThen = (Statement) this.visit(ctx.stat(0));
+    Statement sElse = (Statement) this.visit(ctx.stat(1));
+
+    return new Statement(Statement.StatType.IF, expression, sThen, sElse);
+  }
+
+  @Override
+  public Statement visitWhile_do_done(BasicParser.While_do_doneContext ctx) {
+    Expression expression = (Expression) this.visit(ctx.expr());
+    Statement statement = (Statement) this.visit(ctx.stat());
+
+    return new Statement(Statement.StatType.WHILE, expression, statement);
+  }
+
+  @Override
+  public Statement visitBegin_end(BasicParser.Begin_endContext ctx) {
+    Statement statement = (Statement) this.visit(ctx.stat());
+
+    return new Statement(Statement.StatType.BEGIN, statement);
+  }
+
+  @Override
+  public Statement visitSemi_colon(BasicParser.Semi_colonContext ctx) {
+    Statement statement1 = (Statement) visit(ctx.stat(0));
+    Statement statement2 = (Statement) visit(ctx.stat(1));
+
+    return new Statement(Statement.StatType.CONCAT, statement1, statement2);
+  }
+
+  @Override
   public List<Param> visitParamList(BasicParser.ParamListContext ctx) {
     if (ctx == null) {
       return null;
