@@ -4,6 +4,7 @@ import antlr.*;
 import antlr.BasicParser.ExprContext;
 import antlr.BasicParser.PairElemContext;
 import antlr.BasicParser.PairElemTypeContext;
+import java.util.Arrays;
 import org.antlr.v4.runtime.Token;
 
 import java.awt.*;
@@ -112,6 +113,22 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         return Type.OTHER;
     }
 
+    private boolean checkAllBoolValues(String[] values) {
+
+      for (String value : values) {
+        if (!(value.equals("true") | value.equals("false"))) {
+          if (!currentST.contains(value)) {
+            return false;
+          } else {
+            if (currentST.getType(value) != Type.BOOL) {
+              return false;
+            }
+          }
+        }
+      }
+      return true;
+    }
+
     private Type parseRHS(String expr) {
 
       boolean isBoolean = expr.contains("||") | expr.contains("&&") | expr.contains("==") | expr.contains("!=");
@@ -123,10 +140,16 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
       if (errorCheck) {
         return null;
       } else if (isBoolean) {
+        String[] values = expr.split("\\|\\||&&|==|!=");
+        if (!checkAllBoolValues(values)) {
+          return Type.ERROR;
+        }
         return Type.BOOL;
       } else if (isIntBoolean) {
+        String[] values = expr.split("<|>|<=|>=");
         return Type.BOOL;
       } else if (isInt) {
+        String[] values = expr.split("/+|-|/*|/");
         return Type.INT;
       }
 
@@ -345,8 +368,12 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
     @Override public Object visitPrint(BasicParser.PrintContext ctx) { return visitChildren(ctx); }
 
+
+
     @Override public Object visitPrintln(BasicParser.PrintlnContext ctx) {
-      if (!currentST.contains(ctx.expr().getText())) {
+      if (parseRHS(ctx.expr().getText()) != (Type.ERROR)) {
+        return visitChildren(ctx);
+      } else {
         errors++;
         printSemanticError(Error.NotDefined, null, null, ctx.stop);
       }
@@ -418,6 +445,7 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         PAIR,
         ARRAY,
         ERROR,
+        ERROR1,
         OTHER
     }
 
