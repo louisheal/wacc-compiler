@@ -11,7 +11,6 @@ import java.util.ArrayList;
 
 class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
-    String semanticError = "#semantic_error#";
     String syntaxError = "#syntax_error#";
 
     SymbolTable currentST = new SymbolTable(null);
