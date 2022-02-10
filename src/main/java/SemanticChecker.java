@@ -1,6 +1,7 @@
 import static java.lang.System.exit;
 
 import antlr.*;
+import antlr.BasicParser.ExprContext;
 import antlr.BasicParser.PairElemContext;
 import antlr.BasicParser.PairElemTypeContext;
 import org.antlr.v4.runtime.Token;
@@ -109,6 +110,10 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
             return Type.OTHER;
         }
 
+        if (ctx.NEW_PAIR() != null) {
+          return Type.PAIR;
+        }
+
         if (ctx.arrayLiter() != null) {
             return Type.ARRAY;
         }
@@ -172,8 +177,10 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
     return Type.OTHER;
   }
 
+
     private boolean matchingTypes(Type type, BasicParser.ExprContext expr) {
         switch (type) {
+            case PAIR:   return expr.pairLiter() != null;
             case INT:    return expr.intLiter() != null;
             case BOOL:   return expr.boolLiter() != null;
             case CHAR:   return expr.charLiter() != null;
@@ -261,11 +268,23 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         }
 
         if (lhsType == Type.PAIR && rhsType == Type.PAIR) {
-            validateFstPairType(ctx.type().pairType().pairElemType(0),
-                ctx.assignRHS().pairElem());
-          validateSndPairType(ctx.type().pairType().pairElemType(1),
-              ctx.assignRHS().pairElem());
+          Type lhsPairFst = getPairElemType(ctx.type().pairType().pairElemType(0));
+          Type lhsPairSnd = getPairElemType(ctx.type().pairType().pairElemType(1));
+          //if (ctx.assignRHS().pairElem() == null){
+          //  return visitChildren(ctx); //short circuits and returns if the pair is null
+          // } short circuiting code doesnt work
+          if(!matchingTypes(lhsPairFst,ctx.assignRHS().expr(0))){
+            errors++;
+            printSemanticError(Error.IncompatibleTypes, lhsPairFst, rhsType,
+                ctx.assignRHS().pairElem().expr().start);
+          }
+          if(!matchingTypes(lhsPairSnd,ctx.assignRHS().expr(1))){
+            errors++;
+            printSemanticError(Error.IncompatibleTypes, lhsPairSnd, rhsType,
+                ctx.assignRHS().pairElem().expr().start);
+          }
         }
+
 
         if (lhsType == Type.ARRAY && rhsType == Type.ARRAY) {
             validateArrayType(getArrayType(ctx.type().arrayType()), ctx.assignRHS().arrayLiter());
