@@ -4,6 +4,7 @@ import antlr.*;
 import antlr.BasicParser.ExprContext;
 import antlr.BasicParser.PairElemContext;
 import antlr.BasicParser.PairElemTypeContext;
+import java.util.Arrays;
 import org.antlr.v4.runtime.Token;
 
 import java.awt.*;
@@ -28,6 +29,7 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         switch (error) {
             case IncompatibleTypes: errorMsg += "Incompatible type at " + token.getText() +
                                                 " (expected: " + lType + ", actual: " + rType + ")";
+            case NotDefined: errorMsg += "Variable " + token.getText() + " is not defined in this scope";
                                                 break;
         }
 
@@ -53,13 +55,43 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
     @Override public Object visitStringLiter(BasicParser.StringLiterContext ctx) { return visitChildren(ctx); }
 
-    @Override public Object visitReassignment(BasicParser.ReassignmentContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitReassignment(BasicParser.ReassignmentContext ctx) {
+      Type rhsType = getRHSType(ctx.assignRHS());
+//      if (ctx.assignLHS().getText().contains("[")) {
+//        String arrayType = ctx.assignLHS().getText().replaceAll("/^[-_a-zA-Z0-9.]+$/", "");
+//        if (arrayType.equals("String")) {
+//          printSemanticError(Error.IncompatibleTypes, Type.ARRAY, rhsType, ctx.assignLHS().start);
+//          return visitChildren(ctx);
+//        }
+//      }
+
+      String varName = ctx.assignLHS().IDENT().getText();
+      if (currentST.contains(varName) & (rhsType != currentST.getType(varName))) {
+        printSemanticError(Error.IncompatibleTypes, currentST.getType(varName), rhsType, ctx.stop);
+      }
+
+      return visitChildren(ctx);
+    }
 
     @Override public Object visitSemi_colon(BasicParser.Semi_colonContext ctx) { return visitChildren(ctx); }
 
     @Override public Object visitRead(BasicParser.ReadContext ctx) { return visitChildren(ctx); }
 
-    @Override public Object visitWhile_do_done(BasicParser.While_do_doneContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitWhile_do_done(BasicParser.While_do_doneContext ctx) {
+      String expr = ctx.expr().getText();
+      if (!expr.equals("true") & !expr.equals("false")) {
+        if (currentST.contains(expr)) {
+          if (currentST.getType(expr) != Type.BOOL) {
+            errors++;
+            printSemanticError(Error.IncompatibleTypes, Type.BOOL, currentST.getType(expr), ctx.start);
+          }
+        } else {
+          errors++;
+          printSemanticError(Error.NotDefined, null, null, ctx.expr().start);
+        }
+      }
+      return visitChildren(ctx);
+    }
 
     @Override public Object visitSkip(BasicParser.SkipContext ctx) { return visitChildren(ctx); }
 
@@ -103,7 +135,73 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         return Type.OTHER;
     }
 
+    private boolean checkAllBoolValues(String[] values) {
+
+      for (String value : values) {
+        if (!(value.equals("true") | value.equals("false"))) {
+          if (!currentST.contains(value)) {
+            return false;
+          } else {
+            if (currentST.getType(value) != Type.BOOL) {
+              return false;
+            }
+          }
+        }
+      }
+      return true;
+    }
+
+    public boolean checkIfIsInt(String[] values) {
+      for (String value : values) {
+        try {
+          Integer.parseInt(value);
+        } catch (NumberFormatException ignored) {
+          if (!currentST.contains(value)) {
+            return false;
+          } else {
+            if (currentST.getType(value) != Type.INT) {
+              return false;
+            }
+          }
+        }
+      }
+      return true;
+    }
+
+    private Type parseRHS(String expr) {
+
+      boolean isBoolean = expr.contains("||") | expr.contains("&&") | expr.contains("==") | expr.contains("!=");
+      boolean isIntBoolean = expr.contains(">") | expr.contains(">=") | expr.contains("<") | expr.contains("<=");
+      boolean isInt = expr.contains("+") | expr.contains("-") | expr.contains("*") | expr.contains("/") |
+          expr.contains("%");
+      boolean errorCheck = (isBoolean & isIntBoolean) | (isBoolean & isInt) | (isIntBoolean & isInt);
+
+      if (errorCheck) {
+        return null;
+      } else if (isBoolean) {
+        String[] values = expr.split("\\|\\||&&|==|!=");
+        if (!checkAllBoolValues(values)) {
+          return Type.ERROR;
+        }
+        return Type.BOOL;
+      } else if (isIntBoolean) {
+        String[] values = expr.split("<|>|<=|>=");
+        if (!checkIfIsInt(values)) {
+          return Type.ERROR;
+        }
+        return Type.BOOL;
+      } else if (isInt) {
+        String[] values = expr.split("/+|-|/*|/");
+        if (!checkIfIsInt(values)) {
+          return Type.ERROR;
+        }
+        return Type.INT;
+      }
+      return Type.OTHER;
+    }
+
     private Type getRHSType(BasicParser.AssignRHSContext ctx) {
+        String rhs = ctx.getText();
 
         if (ctx.pairElem() != null) {
             return Type.OTHER;
@@ -136,6 +234,11 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         if (ctx.expr(0).pairLiter() != null) {
             return Type.PAIR;
         }
+
+        if (parseRHS(rhs) == null) {
+          return Type.ERROR;
+        }
+
         return Type.OTHER;
     }
 
@@ -247,13 +350,6 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
           }
         }
       }
-
-
-
-
-
-
-
     }
     
     @Override
@@ -265,6 +361,11 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
         if (ctx.assignRHS().getText().equals("null")) {
           currentST.newSymbol(varName, rhsType, ctx.assignRHS());
+          return visitChildren(ctx);
+        }
+
+        if (rhsType.equals(Type.ERROR)) {
+          printSemanticError(Error.IncompatibleTypes, lhsType, rhsType, ctx.assignRHS().expr(0).start);
           return visitChildren(ctx);
         }
 
@@ -311,7 +412,17 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
     @Override public Object visitPrint(BasicParser.PrintContext ctx) { return visitChildren(ctx); }
 
-    @Override public Object visitPrintln(BasicParser.PrintlnContext ctx) { return visitChildren(ctx); }
+
+
+    @Override public Object visitPrintln(BasicParser.PrintlnContext ctx) {
+      if (parseRHS(ctx.expr().getText()) != (Type.ERROR)) {
+        return visitChildren(ctx);
+      } else {
+        errors++;
+        printSemanticError(Error.NotDefined, null, null, ctx.stop);
+      }
+      return visitChildren(ctx);
+    }
 
     @Override public Object visitBegin_end(BasicParser.Begin_endContext ctx) { return visitChildren(ctx); }
 
@@ -377,11 +488,14 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         STRING,
         PAIR,
         ARRAY,
+        ERROR,
+        ERROR1,
         OTHER
     }
 
     enum Error {
-        IncompatibleTypes
+        IncompatibleTypes,
+        NotDefined
     }
 
 }
