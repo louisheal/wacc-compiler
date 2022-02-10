@@ -234,8 +234,7 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
           String array = currentST.getValue(ident).getText();
           if (!(currentST.contains(ident) & ((currentST.getType(ident).equals(lType)) |
               getBaseTypeOfArray(array).equals(lType)))) {
-            if (currentST.contains(ident) & (currentST.getType(ident).equals(lType))) {
-            } else {
+            if (!(currentST.contains(ident) & (currentST.getType(ident).equals(lType)))) {
               errors++;
               printSemanticError(Error.IncompatibleTypes, lType,
                   getExpressionContextType(expr), expr.start);
