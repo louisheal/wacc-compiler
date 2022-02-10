@@ -116,6 +116,11 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         if (ctx.arrayLiter() != null) {
             return Type.ARRAY;
         }
+
+        if (ctx.expr(0) == null) {
+          return Type.OTHER;
+        }
+
         if (ctx.expr(0).intLiter() != null) {
             return Type.INT;
         }
