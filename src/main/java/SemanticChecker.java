@@ -28,6 +28,7 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         switch (error) {
             case IncompatibleTypes: errorMsg += "Incompatible type at " + token.getText() +
                                                 " (expected: " + lType + ", actual: " + rType + ")";
+            case NotDefined: errorMsg += "Variable " + token.getText() + " is not defined in this scope";
                                                 break;
         }
 
@@ -344,7 +345,13 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
     @Override public Object visitPrint(BasicParser.PrintContext ctx) { return visitChildren(ctx); }
 
-    @Override public Object visitPrintln(BasicParser.PrintlnContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitPrintln(BasicParser.PrintlnContext ctx) {
+      if (!currentST.contains(ctx.expr().getText())) {
+        errors++;
+        printSemanticError(Error.NotDefined, null, null, ctx.stop);
+      }
+      return visitChildren(ctx);
+    }
 
     @Override public Object visitBegin_end(BasicParser.Begin_endContext ctx) { return visitChildren(ctx); }
 
@@ -415,7 +422,8 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
     }
 
     enum Error {
-        IncompatibleTypes
+        IncompatibleTypes,
+        NotDefined
     }
 
 }
