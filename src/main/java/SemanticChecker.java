@@ -116,6 +116,11 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         if (ctx.arrayLiter() != null) {
             return Type.ARRAY;
         }
+
+        if (ctx.expr(0) == null) {
+          return Type.OTHER;
+        }
+
         if (ctx.expr(0).intLiter() != null) {
             return Type.INT;
         }
@@ -257,6 +262,11 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         Type lhsType = getTypeContextType(ctx.type());
         Type rhsType = getRHSType(ctx.assignRHS());
         String varName = ctx.IDENT().getText();
+
+        if (ctx.assignRHS().getText().equals("null")) {
+          currentST.newSymbol(varName, rhsType, ctx.assignRHS());
+          return visitChildren(ctx);
+        }
 
         if (lhsType == Type.OTHER || rhsType == Type.OTHER) {
             return visitChildren(ctx);
