@@ -25,10 +25,32 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
   public Function visitFunc(BasicParser.FuncContext ctx) {
     Type returnType = (Type) this.visit(ctx.type());
     String ident = ctx.IDENT().getText();
-    List<Param> params = null;
+    List<Param> params = visitParamList(ctx.paramList());
     Statement statement = (Statement) this.visit(ctx.stat());
 
     return new Function(returnType, ident, params, statement);
+  }
+
+  @Override
+  public List<Param> visitParamList(BasicParser.ParamListContext ctx) {
+    if (ctx == null) {
+      return null;
+    }
+
+    List<Param> params = new ArrayList<>();
+
+    for (int i = 0; i < ctx.param().size(); i++) {
+      params.add((Param) this.visit(ctx.param(i)));
+    }
+
+    return params;
+  }
+
+  @Override
+  public Param visitParam(BasicParser.ParamContext ctx) {
+    Type type = (Type) this.visit(ctx.type());
+    String ident = (String) this.visit(ctx.IDENT());
+    return new Param(type, ident);
   }
 
 }

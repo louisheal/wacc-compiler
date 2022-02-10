@@ -36,9 +36,10 @@ public class Function {
   public String toString() {
     return "Function{" +
             "returnType=" + returnType +
-            ", ident=" + ident +
+            ", ident='" + ident + '\'' +
             ", params=" + params +
             ", statement=" + statement +
             '}';
   }
+
 }
