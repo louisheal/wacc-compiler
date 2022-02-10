@@ -10,7 +10,7 @@ public class AssignRHS {
   List<Expression> array;
   PairElem pairElem;
   String functionIdent;
-  List<Argument> argList;
+  List<Expression> argList;
 
   enum RHSType {
 
