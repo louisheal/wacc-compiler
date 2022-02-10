@@ -4,8 +4,8 @@ import java.util.List;
 
 public class ArrayElem {
 
-  String ident;
-  List<Expression> expressions;
+  private final String ident;
+  private final List<Expression> expressions;
 
   public ArrayElem(String ident, List<Expression> expressions) {
     this.ident = ident;

@@ -231,4 +231,14 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return new ArrayElem(ctx.IDENT().getText(), expressions);
   }
 
+  @Override
+  public PairElem visitFstElem(BasicParser.FstElemContext ctx) {
+    return new PairElem(PairElem.PairElemType.FST, (Expression) this.visit(ctx.expr()));
+  }
+
+  @Override
+  public PairElem visitSndElem(BasicParser.SndElemContext ctx) {
+    return new PairElem(PairElem.PairElemType.SND, (Expression) this.visit(ctx.expr()));
+  }
+
 }

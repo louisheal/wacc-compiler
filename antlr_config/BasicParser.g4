@@ -71,7 +71,9 @@ assignRHS: expr
 
 argList: expr (COMMA expr)* | ; // second empty in case no args taken
 
-pairElem: FST expr | SND expr ;
+pairElem: FST expr      #fstElem
+        | SND expr      #sndElem
+        ;
 
 type: baseType
     | arrayType
