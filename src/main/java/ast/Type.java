@@ -6,8 +6,8 @@ public class Type {
 
   private final EType type;
   private final Type arrayType;
-  private final EType fstType;
-  private final EType sndType;
+  private final Type fstType;
+  private final Type sndType;
 
   public Type(EType type) {
     this.type = type;
@@ -23,6 +23,13 @@ public class Type {
     this.sndType = null;
   }
 
+  public Type(EType type, Type fstType, Type sndType) {
+    this.type = type;
+    this.arrayType = null;
+    this.fstType = fstType;
+    this.sndType = sndType;
+  }
+
   public EType getType() {
     return type;
   }
@@ -31,11 +38,11 @@ public class Type {
     return arrayType;
   }
 
-  public EType getFstType() {
+  public Type getFstType() {
     return fstType;
   }
 
-  public EType getSndType() {
+  public Type getSndType() {
     return sndType;
   }
 

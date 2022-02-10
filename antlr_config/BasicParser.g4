@@ -91,9 +91,9 @@ arrayType: baseType SB_OPEN SB_CLOSE    #baseArrayType
 
 pairType: PAIR P_OPEN pairElemType COMMA pairElemType P_CLOSE ;
 
-pairElemType: baseType
-            | arrayType
-            | PAIR 
+pairElemType: baseType      #basePairElem
+            | arrayType     #arrayPairElem
+            | PAIR          #pairPairElem
             ;
 
 unaryOper: NOT

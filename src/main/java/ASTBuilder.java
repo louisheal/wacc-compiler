@@ -188,4 +188,27 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return new Type(Type.EType.ARRAY, arrayType);
   }
 
+  @Override
+  public Type visitPairType(BasicParser.PairTypeContext ctx) {
+    Type fstType = (Type) this.visit(ctx.pairElemType(0));
+    Type sndType = (Type) this.visit(ctx.pairElemType(1));
+
+    return new Type(Type.EType.PAIR, fstType, sndType);
+  }
+
+  @Override
+  public Type visitBasePairElem(BasicParser.BasePairElemContext ctx) {
+    return (Type) this.visit(ctx.baseType());
+  }
+
+  @Override
+  public Type visitArrayPairElem(BasicParser.ArrayPairElemContext ctx) {
+    return (Type) this.visit(ctx.arrayType());
+  }
+
+  @Override
+  public Type visitPairPairElem(BasicParser.PairPairElemContext ctx) {
+    return new Type(Type.EType.PAIR);
+  }
+
 }

@@ -243,8 +243,6 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
     @Override public Object visitPairType(BasicParser.PairTypeContext ctx) { return visitChildren(ctx); }
 
-    @Override public Object visitPairElemType(BasicParser.PairElemTypeContext ctx) { return visitChildren(ctx); }
-
     @Override public Object visitUnaryOper(BasicParser.UnaryOperContext ctx) { return visitChildren(ctx); }
 
     @Override public Object visitArrayElem(BasicParser.ArrayElemContext ctx) { return visitChildren(ctx); }
