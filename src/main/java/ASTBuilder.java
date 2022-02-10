@@ -13,20 +13,17 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
   public Program visitProg(BasicParser.ProgContext ctx) {
 
     List<Function> functions = new ArrayList<>();
+    Statement statement = (Statement) this.visit(ctx.stat());
 
-    BasicParser.FuncContext f = ctx.func(0);
-
-    for (int i = 1; f != null; i++) {
-      functions.add(visitFunc(f));
-      f = ctx.func(i);
+    for (int i = 0; i < ctx.func().size(); i++) {
+      functions.add((Function) this.visit(ctx.func(i)));
     }
 
-    return null;
+    return new Program(functions, statement);
   }
 
   @Override
   public Function visitFunc(BasicParser.FuncContext ctx) {
     return null;
   }
-
 }
