@@ -129,6 +129,23 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
       return true;
     }
 
+    public boolean checkIfIsInt(String[] values) {
+      for (String value : values) {
+        try {
+          Integer.parseInt(value);
+        } catch (NumberFormatException ignored) {
+          if (!currentST.contains(value)) {
+            return false;
+          } else {
+            if (currentST.getType(value) != Type.INT) {
+              return false;
+            }
+          }
+        }
+      }
+      return true;
+    }
+
     private Type parseRHS(String expr) {
 
       boolean isBoolean = expr.contains("||") | expr.contains("&&") | expr.contains("==") | expr.contains("!=");
@@ -147,12 +164,17 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         return Type.BOOL;
       } else if (isIntBoolean) {
         String[] values = expr.split("<|>|<=|>=");
+        if (!checkIfIsInt(values)) {
+          return Type.ERROR;
+        }
         return Type.BOOL;
       } else if (isInt) {
         String[] values = expr.split("/+|-|/*|/");
+        if (!checkIfIsInt(values)) {
+          return Type.ERROR;
+        }
         return Type.INT;
       }
-
       return Type.OTHER;
     }
 
