@@ -1,9 +1,8 @@
 import antlr.BasicParser;
 import antlr.BasicParserBaseVisitor;
-import ast.Function;
-import ast.Program;
-import ast.Statement;
+import ast.*;
 
+import javax.swing.plaf.nimbus.State;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +23,12 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
 
   @Override
   public Function visitFunc(BasicParser.FuncContext ctx) {
-    return null;
+    Type returnType = (Type) this.visit(ctx.type());
+    String ident = ctx.IDENT().getText();
+    List<Param> params = null;
+    Statement statement = (Statement) this.visit(ctx.stat());
+
+    return new Function(returnType, ident, params, statement);
   }
+
 }
