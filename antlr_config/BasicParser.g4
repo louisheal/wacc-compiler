@@ -75,13 +75,13 @@ pairElem: FST expr | SND expr ;
 
 type: baseType
     | arrayType
-    | pairType 
+    | pairType
     ;
 
-baseType: INT
-        | BOOL
-        | CHAR
-        | STRING 
+baseType: INT       #intType
+        | BOOL      #boolType
+        | CHAR      #charType
+        | STRING    #stringType
         ;
 
 arrayType: baseType SB_OPEN SB_CLOSE    #baseArrayType

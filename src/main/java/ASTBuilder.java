@@ -149,4 +149,43 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return new Param(type, ident);
   }
 
+  @Override
+  public Type visitIntType(BasicParser.IntTypeContext ctx) {
+    return new Type(Type.EType.INT);
+  }
+
+  @Override
+  public Type visitBoolType(BasicParser.BoolTypeContext ctx) {
+    return new Type(Type.EType.BOOL);
+  }
+
+  @Override
+  public Type visitCharType(BasicParser.CharTypeContext ctx) {
+    return new Type(Type.EType.CHAR);
+  }
+
+  @Override
+  public Type visitStringType(BasicParser.StringTypeContext ctx) {
+    return new Type(Type.EType.STRING);
+  }
+
+  @Override
+  public Type visitBaseArrayType(BasicParser.BaseArrayTypeContext ctx) {
+    Type arrayType = (Type) this.visit(ctx.baseType());
+
+    return new Type(Type.EType.ARRAY, arrayType);
+  }
+
+  @Override public Type visitNestedArrayType(BasicParser.NestedArrayTypeContext ctx) {
+    Type arrayType = (Type) this.visit(ctx.arrayType());
+
+    return new Type(Type.EType.ARRAY, arrayType);
+  }
+
+  @Override public Type visitPairArrayType(BasicParser.PairArrayTypeContext ctx) {
+    Type arrayType = (Type) this.visit(ctx.pairType());
+
+    return new Type(Type.EType.ARRAY, arrayType);
+  }
+
 }

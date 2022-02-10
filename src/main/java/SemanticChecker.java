@@ -79,16 +79,16 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
     private Type getTypeContextType(BasicParser.TypeContext type) {
         if (type.baseType() != null) {
-            if (type.baseType().INT() != null) {
+            if (type.baseType() != null) {
                 return Type.INT;
             }
-            if (type.baseType().BOOL() != null) {
+            if (type.baseType() != null) {
                 return Type.BOOL;
             }
-            if (type.baseType().CHAR() != null) {
+            if (type.baseType() != null) {
                 return Type.CHAR;
             }
-            if (type.baseType().STRING() != null) {
+            if (type.baseType() != null) {
                 return Type.STRING;
             }
         }
@@ -233,10 +233,7 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
     @Override public Object visitType(BasicParser.TypeContext ctx) { return visitChildren(ctx); }
 
-    @Override public Object visitBaseType(BasicParser.BaseTypeContext ctx) { return visitChildren(ctx); }
-
     @Override public Object visitBaseArrayType(BasicParser.BaseArrayTypeContext ctx) { return visitChildren(ctx); }
-
 
     @Override public Object visitNestedArrayType(BasicParser.NestedArrayTypeContext ctx) {
         return visitChildren(ctx);
