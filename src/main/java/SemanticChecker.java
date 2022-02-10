@@ -1,6 +1,9 @@
 import static java.lang.System.exit;
 
 import antlr.*;
+import antlr.BasicParser.ExprContext;
+import antlr.BasicParser.PairElemContext;
+import antlr.BasicParser.PairElemTypeContext;
 import org.antlr.v4.runtime.Token;
 
 import java.awt.*;
@@ -8,7 +11,6 @@ import java.util.ArrayList;
 
 class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
-    String semanticError = "#semantic_error#";
     String syntaxError = "#syntax_error#";
 
     SymbolTable currentST = new SymbolTable(null);
@@ -103,6 +105,14 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
     private Type getRHSType(BasicParser.AssignRHSContext ctx) {
 
+        if (ctx.pairElem() != null) {
+            return Type.OTHER;
+        }
+
+        if (ctx.NEW_PAIR() != null) {
+          return Type.PAIR;
+        }
+
         if (ctx.arrayLiter() != null) {
             return Type.ARRAY;
         }
@@ -140,8 +150,34 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         return Type.values()[typeNum - 25]; //TODO: Change magic number
     }
 
+  private Type getPairElemType(BasicParser.PairElemTypeContext ctx) {
+    if (ctx.baseType() != null) {
+      if (ctx.baseType().INT() != null) {
+        return Type.INT;
+      }
+      if (ctx.baseType().BOOL() != null) {
+        return Type.BOOL;
+      }
+      if (ctx.baseType().CHAR() != null) {
+        return Type.CHAR;
+      }
+      if (ctx.baseType().STRING() != null) {
+        return Type.STRING;
+      }
+    }
+    if (ctx.arrayType() != null) {
+
+    }
+    if (ctx.PAIR() != null){
+      return Type.PAIR;
+    }
+    return Type.OTHER;
+  }
+
+
     private boolean matchingTypes(Type type, BasicParser.ExprContext expr) {
         switch (type) {
+            case PAIR:   return expr.pairLiter() != null;
             case INT:    return expr.intLiter() != null;
             case BOOL:   return expr.boolLiter() != null;
             case CHAR:   return expr.charLiter() != null;
@@ -149,6 +185,36 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         }
         return false;
     }
+
+  public Type getBaseTypeOfArray(String input) {
+    input = input.substring(1, input.length() - 1);
+    StringBuilder extract = new StringBuilder();
+
+    for (char s : input.toCharArray()) {
+      if (s != ',') {
+        extract.append(s);
+      } else {
+        break;
+      }
+    }
+
+    try {
+      Integer.parseInt(extract.toString());
+      return Type.INT;
+    } catch (NumberFormatException e) {
+      if (Boolean.parseBoolean(extract.toString())) {
+        return Type.BOOL;
+      } else if (extract.toString().charAt(0) == '\'') {
+        return Type.CHAR;
+      } else if (extract.toString().charAt(0) == '\"') {
+        return Type.STRING;
+      } else if (extract.toString().charAt(0) == '[') {
+        return Type.ARRAY;
+      }
+    }
+
+    return Type.OTHER;
+  }
 
     private void validateArrayType(Type lType, BasicParser.ArrayLiterContext rType) {
         ArrayList<BasicParser.ExprContext> exprs = new ArrayList<>();
@@ -159,15 +225,32 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
             e = rType.expr(i + 1);
         }
 
-        for (BasicParser.ExprContext expr : exprs) {
-            if (!matchingTypes(lType, expr)) {
-                errors++;
-                printSemanticError(Error.IncompatibleTypes, lType, getExpressionContextType(expr), expr.start);
-                break;
+      for (BasicParser.ExprContext expr : exprs) {
+        String ident = expr.getText();
+        if (!matchingTypes(lType, expr)) {
+          String array = currentST.getValue(ident).getText();
+          if (!(currentST.contains(ident) & ((currentST.getType(ident).equals(lType)) |
+              getBaseTypeOfArray(array).equals(lType)))) {
+            if (!(currentST.contains(ident) & (currentST.getType(ident).equals(lType)))) {
+              errors++;
+              printSemanticError(Error.IncompatibleTypes, lType,
+                  getExpressionContextType(expr), expr.start);
+              printSemanticError(Error.IncompatibleTypes, lType, getExpressionContextType(expr),
+                  expr.start);
+              break;
             }
+          }
         }
-    }
+      }
 
+
+
+
+
+
+
+    }
+    
     @Override
     public Object visitDeclaration(BasicParser.DeclarationContext ctx) {
 
@@ -179,6 +262,25 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
             return visitChildren(ctx);
         }
 
+        if (lhsType == Type.PAIR && rhsType == Type.PAIR) {
+          Type lhsPairFst = getPairElemType(ctx.type().pairType().pairElemType(0));
+          Type lhsPairSnd = getPairElemType(ctx.type().pairType().pairElemType(1));
+          //if (ctx.assignRHS().pairElem() == null){
+          //  return visitChildren(ctx); //short circuits and returns if the pair is null
+          // } short circuiting code doesnt work
+          if(!matchingTypes(lhsPairFst,ctx.assignRHS().expr(0))){
+            errors++;
+            printSemanticError(Error.IncompatibleTypes, lhsPairFst, rhsType,
+                ctx.assignRHS().pairElem().expr().start);
+          }
+          if(!matchingTypes(lhsPairSnd,ctx.assignRHS().expr(1))){
+            errors++;
+            printSemanticError(Error.IncompatibleTypes, lhsPairSnd, rhsType,
+                ctx.assignRHS().pairElem().expr().start);
+          }
+        }
+
+
         if (lhsType == Type.ARRAY && rhsType == Type.ARRAY) {
             validateArrayType(getArrayType(ctx.type().arrayType()), ctx.assignRHS().arrayLiter());
         }
@@ -188,7 +290,7 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
             Token rhsToken = getErrorPos(rhsType, ctx.assignRHS());
             printSemanticError(Error.IncompatibleTypes, lhsType, rhsType, rhsToken);
         }
-        currentST.newSymbol(varName, rhsType);
+        currentST.newSymbol(varName, rhsType, ctx.assignRHS());
 
         return visitChildren(ctx);
     }
