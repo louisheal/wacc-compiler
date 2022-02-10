@@ -69,7 +69,21 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
     @Override public Object visitRead(BasicParser.ReadContext ctx) { return visitChildren(ctx); }
 
-    @Override public Object visitWhile_do_done(BasicParser.While_do_doneContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitWhile_do_done(BasicParser.While_do_doneContext ctx) {
+      String expr = ctx.expr().getText();
+      if (!expr.equals("true") & !expr.equals("false")) {
+        if (currentST.contains(expr)) {
+          if (currentST.getType(expr) != Type.BOOL) {
+            errors++;
+            printSemanticError(Error.IncompatibleTypes, Type.BOOL, currentST.getType(expr), ctx.start);
+          }
+        } else {
+          errors++;
+          printSemanticError(Error.NotDefined, null, null, ctx.expr().start);
+        }
+      }
+      return visitChildren(ctx);
+    }
 
     @Override public Object visitSkip(BasicParser.SkipContext ctx) { return visitChildren(ctx); }
 
