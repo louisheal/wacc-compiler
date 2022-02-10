@@ -7,54 +7,54 @@ COMMENT: '#'~[\n]* '\n' -> skip ;
 IS: 'is' ;
 
 //commands
-S_SKIP: 'skip' ;
-READ: 'read' ;
-FREE: 'free' ;
-RETURN: 'return' ;
-EXIT: 'exit' ;
-PRINT: 'print' ;
-PRINTLN: 'println' ;
-IF: 'if' ;
-THEN: 'then' ;
-ELSE: 'else' ;
-FI: 'fi' ;
-WHILE: 'while' ;
-DO: 'do' ;
-DONE: 'done' ;
-BEGIN: 'begin' ;
-END: 'end' ;
+S_SKIP:     'skip'      ;
+READ:       'read'      ;
+FREE:       'free'      ;
+RETURN:     'return'    ;
+EXIT:       'exit'      ;
+PRINT:      'print'     ;
+PRINTLN:    'println'   ;
+IF:         'if'        ;
+THEN:       'then'      ;
+ELSE:       'else'      ;
+FI:         'fi'        ;
+WHILE:      'while'     ;
+DO:         'do'        ;
+DONE:       'done'      ;
+BEGIN:      'begin'     ;
+END:        'end'       ;
 
 //assign-rhs
 CALL: 'call' ;
 
 //numbers
-fragment DIGIT: '0'..'9' ;
-INTEGER: DIGIT+ ;
+fragment DIGIT:     '0'..'9'    ;
+INTEGER:            DIGIT+      ;
 
 //pair-type
-PAIR: 'pair' ;
-NEW_PAIR: 'newpair' ;
+PAIR:       'pair'      ;
+NEW_PAIR:   'newpair'   ;
 
 //pair-elem
-FST: 'fst' ;
-SND: 'snd' ;
+FST:    'fst'   ;
+SND:    'snd'   ;
 
 //base-type
-INT: 'int' ;
-BOOL: 'bool' ;
-CHAR: 'char' ;
-STRING: 'string' ;
+INT:    'int'       ;
+BOOL:   'bool'      ;
+CHAR:   'char'      ;
+STRING: 'string'    ;
 
 //brackets
-P_OPEN: '(';
-P_CLOSE: ')';
+P_OPEN:  '(' ;
+P_CLOSE: ')' ;
 
 //array-type
-SB_OPEN: '[' ;
+SB_OPEN:  '[' ;
 SB_CLOSE: ']' ;
 
 //uni-operators
-NOT: '!' ;
+NOT: '!'   ;
 LEN: 'len' ;
 ORD: 'ord' ;
 CHR: 'chr' ;
@@ -63,19 +63,19 @@ CHR: 'chr' ;
 ASSIGN: '=' ;
 
 //bin-operators
-PLUS: '+' ;
-MINUS: '-' ;
-MULTIPLY: '*' ;
-DIVIDE: '/' ;
-MODULO: '%' ;
-GREATER_THAN: '>' ;
-GREATER_THAN_OR_EQUAL: '>=' ;
-LESS_THAN: '<' ;
-LESS_THAN_OR_EQUAL: '<=' ;
-EQUAL: '==' ;
-NOT_EQUAL: '!=' ;
-AND: '&&' ;
-OR: '||' ;
+PLUS:                   '+'     ;
+MINUS:                  '-'     ;
+MULTIPLY:               '*'     ;
+DIVIDE:                 '/'     ;
+MODULO:                 '%'     ;
+GREATER_THAN:           '>'     ;
+GREATER_THAN_OR_EQUAL:  '>='    ;
+LESS_THAN:              '<'     ;
+LESS_THAN_OR_EQUAL:     '<='    ;
+EQUAL:                  '=='    ;
+NOT_EQUAL:              '!='    ;
+AND:                    '&&'    ;
+OR:                     '||'    ;
 
 //semicolon
 SEMI_COLON: ';' ;

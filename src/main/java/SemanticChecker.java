@@ -119,21 +119,19 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         if (ctx.expr(0).intLiter() != null) {
             return Type.INT;
         }
-        else if (ctx.expr(0).boolLiter() != null) {
+        if (ctx.expr(0).boolLiter() != null) {
             return Type.BOOL;
         }
-        else if (ctx.expr(0).charLiter() != null) {
+        if (ctx.expr(0).charLiter() != null) {
             return Type.CHAR;
         }
-        else if (ctx.expr(0).stringLiter() != null) {
+        if (ctx.expr(0).stringLiter() != null) {
             return Type.STRING;
         }
-        else if (ctx.expr(0).pairLiter() != null) {
+        if (ctx.expr(0).pairLiter() != null) {
             return Type.PAIR;
         }
-        else {
-            return Type.OTHER;
-        }
+        return Type.OTHER;
     }
 
     private Token getErrorPos(Type type, BasicParser.AssignRHSContext ctx) {
@@ -338,6 +336,15 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
     @Override public Object visitType(BasicParser.TypeContext ctx) { return visitChildren(ctx); }
 
     @Override public Object visitBaseType(BasicParser.BaseTypeContext ctx) { return visitChildren(ctx); }
+
+    @Override public Object visitBaseArrayType(BasicParser.BaseArrayTypeContext ctx) { return visitChildren(ctx); }
+
+
+    @Override public Object visitNestedArrayType(BasicParser.NestedArrayTypeContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    @Override public Object visitPairArrayType(BasicParser.PairArrayTypeContext ctx) { return visitChildren(ctx); }
 
     @Override public Object visitPairType(BasicParser.PairTypeContext ctx) { return visitChildren(ctx); }
 
