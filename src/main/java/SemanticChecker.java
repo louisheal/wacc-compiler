@@ -57,6 +57,14 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
     @Override public Object visitReassignment(BasicParser.ReassignmentContext ctx) {
       Type rhsType = getRHSType(ctx.assignRHS());
+//      if (ctx.assignLHS().getText().contains("[")) {
+//        String arrayType = ctx.assignLHS().getText().replaceAll("/^[-_a-zA-Z0-9.]+$/", "");
+//        if (arrayType.equals("String")) {
+//          printSemanticError(Error.IncompatibleTypes, Type.ARRAY, rhsType, ctx.assignLHS().start);
+//          return visitChildren(ctx);
+//        }
+//      }
+
       String varName = ctx.assignLHS().IDENT().getText();
       if (currentST.contains(varName) & (rhsType != currentST.getType(varName))) {
         printSemanticError(Error.IncompatibleTypes, currentST.getType(varName), rhsType, ctx.stop);
