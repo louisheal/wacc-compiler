@@ -53,7 +53,15 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
     @Override public Object visitStringLiter(BasicParser.StringLiterContext ctx) { return visitChildren(ctx); }
 
-    @Override public Object visitReassignment(BasicParser.ReassignmentContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitReassignment(BasicParser.ReassignmentContext ctx) {
+      Type rhsType = getRHSType(ctx.assignRHS());
+      String varName = ctx.assignLHS().IDENT().getText();
+      if (currentST.contains(varName) & (rhsType != currentST.getType(varName))) {
+        printSemanticError(Error.IncompatibleTypes, currentST.getType(varName), rhsType, ctx.stop);
+      }
+
+      return visitChildren(ctx);
+    }
 
     @Override public Object visitSemi_colon(BasicParser.Semi_colonContext ctx) { return visitChildren(ctx); }
 
@@ -247,13 +255,6 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
           }
         }
       }
-
-
-
-
-
-
-
     }
     
     @Override
