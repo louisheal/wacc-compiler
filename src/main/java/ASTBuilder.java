@@ -171,21 +171,15 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
 
   @Override
   public Type visitBaseArrayType(BasicParser.BaseArrayTypeContext ctx) {
-    Type arrayType = (Type) this.visit(ctx.baseType());
-
-    return new Type(Type.EType.ARRAY, arrayType);
+    return new Type(Type.EType.ARRAY, (Type) this.visit(ctx.baseType()));
   }
 
   @Override public Type visitNestedArrayType(BasicParser.NestedArrayTypeContext ctx) {
-    Type arrayType = (Type) this.visit(ctx.arrayType());
-
-    return new Type(Type.EType.ARRAY, arrayType);
+    return new Type(Type.EType.ARRAY, (Type) this.visit(ctx.arrayType()));
   }
 
   @Override public Type visitPairArrayType(BasicParser.PairArrayTypeContext ctx) {
-    Type arrayType = (Type) this.visit(ctx.pairType());
-
-    return new Type(Type.EType.ARRAY, arrayType);
+    return new Type(Type.EType.ARRAY, (Type) this.visit(ctx.pairType()));
   }
 
   @Override
@@ -209,6 +203,21 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
   @Override
   public Type visitPairPairElem(BasicParser.PairPairElemContext ctx) {
     return new Type(Type.EType.PAIR);
+  }
+
+  @Override
+  public AssignLHS visitIdentLHS(BasicParser.IdentLHSContext ctx) {
+    return new AssignLHS(AssignLHS.LHSType.IDENT, ctx.IDENT().getText());
+  }
+
+  @Override
+  public AssignLHS visitArrayLHS(BasicParser.ArrayLHSContext ctx) {
+    return new AssignLHS(AssignLHS.LHSType.ARRAYELEM, (ArrayElem) this.visit(ctx.arrayElem()));
+  }
+
+  @Override
+  public AssignLHS visitPairLHS(BasicParser.PairLHSContext ctx) {
+    return new AssignLHS(AssignLHS.LHSType.PAIRELEM, (PairElem) this.visit(ctx.pairElem()));
   }
 
 }

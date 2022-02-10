@@ -37,9 +37,9 @@ stat: S_SKIP                            #skip
     | stat SEMI_COLON stat              #semi_colon 
     ;
 
-assignLHS: IDENT
-         | arrayElem
-         | pairElem 
+assignLHS: IDENT        #identLHS
+         | arrayElem    #arrayLHS
+         | pairElem     #pairLHS
          ;
 
 expr: intLiter

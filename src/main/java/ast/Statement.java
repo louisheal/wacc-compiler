@@ -37,7 +37,7 @@ public class Statement {
     this.statType = statType;
     this.lhsType = null;
     this.lhsIdent = null;
-    this.lhs = null;
+    this.lhs = lhs;
     this.rhs = rhs;
     this.expression = null;
     this.statement1 = null;

@@ -207,8 +207,6 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
     @Override public Object visitReturn(BasicParser.ReturnContext ctx) { return visitChildren(ctx); }
 
-    @Override public Object visitAssignLHS(BasicParser.AssignLHSContext ctx) { return visitChildren(ctx); }
-
     @Override
     public Object visitAssignRHS(BasicParser.AssignRHSContext ctx) {
         if (!ctx.expr().isEmpty()) { // Checks if the RHS is an expr
