@@ -220,4 +220,15 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return new AssignLHS(AssignLHS.LHSType.PAIRELEM, (PairElem) this.visit(ctx.pairElem()));
   }
 
+  @Override
+  public ArrayElem visitArrayElem(BasicParser.ArrayElemContext ctx) {
+    List<Expression> expressions = new ArrayList<>();
+
+    for (int i = 0; i < ctx.expr().size(); i++) {
+      expressions.add((Expression) this.visit(ctx.expr(i)));
+    }
+
+    return new ArrayElem(ctx.IDENT().getText(), expressions);
+  }
+
 }
