@@ -111,7 +111,29 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         return Type.OTHER;
     }
 
+    private Type parseRHS(String expr) {
+
+      boolean isBoolean = expr.contains("||") | expr.contains("&&") | expr.contains("==") | expr.contains("!=");
+      boolean isIntBoolean = expr.contains(">") | expr.contains(">=") | expr.contains("<") | expr.contains("<=");
+      boolean isInt = expr.contains("+") | expr.contains("-") | expr.contains("*") | expr.contains("/") |
+          expr.contains("%");
+      boolean errorCheck = (isBoolean & isIntBoolean) | (isBoolean & isInt) | (isIntBoolean & isInt);
+
+      if (errorCheck) {
+        return null;
+      } else if (isBoolean) {
+        return Type.BOOL;
+      } else if (isIntBoolean) {
+        return Type.BOOL;
+      } else if (isInt) {
+        return Type.INT;
+      }
+
+      return Type.OTHER;
+    }
+
     private Type getRHSType(BasicParser.AssignRHSContext ctx) {
+        String rhs = ctx.getText();
 
         if (ctx.pairElem() != null) {
             return Type.OTHER;
@@ -144,6 +166,11 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         if (ctx.expr(0).pairLiter() != null) {
             return Type.PAIR;
         }
+
+        if (parseRHS(rhs) == null) {
+          return Type.ERROR;
+        }
+
         return Type.OTHER;
     }
 
@@ -269,6 +296,11 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
           return visitChildren(ctx);
         }
 
+        if (rhsType.equals(Type.ERROR)) {
+          printSemanticError(Error.IncompatibleTypes, lhsType, rhsType, ctx.assignRHS().expr(0).start);
+          return visitChildren(ctx);
+        }
+
         if (lhsType == Type.OTHER || rhsType == Type.OTHER) {
             return visitChildren(ctx);
         }
@@ -378,6 +410,7 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
         STRING,
         PAIR,
         ARRAY,
+        ERROR,
         OTHER
     }
 
