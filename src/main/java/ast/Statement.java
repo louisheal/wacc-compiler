@@ -110,6 +110,38 @@ public class Statement {
     this.statement2 = statement2;
   }
 
+  public StatType getStatType() {
+    return statType;
+  }
+
+  public Type getLhsType() {
+    return lhsType;
+  }
+
+  public String getLhsIdent() {
+    return lhsIdent;
+  }
+
+  public AssignLHS getLHS() {
+    return lhs;
+  }
+
+  public AssignRHS getRHS() {
+    return rhs;
+  }
+
+  public Expression getExpression() {
+    return expression;
+  }
+
+  public Statement getStatement1() {
+    return statement1;
+  }
+
+  public Statement getStatement2() {
+    return statement2;
+  }
+
   @Override
   public String toString() {
 
