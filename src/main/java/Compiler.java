@@ -51,6 +51,13 @@ public class Compiler {
     Program ast = (Program) astBuilder.visit(tree);
     System.out.println(ast);
 
+    TraverseAST traverseAST = new TraverseAST();
+    traverseAST.traverse(ast);
+    if (traverseAST.getNumberOfErrors() > 0) {
+      System.out.println("#semantic_error#");
+      exit(200);
+    }
+
   }
 
 }
