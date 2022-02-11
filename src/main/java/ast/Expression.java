@@ -75,6 +75,26 @@ public class Expression {
       result.append("chr ").append(expression1);
     }
 
+    if (exprType == ExprType.DIVIDE) {
+      result.append(expression1).append(" / ").append(expression2);
+    }
+
+    if (exprType == ExprType.MULTIPLY) {
+      result.append(expression1).append(" * ").append(expression2);
+    }
+
+    if (exprType == ExprType.MODULO) {
+      result.append(expression1).append(" % ").append(expression2);
+    }
+
+    if (exprType == ExprType.PLUS) {
+      result.append(expression1).append(" + ").append(expression2);
+    }
+
+    if (exprType == ExprType.MINUS) {
+      result.append(expression1).append(" - ").append(expression2);
+    }
+
     if (exprType == ExprType.BRACKETS) {
       result.append("(").append(expression1).append(")");
     }

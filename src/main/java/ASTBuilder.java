@@ -45,7 +45,7 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
   @Override
   public Statement visitDeclaration(BasicParser.DeclarationContext ctx) {
     Type type = (Type) this.visit(ctx.type());
-    String ident = (String) this.visit(ctx.IDENT());
+    String ident = ctx.IDENT().getText();
     AssignRHS rhs = (AssignRHS) this.visit(ctx.assignRHS());
 
     return new StatementBuilder().buildDeclaration(type, ident, rhs);
@@ -153,7 +153,7 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
   @Override
   public Param visitParam(BasicParser.ParamContext ctx) {
     Type type = (Type) this.visit(ctx.type());
-    String ident = (String) this.visit(ctx.IDENT());
+    String ident = ctx.IDENT().getText();
     return new Param(type, ident);
   }
 
@@ -417,6 +417,58 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
   @Override
   public Expression.ExprType visitChr(BasicParser.ChrContext ctx) {
     return Expression.ExprType.CHR;
+  }
+
+  //BINARY-OP
+
+  //DIVIDE
+  @Override
+  public Expression visitDivExpr(BasicParser.DivExprContext ctx) {
+
+    Expression expression1 = (Expression) this.visit(ctx.expr(0));
+    Expression expression2 = (Expression) this.visit(ctx.expr(1));
+
+    return new ExpressionBuilder().buildDivExpr(expression1, expression2);
+  }
+
+  //MULTIPLY
+  @Override
+  public Expression visitMulExpr(BasicParser.MulExprContext ctx) {
+
+    Expression expression1 = (Expression) this.visit(ctx.expr(0));
+    Expression expression2 = (Expression) this.visit(ctx.expr(1));
+
+    return new ExpressionBuilder().buildMulExpr(expression1, expression2);
+  }
+
+  //MODULO
+  @Override
+  public Expression visitModExpr(BasicParser.ModExprContext ctx) {
+
+    Expression expression1 = (Expression) this.visit(ctx.expr(0));
+    Expression expression2 = (Expression) this.visit(ctx.expr(1));
+
+    return new ExpressionBuilder().buildModExpr(expression1, expression2);
+  }
+
+  //PLUS
+  @Override
+  public Expression visitPlusExpr(BasicParser.PlusExprContext ctx) {
+
+    Expression expression1 = (Expression) this.visit(ctx.expr(0));
+    Expression expression2 = (Expression) this.visit(ctx.expr(1));
+
+    return new ExpressionBuilder().buildPlusExpr(expression1, expression2);
+  }
+
+  //MINUS
+  @Override
+  public Expression visitMinusExpr(BasicParser.MinusExprContext ctx) {
+
+    Expression expression1 = (Expression) this.visit(ctx.expr(0));
+    Expression expression2 = (Expression) this.visit(ctx.expr(1));
+
+    return new ExpressionBuilder().buildMinusExpr(expression1, expression2);
   }
 
   //BRACKETS

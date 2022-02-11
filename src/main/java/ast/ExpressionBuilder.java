@@ -58,13 +58,40 @@ public class ExpressionBuilder {
     return this.build();
   }
 
-  //TODO: IntOp Expressions
+  public Expression buildDivExpr(Expression expression1, Expression expression2) {
+    this.exprType = Expression.ExprType.DIVIDE;
+    this.expression1 = expression1;
+    this.expression2 = expression2;
+    return this.build();
+  }
 
-  //TODO: IntCharOpExpressions
+  public Expression buildMulExpr(Expression expression1, Expression expression2) {
+    this.exprType = Expression.ExprType.MULTIPLY;
+    this.expression1 = expression1;
+    this.expression2 = expression2;
+    return this.build();
+  }
 
-  //TODO: AllOpExpressions
+  public Expression buildModExpr(Expression expression1, Expression expression2) {
+    this.exprType = Expression.ExprType.MODULO;
+    this.expression1 = expression1;
+    this.expression2 = expression2;
+    return this.build();
+  }
 
-  //TODO: BoolOpExpressions
+  public Expression buildPlusExpr(Expression expression1, Expression expression2) {
+    this.exprType = Expression.ExprType.PLUS;
+    this.expression1 = expression1;
+    this.expression2 = expression2;
+    return this.build();
+  }
+
+  public Expression buildMinusExpr(Expression expression1, Expression expression2) {
+    this.exprType = Expression.ExprType.MINUS;
+    this.expression1 = expression1;
+    this.expression2 = expression2;
+    return this.build();
+  }
 
   public Expression buildBracketsExpr(Expression expression) {
     this.exprType = Expression.ExprType.BRACKETS;
