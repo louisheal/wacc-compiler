@@ -138,7 +138,6 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
             Token rhsToken = getErrorPos(rhsType, ctx.assignRHS());
             printSemanticError(Error.IncompatibleTypes, lhsType, rhsType, rhsToken);
         }
-        currentST.newSymbol(varName, rhsType);
 
         return visitChildren(ctx);
     }
