@@ -8,6 +8,8 @@ import ast.Program;
 import ast.Statement;
 import ast.Type;
 import ast.Type.EType;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -17,7 +19,7 @@ public class TraverseAST {
   private int errors = 0;
 
   private void printSemanticError() {
-    String errorMsg = "Semantic Error\n";
+    String errorMsg = "#semantic_error";
     errors++;
 
     System.out.println(errorMsg);

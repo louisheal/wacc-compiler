@@ -168,6 +168,10 @@ public class Expression {
     return expression2;
   }
 
+  public String getIdent() {
+    return ident;
+  }
+
   public enum ExprType {
 
     INTLITER,
