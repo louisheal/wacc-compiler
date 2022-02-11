@@ -14,7 +14,9 @@ paramList: param (COMMA param)* ;
 param: type IDENT ;
 
 intLiter: INTEGER ;
-signedIntLiter: PLUS INTEGER | MINUS INTEGER ;
+signedIntLiter: PLUS INTEGER    #positiveInt
+              | MINUS INTEGER   #negativeInt
+              ;
 
 boolLiter: BOOL_LITER ;
 

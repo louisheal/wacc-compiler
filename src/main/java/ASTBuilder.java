@@ -289,11 +289,21 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
 
   @Override
   public Expression visitIntExpr(BasicParser.IntExprContext ctx) {
-    return new Expression(Expression.ExprType.INTLITER, (Integer) this.visit(ctx.intLiter()));
+    return new ExpressionBuilder().buildIntExpr(visitIntLiter(ctx.intLiter()));
   }
 
   @Override
   public Integer visitIntLiter(BasicParser.IntLiterContext ctx) {
+    return Integer.parseInt(ctx.INTEGER().getText());
+  }
+
+  @Override
+  public Expression visitSignedIntExpr(BasicParser.SignedIntExprContext ctx) {
+    return new ExpressionBuilder().buildIntExpr((Integer) this.visit(ctx.signedIntLiter()));
+  }
+
+  @Override
+  public Integer visitPositiveInt(BasicParser.PositiveIntContext ctx) {
     return Integer.parseInt(ctx.INTEGER().getText());
   }
 

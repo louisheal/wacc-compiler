@@ -13,9 +13,17 @@ public class Expression {
   Expression expression1;
   Expression expression2;
 
-  public Expression(ExprType exprType, int intLiter) {
+  public Expression(ExprType exprType, int intLiter, boolean boolLiter, char charLiter, String stringLiter,
+                    String ident, ArrayElem arrayElem, Expression expression1, Expression expression2) {
     this.exprType = exprType;
     this.intLiter = intLiter;
+    this.boolLiter = boolLiter;
+    this.charLiter = charLiter;
+    this.stringLiter = stringLiter;
+    this.ident = ident;
+    this.arrayElem = arrayElem;
+    this.expression1 = expression1;
+    this.expression2 = expression2;
   }
 
   @Override
