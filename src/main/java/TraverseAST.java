@@ -39,6 +39,13 @@ public class TraverseAST {
         return new Type(EType.CHAR);
       case STRINGLITER:
         return new Type(EType.STRING);
+      //case IDENT:
+      case PAIRELEM:
+        return new Type(EType.PAIR,getExpressionType(expr.getExpression1()),
+            getExpressionType(expr.getExpression2()));
+
+
+
     }
     return null;
   }

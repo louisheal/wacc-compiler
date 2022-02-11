@@ -10,6 +10,7 @@ public class ExpressionBuilder {
   private char charLiter;
   private String stringLiter;
   private String ident;
+  private PairElem pairElem;
   private ArrayElem arrayElem;
   private Expression expression1;
   private Expression expression2;
@@ -154,7 +155,8 @@ public class ExpressionBuilder {
   }
 
   private Expression build() {
-    return new Expression(exprType, intLiter, boolLiter, charLiter, stringLiter, ident, arrayElem, expression1, expression2);
+    return new Expression(exprType, intLiter, boolLiter, charLiter, stringLiter, ident,
+        pairElem, arrayElem, expression1, expression2);
   }
 
 }
