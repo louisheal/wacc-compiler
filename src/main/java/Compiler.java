@@ -1,4 +1,5 @@
 import antlr.*;
+import ast.Program;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -46,12 +47,9 @@ public class Compiler {
       exit(100);
     }
 
-    SemanticChecker visitor = new SemanticChecker();
-    visitor.visit(tree);
-
-    if (visitor.getNumberOfSemanticErrors() > 0) {
-      exit(200);
-    }
+    ASTBuilder astBuilder = new ASTBuilder();
+    Program ast = (Program) astBuilder.visit(tree);
+    System.out.println(ast);
 
   }
 
