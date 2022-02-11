@@ -102,7 +102,8 @@ public class TraverseAST {
       case READ:
         break;
       case FREE:
-        if(statement.getRHS().getAssignType() != RHSType.ARRAY
+        if(statement.getRHS() == null
+            ||statement.getRHS().getAssignType() != RHSType.ARRAY
             || statement.getRHS().getAssignType() != RHSType.PAIRELEM
             || statement.getRHS().getAssignType() != RHSType.NEWPAIR){
           printSemanticError();
