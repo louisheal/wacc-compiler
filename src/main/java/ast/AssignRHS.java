@@ -12,52 +12,13 @@ public class AssignRHS {
   String functionIdent;
   List<Expression> argList;
 
-  public AssignRHS(RHSType assignType, Expression expression) {
-    this.assignType = assignType;
-    this.expression1 = expression;
-    this.expression2 = null;
-    this.array = null;
-    this.pairElem = null;
-    this.functionIdent = null;
-    this.argList = null;
-  }
-
-  public AssignRHS(RHSType assignType, List<Expression> array) {
-    this.assignType = assignType;
-    this.expression1 = null;
-    this.expression2 = null;
-    this.array = array;
-    this.pairElem = null;
-    this.functionIdent = null;
-    this.argList = null;
-  }
-
-  public AssignRHS(RHSType assignType, Expression expression1, Expression expression2) {
+  public AssignRHS(RHSType assignType, Expression expression1, Expression expression2, List<Expression> array,
+                   PairElem pairElem, String functionIdent, List<Expression> argList) {
     this.assignType = assignType;
     this.expression1 = expression1;
     this.expression2 = expression2;
-    this.array = null;
-    this.pairElem = null;
-    this.functionIdent = null;
-    this.argList = null;
-  }
-
-  public AssignRHS(RHSType assignType, PairElem pairElem) {
-    this.assignType = assignType;
-    this.expression1 = null;
-    this.expression2 = null;
-    this.array = null;
+    this.array = array;
     this.pairElem = pairElem;
-    this.functionIdent = null;
-    this.argList = null;
-  }
-
-  public AssignRHS(RHSType assignType, String functionIdent, List<Expression> argList) {
-    this.assignType = assignType;
-    this.expression1 = null;
-    this.expression2 = null;
-    this.array = null;
-    this.pairElem = null;
     this.functionIdent = functionIdent;
     this.argList = argList;
   }

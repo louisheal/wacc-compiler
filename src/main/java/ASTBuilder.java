@@ -243,7 +243,9 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
 
   @Override
   public AssignRHS visitExprRHS(BasicParser.ExprRHSContext ctx) {
-    return new AssignRHS(AssignRHS.RHSType.EXPR, (Expression) this.visit(ctx.expr()));
+    Expression expression = (Expression) this.visit(ctx.expr());
+
+    return new AssignRHSBuilder().buildExprRHS(expression);
   }
 
   @Override
@@ -254,31 +256,35 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
       expressions.add((Expression) this.visit(ctx.arrayLiter().expr(i)));
     }
 
-    return new AssignRHS(AssignRHS.RHSType.ARRAY, expressions);
+    return new AssignRHSBuilder().buildArrayRHS(expressions);
   }
 
   @Override
   public AssignRHS visitNewPairRHS(BasicParser.NewPairRHSContext ctx) {
     Expression fst = (Expression) this.visit(ctx.expr(0));
     Expression snd = (Expression) this.visit(ctx.expr(1));
-    return new AssignRHS(AssignRHS.RHSType.NEWPAIR, fst, snd);
+
+    return new AssignRHSBuilder().buildNewPair(fst, snd);
   }
 
   @Override
   public AssignRHS visitPairElemRHS(BasicParser.PairElemRHSContext ctx) {
-    return new AssignRHS(AssignRHS.RHSType.PAIRELEM, (PairElem) this.visit(ctx.pairElem()));
+    PairElem pairElem = (PairElem) this.visit(ctx.pairElem());
+
+    return new AssignRHSBuilder().buildPairElem(pairElem);
   }
 
   @Override
   public AssignRHS visitCallRHS(BasicParser.CallRHSContext ctx) {
 
     List<Expression> expressions = new ArrayList<>();
+    String functionIdent = ctx.IDENT().getText();
 
     for (int i = 0; i < ctx.argList().expr().size(); i++) {
       expressions.add((Expression) this.visit(ctx.argList().expr(i)));
     }
 
-    return new AssignRHS(AssignRHS.RHSType.CALL, ctx.IDENT().getText(), expressions);
+    return new AssignRHSBuilder().buildCallRHS(functionIdent, expressions);
   }
 
   @Override
