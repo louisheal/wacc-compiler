@@ -100,7 +100,8 @@ public class TraverseAST {
         break;
       case FREE:
         if(statement.getRHS().getAssignType() != RHSType.ARRAY
-            || statement.getRHS().getAssignType() != RHSType.PAIRELEM){
+            || statement.getRHS().getAssignType() != RHSType.PAIRELEM
+            || statement.getRHS().getAssignType() != RHSType.NEWPAIR){
           errors++;
         }
         else{
