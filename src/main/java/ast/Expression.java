@@ -1,7 +1,5 @@
 package ast;
 
-import java.math.BigInteger;
-
 public class Expression {
 
   private final ExprType exprType;
@@ -134,6 +132,34 @@ public class Expression {
     }
 
     return result.toString();
+  }
+
+  public long getIntLiter() {
+    return intLiter;
+  }
+
+  public boolean getBoolLiter() {
+    return boolLiter;
+  }
+
+  public char getCharLiter() {
+    return charLiter;
+  }
+
+  public String getStringLiter() {
+    return stringLiter;
+  }
+
+  public ExprType getExprType() {
+    return exprType;
+  }
+
+  public Expression getExpression1() {
+    return expression1;
+  }
+
+  public Expression getExpression2() {
+    return expression2;
   }
 
   public enum ExprType {

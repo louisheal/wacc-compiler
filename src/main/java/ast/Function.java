@@ -36,7 +36,7 @@ public class Function {
   public String toString() {
     StringBuilder paramSB = new StringBuilder();
     for (Param param : params) {
-      paramSB.append(param);
+      paramSB.append(param.getType()).append(" ").append(param.getIdent()).append(" ");
     }
     return returnType + " " + ident + " (" + paramSB + ") is\n" + statement + "end\n";
   }
