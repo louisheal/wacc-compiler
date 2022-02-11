@@ -16,7 +16,7 @@ public class TraverseAST {
   private int errors = 0;
 
   private void printSemanticError() {
-    String errorMsg = "Semantic Error";
+    String errorMsg = "Semantic Error\n";
 
     System.out.println(errorMsg);
   }
