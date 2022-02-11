@@ -4,69 +4,48 @@ import java.util.List;
 
 public class AssignRHSBuilder {
 
-  AssignRHS.RHSType assignType;
-  Expression expression1;
-  Expression expression2;
-  List<Expression> array;
-  PairElem pairElem;
-  String functionIdent;
-  List<Expression> argList;
+  private AssignRHS.RHSType assignType;
+  private Expression expression1;
+  private Expression expression2;
+  private List<Expression> array;
+  private PairElem pairElem;
+  private String functionIdent;
+  private List<Expression> argList;
 
-  public AssignRHSBuilder withAssignType(AssignRHS.RHSType assignType) {
-    this.assignType = assignType;
-    return this;
-  }
-
-  public AssignRHSBuilder withExpression1(Expression expression1) {
+  public AssignRHS buildExprRHS(Expression expression1) {
+    this.assignType = AssignRHS.RHSType.EXPR;
     this.expression1 = expression1;
-    return this;
+    return this.build();
   }
 
-  public AssignRHSBuilder withExpression2(Expression expression2) {
-    this.expression2 = expression2;
-    return this;
-  }
-
-  public AssignRHSBuilder withArray(List<Expression> array) {
+  public AssignRHS buildArrayRHS(List<Expression> array) {
+    this.assignType = AssignRHS.RHSType.ARRAY;
     this.array = array;
-    return this;
+    return this.build();
   }
 
-  public AssignRHSBuilder withPairElem(PairElem pairElem) {
+  public AssignRHS buildNewPair(Expression expression1, Expression expression2) {
+    this.assignType = AssignRHS.RHSType.NEWPAIR;
+    this.expression1 = expression1;
+    this.expression2 = expression2;
+    return this.build();
+  }
+
+  public AssignRHS buildPairElem(PairElem pairElem) {
+    this.assignType = AssignRHS.RHSType.PAIRELEM;
     this.pairElem = pairElem;
-    return this;
+    return this.build();
   }
 
-  public AssignRHSBuilder withFunctionIdent(String functionIdent) {
+  public AssignRHS buildCallRHS(String functionIdent, List<Expression> argList) {
+    this.assignType = AssignRHS.RHSType.CALL;
     this.functionIdent = functionIdent;
-    return this;
-  }
-
-  public AssignRHSBuilder withArgList(List<Expression> argList) {
     this.argList = argList;
-    return this;
+    return this.build();
   }
 
-  public AssignRHS buildExprRHS() {
-    return new AssignRHS(assignType, expression1);
-  }
-
-  public AssignRHS buildArray() {
-    return new AssignRHS(assignType, array);
-  }
-
-  public AssignRHS buildNewPair() {
-    return new AssignRHS(assignType, expression1, expression2);
-  }
-
-  public AssignRHS buildPairElem() {
-    return new AssignRHS(assignType, pairElem);
-  }
-
-  public AssignRHS buildCall() {
-    return new AssignRHS(assignType, functionIdent, argList);
+  private AssignRHS build() {
+    return new AssignRHS(assignType, expression1, expression2, array, pairElem, functionIdent, argList);
   }
 
 }
-
-
