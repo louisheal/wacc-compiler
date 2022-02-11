@@ -222,19 +222,17 @@ public class TraverseAST {
         }
         break;
       case IF:
-        if(expression.getExprType() != ExprType.BOOLLITER){
-          if(expression == null) {
-            printSemanticError(statement);
-          }
-          else {
-            traverse(expression);
-          }
+        if(!getExpressionType(expression).equals(new Type(EType.BOOL))){
+          traverse(expression);
+        }
+        else {
+          printSemanticError(statement);
         }
         traverse(statement.getStatement1());
         traverse(statement.getStatement2());
         break;
       case WHILE:
-        if(expression.getExprType()  != Expression.ExprType.BOOLLITER) {
+        if(!getExpressionType(expression).equals(new Type(EType.BOOL))) {
           printSemanticError(statement);
         }
         traverse(expression);
