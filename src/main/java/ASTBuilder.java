@@ -380,10 +380,13 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
   }
 
   //UNARY-OP
-
   @Override
   public Expression visitUnOp(BasicParser.UnOpContext ctx) {
-    return new ExpressionBuilder().buildUnOpExpr((Expression.ExprType) this.visit(ctx.unaryOper()), (Expression) this.visit(ctx.expr()));
+
+    Expression.ExprType exprType = (Expression.ExprType) this.visit(ctx.unaryOper());
+    Expression expression = (Expression) this.visit(ctx.expr());
+
+    return new ExpressionBuilder().buildUnOpExpr(exprType, expression);
   }
 
   //NOT
@@ -402,6 +405,12 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
   @Override
   public Expression.ExprType visitLen(BasicParser.LenContext ctx) {
     return Expression.ExprType.LEN;
+  }
+
+  //ORD
+  @Override
+  public Expression.ExprType visitOrd(BasicParser.OrdContext ctx) {
+    return Expression.ExprType.ORD;
   }
 
 }

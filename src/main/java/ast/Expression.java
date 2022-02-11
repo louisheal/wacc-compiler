@@ -67,6 +67,10 @@ public class Expression {
       result.append("len ").append(expression1);
     }
 
+    if (exprType == ExprType.ORD) {
+      result.append("ord ").append(expression1);
+    }
+
     return result.toString();
   }
 
