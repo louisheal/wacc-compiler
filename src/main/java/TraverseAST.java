@@ -96,6 +96,7 @@ public class TraverseAST {
         }
         else{
           errors++;
+          printSemanticError();
         }
         break;
       case READ:
@@ -105,6 +106,7 @@ public class TraverseAST {
             || statement.getRHS().getAssignType() != RHSType.PAIRELEM
             || statement.getRHS().getAssignType() != RHSType.NEWPAIR){
           errors++;
+          printSemanticError();
         }
         else{
           traverse(statement.getExpression());
@@ -116,6 +118,7 @@ public class TraverseAST {
       case EXIT:
         if(statement.getLhsType().getType() != EType.INT){
           errors++;
+          printSemanticError();
         }
         else {
           traverse(statement.getExpression());
@@ -131,6 +134,7 @@ public class TraverseAST {
         if(statement.getExpression().getExprType() != ExprType.BOOLLITER){
           if(statement.getExpression() == null) {
             errors++;
+            printSemanticError();
           }
           else {
             traverse(statement.getExpression());
