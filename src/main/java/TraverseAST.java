@@ -39,7 +39,6 @@ public class TraverseAST {
       case STRINGLITER:
         return new Type(EType.STRING);
     }
-
     return null;
   }
 
@@ -57,7 +56,7 @@ public class TraverseAST {
         break;
     }
     printSemanticError();
-    return EType.INT;
+    return null;
   }
 
   public void traverse(Program program) {
@@ -121,6 +120,9 @@ public class TraverseAST {
       case SKIP:
         break;
       case DECLARATION:
+        if (!statement.getLhsType().getType().equals(getRHSType(statement.getRHS()))) {
+          printSemanticError();
+        }
         currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
         traverse(statement.getRHS().getExpression1());
         break;
