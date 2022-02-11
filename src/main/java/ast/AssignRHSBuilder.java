@@ -47,7 +47,7 @@ public class AssignRHSBuilder {
     return this;
   }
 
-  public AssignRHS buildExprRHS() {
+  public AssignRHS buildExpr() {
     return new AssignRHS(assignType, expression1);
   }
 
