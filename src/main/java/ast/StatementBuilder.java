@@ -10,41 +10,6 @@ public class StatementBuilder {
   private Statement statement1;
   private Statement statement2;
 
-  public StatementBuilder withLHSType(Type lhsType) {
-    this.lhsType = lhsType;
-    return this;
-  }
-
-  public StatementBuilder withLHSIdent(String lhsIdent) {
-    this.lhsIdent = lhsIdent;
-    return this;
-  }
-
-  public StatementBuilder withLHS(AssignLHS lhs) {
-    this.lhs = lhs;
-    return this;
-  }
-
-  public StatementBuilder withRHS(AssignRHS rhs) {
-    this.rhs = rhs;
-    return this;
-  }
-
-  public StatementBuilder withExpression(Expression expression) {
-    this.expression = expression;
-    return this;
-  }
-
-  public StatementBuilder withStatement1(Statement statement1) {
-    this.statement1 = statement1;
-    return this;
-  }
-
-  public StatementBuilder withStatement2(Statement statement2) {
-    this.statement2 = statement2;
-    return this;
-  }
-
   public Statement buildSkip() {
     this.statType = Statement.StatType.SKIP;
     return this.build();
