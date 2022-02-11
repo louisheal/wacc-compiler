@@ -18,11 +18,11 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 //
 //    SymbolTable currentST = new SymbolTable(null);
 //
-//    private int errors = 0;
-//
-//    public int getNumberOfSemanticErrors() {
-//        return errors;
-//    }
+    private int errors = 0;
+
+    public int getNumberOfSemanticErrors() {
+        return errors;
+    }
 //
 //    private void printSemanticError(Error error, Type lType, Type rType, Token token) {
 //
