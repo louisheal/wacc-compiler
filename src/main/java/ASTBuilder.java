@@ -281,4 +281,14 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return new AssignRHS(AssignRHS.RHSType.CALL, ctx.IDENT().getText(), expressions);
   }
 
+  @Override
+  public Expression visitIntExpr(BasicParser.IntExprContext ctx) {
+    return new Expression(Expression.ExprType.INTLITER, (Integer) this.visit(ctx.intLiter()));
+  }
+
+  @Override
+  public Integer visitIntLiter(BasicParser.IntLiterContext ctx) {
+    return Integer.parseInt(ctx.INTEGER().getText());
+  }
+
 }

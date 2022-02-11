@@ -42,24 +42,23 @@ assignLHS: IDENT        #identLHS
          | pairElem     #pairLHS
          ;
 
-expr: intLiter                      #intExpr
-    | signedIntLiter                #signedIntExpr
-    | boolLiter                     #boolExpr
-    | charLiter                     #charExpr
-    | stringLiter                   #stringExpr
-    | pairLiter                     #pairExpr
-    | IDENT                         #identExpr
-    | arrayElem                     #arrayExpr
-    | unaryOper expr                #unOp
-    | expr DIVIDE expr              #intOp
-    | expr MULTIPLY expr            #intOp
-    | expr MODULO expr              #intOp
-    | expr (PLUS | MINUS) expr      #intOp
-    | expr (GREATER_THAN | GREATER_THAN_OR_EQUAL | LESS_THAN | LESS_THAN_OR_EQUAL) expr     #intOp
-    | expr (EQUAL | NOT_EQUAL) expr #intOp
-    | expr AND expr                 #boolOp
-    | expr OR expr                  #boolOp
-    | P_OPEN expr P_CLOSE           #brackets
+expr: intLiter                                      #intExpr
+    | signedIntLiter                                #signedIntExpr
+    | boolLiter                                     #boolExpr
+    | charLiter                                     #charExpr
+    | stringLiter                                   #stringExpr
+    | pairLiter                                     #pairExpr
+    | IDENT                                         #identExpr
+    | arrayElem                                     #arrayExpr
+    | unaryOper expr                                #unOp
+    | expr (DIVIDE | MULTIPLY | MODULO) expr        #intOp
+    | expr (PLUS | MINUS) expr                      #intOp
+    | expr (GREATER_THAN | GREATER_THAN_OR_EQUAL
+            | LESS_THAN | LESS_THAN_OR_EQUAL) expr  #intCharOp
+    | expr (EQUAL | NOT_EQUAL) expr                 #allOp
+    | expr AND expr                                 #boolOp
+    | expr OR expr                                  #boolOp
+    | P_OPEN expr P_CLOSE                           #brackets
     ;
 
 assignRHS: expr                                     #exprRHS

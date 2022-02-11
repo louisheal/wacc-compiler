@@ -13,7 +13,24 @@ public class Expression {
   Expression expression1;
   Expression expression2;
 
-  enum ExprType {
+  public Expression(ExprType exprType, int intLiter) {
+    this.exprType = exprType;
+    this.intLiter = intLiter;
+  }
+
+  @Override
+  public String toString() {
+
+    StringBuilder result = new StringBuilder();
+
+    if (exprType == ExprType.INTLITER) {
+      result.append(intLiter);
+    }
+
+    return result.toString();
+  }
+
+  public enum ExprType {
 
     INTLITER,
     BOOLLITER,
