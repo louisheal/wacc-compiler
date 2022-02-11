@@ -419,4 +419,11 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return Expression.ExprType.CHR;
   }
 
+  //BRACKETS
+  @Override
+  public Expression visitBrExpr(BasicParser.BrExprContext ctx) {
+    Expression expression = (Expression) this.visit(ctx.expr());
+    return new ExpressionBuilder().buildBracketsExpr(expression);
+  }
+
 }

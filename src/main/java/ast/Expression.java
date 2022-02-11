@@ -75,6 +75,10 @@ public class Expression {
       result.append("chr ").append(expression1);
     }
 
+    if (exprType == ExprType.BRACKETS) {
+      result.append("(").append(expression1).append(")");
+    }
+
     return result.toString();
   }
 
