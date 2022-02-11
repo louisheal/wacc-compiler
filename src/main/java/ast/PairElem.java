@@ -20,7 +20,7 @@ public class PairElem {
 
   @Override
   public String toString() {
-    return type + " " + expression;
+    return type.toString().toLowerCase() + " " + expression;
   }
 
   public enum PairElemType {

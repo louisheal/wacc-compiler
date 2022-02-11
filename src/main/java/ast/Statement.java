@@ -145,18 +145,22 @@ public class Statement {
   @Override
   public String toString() {
 
-    String result = "Statement{" + "statType=" + statType;
+    StringBuilder result = new StringBuilder();
+
+    if (statType != StatType.CONCAT) {
+      result.append(statType).append(": ");
+    }
 
     if (statType == StatType.DECLARATION) {
-      result += ", " + lhsType + " " + lhsIdent + " = " + rhs;
+      result.append(lhsType).append(" ").append(lhsIdent).append(" = ").append(rhs);
     }
 
     if (statType == StatType.REASSIGNMENT) {
-      result += ", " + lhs + " = " + rhs;
+      result.append(lhs).append(" = ").append(rhs);
     }
 
     if (statType == StatType.READ) {
-      result += " " + lhs;
+      result.append(statType.toString().toLowerCase()).append(lhs);
     }
 
     if (statType == StatType.FREE ||
@@ -164,27 +168,29 @@ public class Statement {
         statType == StatType.EXIT ||
         statType == StatType.PRINT ||
         statType == StatType.PRINTLN) {
-      result += " " + expression;
+      result.append(statType.toString().toLowerCase()).append(expression);
     }
 
     if (statType == StatType.IF) {
-      result += ", if: " + expression + ", then: " + statement1 + ", else: " + statement2;
+      result.append("if ").append(expression).append("then ").append(statement1)
+              .append("else ").append(statement2).append("fi");
     }
 
     if (statType == StatType.WHILE) {
-      result += ", while: " + expression +
-                ", do: " + statement1;
+      result.append("while ").append(expression).append("do").append(statement1);
     }
 
     if (statType == StatType.BEGIN) {
-      result += ", begin " + statement1 + " end";
+      result.append("begin\n").append(statement1);
     }
 
     if (statType == StatType.CONCAT) {
-      result += ", " + statement1 + ", " + statement2;
+      result.append(statement1).append(statement2);
+    } else {
+      result.append('\n');
     }
 
-    return result + '}';
+    return result.toString();
   }
 
   public enum StatType {

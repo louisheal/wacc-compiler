@@ -22,10 +22,11 @@ public class Program {
 
   @Override
   public String toString() {
-    return "Program{" +
-            "functions=" + functions +
-            ", statement=" + statement +
-            '}';
+    StringBuilder functionSB = new StringBuilder();
+    for (Function function : functions) {
+      functionSB.append(function);
+    }
+    return "begin\n" + functionSB + statement + "end";
   }
 
 }

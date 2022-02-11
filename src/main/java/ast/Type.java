@@ -57,7 +57,7 @@ public class Type {
       result = type.toString();
     }
 
-    return result;
+    return result.toLowerCase();
   }
 
   @Override

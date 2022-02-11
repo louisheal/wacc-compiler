@@ -42,31 +42,31 @@ assignLHS: IDENT        #identLHS
          | pairElem     #pairLHS
          ;
 
-expr: intLiter
-    | signedIntLiter
-    | boolLiter
-    | charLiter
-    | stringLiter
-    | pairLiter
-    | IDENT
-    | arrayElem
-    | unaryOper expr
-    | expr DIVIDE expr
-    | expr MULTIPLY expr
-    | expr MODULO expr
-    | expr (PLUS | MINUS) expr
-    | expr (GREATER_THAN | GREATER_THAN_OR_EQUAL | LESS_THAN | LESS_THAN_OR_EQUAL) expr
-    | expr (EQUAL | NOT_EQUAL) expr
-    | expr AND expr
-    | expr OR expr
-    | P_OPEN expr P_CLOSE
+expr: intLiter                      #intExpr
+    | signedIntLiter                #signedIntExpr
+    | boolLiter                     #boolExpr
+    | charLiter                     #charExpr
+    | stringLiter                   #stringExpr
+    | pairLiter                     #pairExpr
+    | IDENT                         #identExpr
+    | arrayElem                     #arrayExpr
+    | unaryOper expr                #unOp
+    | expr DIVIDE expr              #intOp
+    | expr MULTIPLY expr            #intOp
+    | expr MODULO expr              #intOp
+    | expr (PLUS | MINUS) expr      #intOp
+    | expr (GREATER_THAN | GREATER_THAN_OR_EQUAL | LESS_THAN | LESS_THAN_OR_EQUAL) expr     #intOp
+    | expr (EQUAL | NOT_EQUAL) expr #intOp
+    | expr AND expr                 #boolOp
+    | expr OR expr                  #boolOp
+    | P_OPEN expr P_CLOSE           #brackets
     ;
 
-assignRHS: expr
-         | arrayLiter
-         | NEW_PAIR P_OPEN expr COMMA expr P_CLOSE
-         | pairElem
-         | CALL IDENT P_OPEN argList P_CLOSE 
+assignRHS: expr                                     #exprRHS
+         | arrayLiter                               #arrayRHS
+         | NEW_PAIR P_OPEN expr COMMA expr P_CLOSE  #newPairRHS
+         | pairElem                                 #pairElemRHS
+         | CALL IDENT P_OPEN argList P_CLOSE        #callRHS
          ;
 
 argList: expr (COMMA expr)* | ; // second empty in case no args taken
@@ -98,11 +98,11 @@ pairElemType: baseType      #basePairElem
             | PAIR          #pairPairElem
             ;
 
-unaryOper: NOT
-         | MINUS
-         | LEN
-         | ORD
-         | CHR 
+unaryOper: NOT      #not
+         | MINUS    #minus
+         | LEN      #len
+         | ORD      #ord
+         | CHR      #chr
          ;
 
 arrayElem: IDENT (SB_OPEN expr SB_CLOSE)+ ;

@@ -129,11 +129,11 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
 
   @Override
   public List<Param> visitParamList(BasicParser.ParamListContext ctx) {
-    if (ctx == null) {
-      return null;
-    }
-
     List<Param> params = new ArrayList<>();
+
+    if (ctx == null) {
+      return params;
+    }
 
     for (int i = 0; i < ctx.param().size(); i++) {
       params.add((Param) this.visit(ctx.param(i)));
@@ -239,6 +239,46 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
   @Override
   public PairElem visitSndElem(BasicParser.SndElemContext ctx) {
     return new PairElem(PairElem.PairElemType.SND, (Expression) this.visit(ctx.expr()));
+  }
+
+  @Override
+  public AssignRHS visitExprRHS(BasicParser.ExprRHSContext ctx) {
+    return new AssignRHS(AssignRHS.RHSType.EXPR, (Expression) this.visit(ctx.expr()));
+  }
+
+  @Override
+  public AssignRHS visitArrayRHS(BasicParser.ArrayRHSContext ctx) {
+    List<Expression> expressions = new ArrayList<>();
+
+    for (int i = 0; i < ctx.arrayLiter().expr().size(); i++) {
+      expressions.add((Expression) this.visit(ctx.arrayLiter().expr(i)));
+    }
+
+    return new AssignRHS(AssignRHS.RHSType.ARRAY, expressions);
+  }
+
+  @Override
+  public AssignRHS visitNewPairRHS(BasicParser.NewPairRHSContext ctx) {
+    Expression fst = (Expression) this.visit(ctx.expr(0));
+    Expression snd = (Expression) this.visit(ctx.expr(1));
+    return new AssignRHS(AssignRHS.RHSType.NEWPAIR, fst, snd);
+  }
+
+  @Override
+  public AssignRHS visitPairElemRHS(BasicParser.PairElemRHSContext ctx) {
+    return new AssignRHS(AssignRHS.RHSType.PAIRELEM, (PairElem) this.visit(ctx.pairElem()));
+  }
+
+  @Override
+  public AssignRHS visitCallRHS(BasicParser.CallRHSContext ctx) {
+
+    List<Expression> expressions = new ArrayList<>();
+
+    for (int i = 0; i < ctx.argList().expr().size(); i++) {
+      expressions.add((Expression) this.visit(ctx.argList().expr(i)));
+    }
+
+    return new AssignRHS(AssignRHS.RHSType.CALL, ctx.IDENT().getText(), expressions);
   }
 
 }

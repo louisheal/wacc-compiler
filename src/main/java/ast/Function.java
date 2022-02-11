@@ -34,12 +34,11 @@ public class Function {
 
   @Override
   public String toString() {
-    return "Function{" +
-            "returnType=" + returnType +
-            ", ident='" + ident + '\'' +
-            ", params=" + params +
-            ", statement=" + statement +
-            '}';
+    StringBuilder paramSB = new StringBuilder();
+    for (Param param : params) {
+      paramSB.append(param);
+    }
+    return returnType + " " + ident + " (" + paramSB + ") is\n" + statement + "end\n";
   }
 
 }
