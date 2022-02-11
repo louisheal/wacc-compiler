@@ -51,55 +51,55 @@ public class StatementBuilder {
   }
 
   public Statement buildSkip() {
-    return new Statement(statType);
+    return new Statement(Statement.StatType.SKIP);
   }
 
   public Statement buildDeclaration() {
-    return new Statement(statType, lhsType, lhsIdent, rhs);
+    return new Statement(Statement.StatType.DECLARATION, lhsType, lhsIdent, rhs);
   }
 
   public Statement buildReassignment() {
-    return new Statement(statType, lhs, rhs);
+    return new Statement(Statement.StatType.REASSIGNMENT, lhs, rhs);
   }
 
   public Statement buildRead() {
-    return new Statement(statType, lhs);
+    return new Statement(Statement.StatType.READ, lhs);
   }
 
   public Statement buildFree() {
-    return new Statement(statType, expression);
+    return new Statement(Statement.StatType.FREE, expression);
   }
 
   public Statement buildReturn() {
-    return new Statement(statType, expression);
+    return new Statement(Statement.StatType.RETURN, expression);
   }
 
   public Statement buildExit() {
-    return new Statement(statType, expression);
+    return new Statement(Statement.StatType.EXIT, expression);
   }
 
   public Statement buildPrint() {
-    return new Statement(statType, expression);
+    return new Statement(Statement.StatType.PRINT, expression);
   }
 
   public Statement buildPrintln() {
-    return new Statement(statType, expression);
+    return new Statement(Statement.StatType.PRINTLN, expression);
   }
 
-  public Statement buildIfThenElseFi() {
-    return new Statement(statType, expression, statement1, statement2);
+  public Statement buildIfThenElse() {
+    return new Statement(Statement.StatType.IF, expression, statement1, statement2);
   }
 
   public Statement buildWhile() {
-    return new Statement(statType, expression, statement1);
+    return new Statement(Statement.StatType.WHILE, expression, statement1);
   }
 
   public Statement buildBegin() {
-    return new Statement(statType, statement1);
+    return new Statement(Statement.StatType.BEGIN, statement1);
   }
 
   public Statement buildSemiColon() {
-    return new Statement(statType, statement1, statement2);
+    return new Statement(Statement.StatType.CONCAT, statement1, statement2);
   }
 
 
