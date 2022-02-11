@@ -367,4 +367,10 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return ctx.STR_LITER().getText();
   }
 
+  //IDENT-EXPR
+  @Override
+  public Expression visitIdentExpr(BasicParser.IdentExprContext ctx) {
+    return new ExpressionBuilder().buildIdentExpr(ctx.IDENT().getText());
+  }
+
 }

@@ -47,6 +47,10 @@ public class Expression {
       result.append(stringLiter);
     }
 
+    if (exprType == ExprType.IDENT) {
+      result.append(ident);
+    }
+
     return result.toString().toLowerCase();
   }
 
