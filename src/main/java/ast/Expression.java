@@ -1,9 +1,11 @@
 package ast;
 
+import java.math.BigInteger;
+
 public class Expression {
 
   private final ExprType exprType;
-  private final int intLiter;
+  private final long intLiter;
   private final boolean boolLiter;
   private final char charLiter;
   private final String stringLiter;
@@ -13,7 +15,7 @@ public class Expression {
   private final Expression expression1;
   private final Expression expression2;
 
-  public Expression(ExprType exprType, int intLiter, boolean boolLiter, char charLiter, String stringLiter,
+  public Expression(ExprType exprType, long intLiter, boolean boolLiter, char charLiter, String stringLiter,
                     String ident, ArrayElem arrayElem, Expression expression1, Expression expression2) {
     this.exprType = exprType;
     this.intLiter = intLiter;

@@ -314,24 +314,24 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
   }
 
   @Override
-  public Integer visitIntLiter(BasicParser.IntLiterContext ctx) {
-    return Integer.parseInt(ctx.INTEGER().getText());
+  public Long visitIntLiter(BasicParser.IntLiterContext ctx) {
+    return Long.parseLong(ctx.INTEGER().getText());
   }
 
   //SIGNED-INT-EXPR
   @Override
   public Expression visitSignedIntExpr(BasicParser.SignedIntExprContext ctx) {
-    return new ExpressionBuilder().buildIntExpr((Integer) this.visit(ctx.signedIntLiter()));
+    return new ExpressionBuilder().buildIntExpr((Long) this.visit(ctx.signedIntLiter()));
   }
 
   @Override
-  public Integer visitPositiveInt(BasicParser.PositiveIntContext ctx) {
-    return Integer.parseInt(ctx.INTEGER().getText());
+  public Long visitPositiveInt(BasicParser.PositiveIntContext ctx) {
+    return Long.parseLong(ctx.INTEGER().getText());
   }
 
   @Override
-  public Integer visitNegativeInt(BasicParser.NegativeIntContext ctx) {
-    return (-1) * Integer.parseInt(ctx.INTEGER().getText());
+  public Long visitNegativeInt(BasicParser.NegativeIntContext ctx) {
+    return (-1) * Long.parseLong(ctx.INTEGER().getText());
   }
 
   //BOOL-EXPR
