@@ -12,6 +12,12 @@ public class TraverseAST {
 
   private int errors = 0;
 
+  private void printSemanticError() {
+    String errorMsg = "Semantic Error";
+
+    System.out.println(errorMsg);
+  }
+
   public Integer getNumberOfErrors() {
     return errors;
   }
