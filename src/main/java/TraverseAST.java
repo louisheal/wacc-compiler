@@ -6,6 +6,7 @@ import ast.Param;
 import ast.Program;
 import ast.Statement;
 import ast.Type;
+import ast.Type.EType;
 import java.util.List;
 
 public class TraverseAST {
@@ -112,7 +113,12 @@ public class TraverseAST {
         traverse(statement.getExpression());
         break;
       case EXIT:
-        traverse(statement.getExpression());
+        if(statement.getLhsType().getType() != EType.INT){
+          errors++;
+        }
+        else {
+          traverse(statement.getExpression());
+        }
         break;
       case PRINT:
         traverse(statement.getExpression());
