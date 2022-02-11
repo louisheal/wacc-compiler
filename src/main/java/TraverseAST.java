@@ -68,6 +68,9 @@ public class TraverseAST {
           sndType = new Type(EType.PAIR);
         }
         return new Type(EType.PAIR, fstType, sndType);
+      case BRACKETS:
+        return (getExpressionType(expr.getExpression1()));
+
 
     }
     return null;
