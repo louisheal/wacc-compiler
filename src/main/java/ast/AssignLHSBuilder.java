@@ -7,20 +7,20 @@ public class AssignLHSBuilder {
   private ArrayElem arrayElem;
   private PairElem pairElem;
 
-  public AssignLHS buildIdentLHS(AssignLHS.LHSType assignType, String ident) {
-    this.assignType = assignType;
+  public AssignLHS buildIdentLHS(String ident) {
+    this.assignType = AssignLHS.LHSType.IDENT;
     this.ident = ident;
     return this.build();
   }
 
-  public AssignLHS buildArrayLHS(AssignLHS.LHSType assignType, ArrayElem arrayElem) {
-    this.assignType = assignType;
+  public AssignLHS buildArrayLHS(ArrayElem arrayElem) {
+    this.assignType = AssignLHS.LHSType.ARRAYELEM;
     this.arrayElem = arrayElem;
     return this.build();
   }
 
-  public AssignLHS buildPairLHS(AssignLHS.LHSType assignType, PairElem pairElem) {
-    this.assignType = assignType;
+  public AssignLHS buildPairLHS( PairElem pairElem) {
+    this.assignType = AssignLHS.LHSType.PAIRELEM;
     this.pairElem = pairElem;
     return this.build();
   }
