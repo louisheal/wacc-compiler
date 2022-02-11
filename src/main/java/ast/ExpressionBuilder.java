@@ -5,7 +5,7 @@ import javax.print.DocFlavor;
 public class ExpressionBuilder {
 
   private Expression.ExprType exprType;
-  private int intLiter;
+  private long intLiter;
   private boolean boolLiter;
   private char charLiter;
   private String stringLiter;
@@ -14,7 +14,7 @@ public class ExpressionBuilder {
   private Expression expression1;
   private Expression expression2;
 
-  public Expression buildIntExpr(int intLiter) {
+  public Expression buildIntExpr(long intLiter) {
     this.exprType = Expression.ExprType.INTLITER;
     this.intLiter = intLiter;
     return this.build();

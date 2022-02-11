@@ -317,31 +317,31 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
   }
 
   @Override
-  public Integer visitIntLiter(BasicParser.IntLiterContext ctx) {
-    double max = Math.pow(2, 31) - 1;
-    double min = -Math.pow(2, 31);
-    double value = Double.parseDouble(ctx.INTEGER().getText());
+  public Long visitIntLiter(BasicParser.IntLiterContext ctx) {
+    long max = (long) (Math.pow(2, 31) - 1);
+    long min = (long) -Math.pow(2, 31);
+    long value = Long.parseLong(ctx.INTEGER().getText());
     if (value > max | value < min) {
       System.out.println("#syntax_error#");
       exit(100);
     }
-    return Integer.parseInt(ctx.INTEGER().getText());
+    return Long.parseLong(ctx.INTEGER().getText());
   }
 
   //SIGNED-INT-EXPR
   @Override
   public Expression visitSignedIntExpr(BasicParser.SignedIntExprContext ctx) {
-    return new ExpressionBuilder().buildIntExpr((Integer) this.visit(ctx.signedIntLiter()));
+    return new ExpressionBuilder().buildIntExpr((Long) this.visit(ctx.signedIntLiter()));
   }
 
   @Override
-  public Integer visitPositiveInt(BasicParser.PositiveIntContext ctx) {
-    return Integer.parseInt(ctx.INTEGER().getText());
+  public Long visitPositiveInt(BasicParser.PositiveIntContext ctx) {
+    return Long.parseLong(ctx.INTEGER().getText());
   }
 
   @Override
-  public Integer visitNegativeInt(BasicParser.NegativeIntContext ctx) {
-    return (-1) * Integer.parseInt(ctx.INTEGER().getText());
+  public Long visitNegativeInt(BasicParser.NegativeIntContext ctx) {
+    return (-1) * Long.parseLong(ctx.INTEGER().getText());
   }
 
   //BOOL-EXPR

@@ -23,105 +23,6 @@ public class Statement {
     this.statement2 = statement2;
   }
 
-  public Statement(StatType statType) {
-    this.statType = statType;
-    this.lhsType = null;
-    this.lhsIdent = null;
-    this.lhs = null;
-    this.rhs = null;
-    this.expression = null;
-    this.statement1 = null;
-    this.statement2 = null;
-  }
-
-  public Statement(StatType statType, Type lhsType, String lhsIdent, AssignRHS rhs) {
-    this.statType = statType;
-    this.lhsType = lhsType;
-    this.lhsIdent = lhsIdent;
-    this.lhs = null;
-    this.rhs = rhs;
-    this.expression = null;
-    this.statement1 = null;
-    this.statement2 = null;
-  }
-
-  public Statement(StatType statType, AssignLHS lhs, AssignRHS rhs) {
-    this.statType = statType;
-    this.lhsType = null;
-    this.lhsIdent = null;
-    this.lhs = lhs;
-    this.rhs = rhs;
-    this.expression = null;
-    this.statement1 = null;
-    this.statement2 = null;
-  }
-
-  public Statement(StatType statType, AssignLHS lhs) {
-    this.statType = statType;
-    this.lhsType = null;
-    this.lhsIdent = null;
-    this.lhs = lhs;
-    this.rhs = null;
-    this.expression = null;
-    this.statement1 = null;
-    this.statement2 = null;
-  }
-
-  public Statement(StatType statType, Expression expression) {
-    this.statType = statType;
-    this.lhsType = null;
-    this.lhsIdent = null;
-    this.lhs = null;
-    this.rhs = null;
-    this.expression = expression;
-    this.statement1 = null;
-    this.statement2 = null;
-  }
-
-  public Statement(StatType statType, Expression expression, Statement statement1, Statement statement2) {
-    this.statType = statType;
-    this.lhsType = null;
-    this.lhsIdent = null;
-    this.lhs = null;
-    this.rhs = null;
-    this.expression = expression;
-    this.statement1 = statement1;
-    this.statement2 = statement2;
-  }
-
-  public Statement(StatType statType, Expression expression, Statement statement) {
-    this.statType = statType;
-    this.lhsType = null;
-    this.lhsIdent = null;
-    this.lhs = null;
-    this.rhs = null;
-    this.expression = expression;
-    this.statement1 = statement;
-    this.statement2 = null;
-  }
-
-  public Statement(StatType statType, Statement statement) {
-    this.statType = statType;
-    this.lhsType = null;
-    this.lhsIdent = null;
-    this.lhs = null;
-    this.rhs = null;
-    this.expression = null;
-    this.statement1 = statement;
-    this.statement2 = null;
-  }
-
-  public Statement(StatType statType, Statement statement1, Statement statement2) {
-    this.statType = statType;
-    this.lhsType = null;
-    this.lhsIdent = null;
-    this.lhs = null;
-    this.rhs = null;
-    this.expression = null;
-    this.statement1 = statement1;
-    this.statement2 = statement2;
-  }
-
   public StatType getStatType() {
     return statType;
   }
@@ -172,7 +73,7 @@ public class Statement {
     }
 
     if (statType == StatType.READ) {
-      result.append(statType.toString().toLowerCase()).append(lhs);
+      result.append(statType.toString().toLowerCase()).append(" ").append(lhs);
     }
 
     if (statType == StatType.FREE ||
@@ -184,8 +85,8 @@ public class Statement {
     }
 
     if (statType == StatType.IF) {
-      result.append("if ").append(expression).append(" then ").append(statement1)
-              .append("else ").append(statement2).append("fi");
+      result.append("if ").append(expression).append(" then\n").append(statement1)
+              .append(" else\n").append(statement2).append("fi");
     }
 
     if (statType == StatType.WHILE) {

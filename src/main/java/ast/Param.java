@@ -20,10 +20,7 @@ public class Param {
 
   @Override
   public String toString() {
-    return "Param{" +
-            "type=" + type +
-            ", ident='" + ident + '\'' +
-            '}';
+    return type + ", " + ident;
   }
 
 }
