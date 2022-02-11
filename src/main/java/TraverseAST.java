@@ -81,7 +81,13 @@ public class TraverseAST {
         traverse(statement.getRHS().getExpression1());
         break;
       case REASSIGNMENT:
-        traverse(statement.getRHS().getExpression1());
+        if (currentST.contains(statement.getLhsIdent())){
+          currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType().getType());
+          traverse(statement.getRHS().getExpression1());
+        }
+        else{
+          errors++;
+        }
         break;
       case READ:
         break;
