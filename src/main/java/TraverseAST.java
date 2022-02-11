@@ -83,7 +83,6 @@ public class TraverseAST {
       case DECLARATION:
         currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType().getType());
         traverse(statement.getRHS().getExpression1());
-        traverse(statement.getRHS().getExpression2());
         break;
       case REASSIGNMENT:
         traverse(statement.getRHS().getExpression1());
@@ -121,6 +120,7 @@ public class TraverseAST {
       case CONCAT:
         traverse(statement.getStatement1());
         traverse(statement.getStatement2());
+        break;
     }
   }
 }
