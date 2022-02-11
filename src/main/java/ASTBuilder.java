@@ -392,4 +392,10 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return Expression.ExprType.NOT;
   }
 
+  //NEGATE
+  @Override
+  public Expression.ExprType visitNeg(BasicParser.NegContext ctx) {
+    return Expression.ExprType.NEG;
+  }
+
 }

@@ -59,6 +59,10 @@ public class Expression {
       result.append("!").append(expression1);
     }
 
+    if (exprType == ExprType.NEG) {
+      result.append("-").append(expression1);
+    }
+
     return result.toString();
   }
 
@@ -72,7 +76,7 @@ public class Expression {
     IDENT,
     ARRAYELEM,
     NOT,
-    UN_MINUS,
+    NEG,
     LEN,
     ORD,
     CHR,
@@ -80,7 +84,7 @@ public class Expression {
     MULTIPLY,
     MODULO,
     PLUS,
-    BIN_MINUS,
+    MINUS,
     GT,
     GTE,
     LT,

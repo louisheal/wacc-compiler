@@ -106,7 +106,7 @@ pairElemType: baseType      #basePairElem
             ;
 
 unaryOper: NOT      #not
-         | MINUS    #minus
+         | MINUS    #neg
          | LEN      #len
          | ORD      #ord
          | CHR      #chr
