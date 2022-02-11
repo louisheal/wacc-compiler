@@ -35,7 +35,15 @@ public class Expression {
       result.append(intLiter);
     }
 
-    return result.toString();
+    if (exprType == ExprType.BOOLLITER) {
+      result.append(boolLiter);
+    }
+
+    if (exprType == ExprType.CHARLITER) {
+      result.append("'").append(charLiter).append("'");
+    }
+
+    return result.toString().toLowerCase();
   }
 
   public enum ExprType {
