@@ -35,9 +35,9 @@ public class TraverseAST {
       case SKIP:
         break;
       case DECLARATION:
-        currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType().getType());
+        currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
       case REASSIGNMENT:
-        Type.EType lhsType = currentST.getType(statement.getLhsIdent());
+        Type lhsType = currentST.getType(statement.getLhsIdent());
         statement.getRHS();
         // need to check if rhs has same type as lhs
 
