@@ -39,7 +39,7 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
 
   @Override
   public Statement visitSkip(BasicParser.SkipContext ctx) {
-    return new Statement(Statement.StatType.SKIP);
+    return new StatementBuilder().buildSkip();
   }
 
   @Override
@@ -48,7 +48,7 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     String ident = (String) this.visit(ctx.IDENT());
     AssignRHS rhs = (AssignRHS) this.visit(ctx.assignRHS());
 
-    return new Statement(Statement.StatType.DECLARATION, type, ident, rhs);
+    return new StatementBuilder().buildDeclaration(type, ident, rhs);
   }
 
   @Override
@@ -56,49 +56,49 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     AssignLHS lhs = (AssignLHS) this.visit(ctx.assignLHS());
     AssignRHS rhs = (AssignRHS) this.visit(ctx.assignRHS());
 
-    return new Statement(Statement.StatType.REASSIGNMENT, lhs, rhs);
+    return new StatementBuilder().buildReassignment(lhs, rhs);
   }
 
   @Override
   public Statement visitRead(BasicParser.ReadContext ctx) {
     AssignLHS lhs = (AssignLHS) this.visit(ctx.assignLHS());
 
-    return new Statement(Statement.StatType.READ, lhs);
+    return new StatementBuilder().buildRead(lhs);
   }
 
   @Override
   public Statement visitFree(BasicParser.FreeContext ctx) {
     Expression expression = (Expression) this.visit(ctx.expr());
 
-    return new Statement(Statement.StatType.FREE, expression);
+    return new StatementBuilder().buildFree(expression);
   }
 
   @Override
   public Statement visitReturn(BasicParser.ReturnContext ctx) {
     Expression expression = (Expression) this.visit(ctx.expr());
 
-    return new Statement(Statement.StatType.RETURN, expression);
+    return new StatementBuilder().buildReturn(expression);
   }
 
   @Override
   public Statement visitExit(BasicParser.ExitContext ctx) {
     Expression expression = (Expression) this.visit(ctx.expr());
 
-    return new Statement(Statement.StatType.EXIT, expression);
+    return new StatementBuilder().buildExit(expression);
   }
 
   @Override
   public Statement visitPrint(BasicParser.PrintContext ctx) {
     Expression expression = (Expression) this.visit(ctx.expr());
 
-    return new Statement(Statement.StatType.PRINT, expression);
+    return new StatementBuilder().buildPrint(expression);
   }
 
   @Override
   public Statement visitPrintln(BasicParser.PrintlnContext ctx) {
     Expression expression = (Expression) this.visit(ctx.expr());
 
-    return new Statement(Statement.StatType.PRINTLN, expression);
+    return new StatementBuilder().buildPrintln(expression);
   }
 
   @Override
@@ -107,7 +107,7 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     Statement sThen = (Statement) this.visit(ctx.stat(0));
     Statement sElse = (Statement) this.visit(ctx.stat(1));
 
-    return new Statement(Statement.StatType.IF, expression, sThen, sElse);
+    return new StatementBuilder().buildIfThenElse(expression, sThen, sElse);
   }
 
   @Override
@@ -115,14 +115,14 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     Expression expression = (Expression) this.visit(ctx.expr());
     Statement statement = (Statement) this.visit(ctx.stat());
 
-    return new Statement(Statement.StatType.WHILE, expression, statement);
+    return new StatementBuilder().buildWhile(expression, statement);
   }
 
   @Override
   public Statement visitBegin_end(BasicParser.Begin_endContext ctx) {
     Statement statement = (Statement) this.visit(ctx.stat());
 
-    return new Statement(Statement.StatType.BEGIN, statement);
+    return new StatementBuilder().buildBegin(statement);
   }
 
   @Override
@@ -130,7 +130,7 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     Statement statement1 = (Statement) visit(ctx.stat(0));
     Statement statement2 = (Statement) visit(ctx.stat(1));
 
-    return new Statement(Statement.StatType.CONCAT, statement1, statement2);
+    return new StatementBuilder().buildSemiColon(statement1, statement2);
   }
 
   //PARAMS
