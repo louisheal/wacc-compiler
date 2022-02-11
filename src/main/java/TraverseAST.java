@@ -17,6 +17,7 @@ public class TraverseAST {
 
   private void printSemanticError() {
     String errorMsg = "Semantic Error";
+    errors++;
 
     System.out.println(errorMsg);
   }
@@ -95,7 +96,6 @@ public class TraverseAST {
           traverse(statement.getRHS().getExpression1());
         }
         else{
-          errors++;
           printSemanticError();
         }
         break;
@@ -105,7 +105,6 @@ public class TraverseAST {
         if(statement.getRHS().getAssignType() != RHSType.ARRAY
             || statement.getRHS().getAssignType() != RHSType.PAIRELEM
             || statement.getRHS().getAssignType() != RHSType.NEWPAIR){
-          errors++;
           printSemanticError();
         }
         else{
@@ -117,7 +116,6 @@ public class TraverseAST {
         break;
       case EXIT:
         if(statement.getLhsType().getType() != EType.INT){
-          errors++;
           printSemanticError();
         }
         else {
@@ -133,7 +131,6 @@ public class TraverseAST {
       case IF:
         if(statement.getExpression().getExprType() != ExprType.BOOLLITER){
           if(statement.getExpression() == null) {
-            errors++;
             printSemanticError();
           }
           else {
@@ -145,7 +142,6 @@ public class TraverseAST {
         break;
       case WHILE:
         if(statement.getExpression().getExprType()  != Expression.ExprType.BOOLLITER) {
-          errors++;
           printSemanticError();
         }
         traverse(statement.getExpression());
