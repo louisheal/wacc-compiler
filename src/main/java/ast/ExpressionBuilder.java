@@ -1,5 +1,7 @@
 package ast;
 
+import javax.print.DocFlavor;
+
 public class ExpressionBuilder {
 
   private Expression.ExprType exprType;
@@ -27,6 +29,12 @@ public class ExpressionBuilder {
   public Expression buildCharExpr(char charLiter) {
     this.exprType = Expression.ExprType.CHARLITER;
     this.charLiter = charLiter;
+    return this.build();
+  }
+
+  public Expression buildStringExpr(String stringLiter) {
+    this.exprType = Expression.ExprType.STRINGLITER;
+    this.stringLiter = stringLiter;
     return this.build();
   }
 

@@ -43,6 +43,10 @@ public class Expression {
       result.append("'").append(charLiter).append("'");
     }
 
+    if (exprType == ExprType.STRINGLITER) {
+      result.append(stringLiter);
+    }
+
     return result.toString().toLowerCase();
   }
 

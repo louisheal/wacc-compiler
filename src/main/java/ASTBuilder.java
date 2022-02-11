@@ -356,4 +356,15 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return ctx.CHAR_LITER().getText().charAt(1);
   }
 
+  //STRING-EXPR
+  @Override
+  public Expression visitStringExpr(BasicParser.StringExprContext ctx) {
+    return new ExpressionBuilder().buildStringExpr(visitStringLiter(ctx.stringLiter()));
+  }
+
+  @Override
+  public String visitStringLiter(BasicParser.StringLiterContext ctx) {
+    return ctx.STR_LITER().getText();
+  }
+
 }
