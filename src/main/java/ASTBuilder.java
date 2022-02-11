@@ -207,17 +207,17 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
 
   @Override
   public AssignLHS visitIdentLHS(BasicParser.IdentLHSContext ctx) {
-    return new AssignLHS(AssignLHS.LHSType.IDENT, ctx.IDENT().getText());
+    return new AssignLHSBuilder().buildIdentLHS(ctx.IDENT().getText());
   }
 
   @Override
   public AssignLHS visitArrayLHS(BasicParser.ArrayLHSContext ctx) {
-    return new AssignLHS(AssignLHS.LHSType.ARRAYELEM, (ArrayElem) this.visit(ctx.arrayElem()));
+    return new AssignLHSBuilder().buildArrayLHS((ArrayElem) this.visit(ctx.arrayElem()));
   }
 
   @Override
   public AssignLHS visitPairLHS(BasicParser.PairLHSContext ctx) {
-    return new AssignLHS(AssignLHS.LHSType.PAIRELEM, (PairElem) this.visit(ctx.pairElem()));
+    return new AssignLHSBuilder().buildPairLHS((PairElem) this.visit(ctx.pairElem()));
   }
 
   @Override
