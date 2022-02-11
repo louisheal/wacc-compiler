@@ -307,4 +307,9 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return Integer.parseInt(ctx.INTEGER().getText());
   }
 
+  @Override
+  public Integer visitNegativeInt(BasicParser.NegativeIntContext ctx) {
+    return (-1) * Integer.parseInt(ctx.INTEGER().getText());
+  }
+
 }
