@@ -17,12 +17,41 @@ public class TraverseAST {
 
   private void printSemanticError() {
     String errorMsg = "Semantic Error\n";
+    errors++;
 
     System.out.println(errorMsg);
   }
 
   public Integer getNumberOfErrors() {
     return errors;
+  }
+
+  public Type getExpressionType(Expression expression) {
+    return new Type(EType.INT);
+  }
+
+  public Type getRHSType(AssignRHS rhs) {
+    switch(rhs.getAssignType()){
+      case EXPR:
+        return getExpressionType(rhs.getExpression1());
+        break;
+      case ARRAY:
+        //TODO: match empty array to all array types
+        if(rhs.getArray().isEmpty()){
+          return new Type(EType.ARRAY);
+        }
+        return new Type(EType.ARRAY, getExpressionType(rhs.getArray().get(0)));
+        break;
+      case NEWPAIR:
+        break;
+      case PAIRELEM:
+        return new Type(EType.PAIR, getExpressionType(rhs.getExpression1()), getExpressionType(rhs.getExpression2()));
+        break;
+      case CALL:
+        break;
+    }
+    printSemanticError();
+    return new Type(EType.INT);
   }
 
   public void traverse(Program program) {
@@ -95,17 +124,16 @@ public class TraverseAST {
           traverse(statement.getRHS().getExpression1());
         }
         else{
-          errors++;
           printSemanticError();
         }
         break;
       case READ:
         break;
       case FREE:
-        if(statement.getRHS().getAssignType() != RHSType.ARRAY
+        if(statement.getRHS() == null
+            ||statement.getRHS().getAssignType() != RHSType.ARRAY
             || statement.getRHS().getAssignType() != RHSType.PAIRELEM
             || statement.getRHS().getAssignType() != RHSType.NEWPAIR){
-          errors++;
           printSemanticError();
         }
         else{
@@ -117,7 +145,6 @@ public class TraverseAST {
         break;
       case EXIT:
         if(statement.getLhsType().getType() != EType.INT){
-          errors++;
           printSemanticError();
         }
         else {
@@ -133,7 +160,6 @@ public class TraverseAST {
       case IF:
         if(statement.getExpression().getExprType() != ExprType.BOOLLITER){
           if(statement.getExpression() == null) {
-            errors++;
             printSemanticError();
           }
           else {
@@ -145,7 +171,6 @@ public class TraverseAST {
         break;
       case WHILE:
         if(statement.getExpression().getExprType()  != Expression.ExprType.BOOLLITER) {
-          errors++;
           printSemanticError();
         }
         traverse(statement.getExpression());
