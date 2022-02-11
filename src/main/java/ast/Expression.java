@@ -63,6 +63,10 @@ public class Expression {
       result.append("-").append(expression1);
     }
 
+    if (exprType == ExprType.LEN) {
+      result.append("len ").append(expression1);
+    }
+
     return result.toString();
   }
 

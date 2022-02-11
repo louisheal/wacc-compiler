@@ -398,4 +398,10 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return Expression.ExprType.NEG;
   }
 
+  //LENGTH
+  @Override
+  public Expression.ExprType visitLen(BasicParser.LenContext ctx) {
+    return Expression.ExprType.LEN;
+  }
+
 }
