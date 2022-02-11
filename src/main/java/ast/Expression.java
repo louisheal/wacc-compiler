@@ -71,6 +71,10 @@ public class Expression {
       result.append("ord ").append(expression1);
     }
 
+    if (exprType == ExprType.CHR) {
+      result.append("chr ").append(expression1);
+    }
+
     return result.toString();
   }
 

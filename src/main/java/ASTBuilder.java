@@ -413,4 +413,10 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return Expression.ExprType.ORD;
   }
 
+  //CHR
+  @Override
+  public Expression.ExprType visitChr(BasicParser.ChrContext ctx) {
+    return Expression.ExprType.CHR;
+  }
+
 }
