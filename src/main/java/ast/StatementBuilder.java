@@ -46,57 +46,92 @@ public class StatementBuilder {
   }
 
   public Statement buildSkip() {
-    return new Statement(Statement.StatType.SKIP);
+    this.statType = Statement.StatType.SKIP;
+    return this.build();
   }
 
-  public Statement buildDeclaration() {
-    return new Statement(Statement.StatType.DECLARATION, lhsType, lhsIdent, rhs);
+  public Statement buildDeclaration(Type lhsType, String lhsIdent, AssignRHS rhs) {
+    this.statType = Statement.StatType.DECLARATION;
+    this.lhsType = lhsType;
+    this.lhsIdent = lhsIdent;
+    this.rhs = rhs;
+    return this.build();
   }
 
-  public Statement buildReassignment() {
-    return new Statement(Statement.StatType.REASSIGNMENT, lhs, rhs);
+  public Statement buildReassignment(AssignLHS lhs, AssignRHS rhs) {
+    this.statType = Statement.StatType.REASSIGNMENT;
+    this.lhs = lhs;
+    this.rhs = rhs;
+    return this.build();
   }
 
-  public Statement buildRead() {
-    return new Statement(Statement.StatType.READ, lhs);
+  public Statement buildRead(AssignLHS lhs) {
+    this.statType = Statement.StatType.READ;
+    this.lhs = lhs;
+    return this.build();
   }
 
-  public Statement buildFree() {
-    return new Statement(Statement.StatType.FREE, expression);
+  public Statement buildFree(Expression expression) {
+    this.statType = Statement.StatType.FREE;
+    this.expression = expression;
+    return this.build();
   }
 
-  public Statement buildReturn() {
-    return new Statement(Statement.StatType.RETURN, expression);
+  public Statement buildReturn(Expression expression) {
+    this.statType = Statement.StatType.RETURN;
+    this.expression = expression;
+    return this.build();
   }
 
-  public Statement buildExit() {
-    return new Statement(Statement.StatType.EXIT, expression);
+  public Statement buildExit(Expression expression) {
+    this.statType = Statement.StatType.EXIT;
+    this.expression = expression;
+    return this.build();
   }
 
-  public Statement buildPrint() {
-    return new Statement(Statement.StatType.PRINT, expression);
+  public Statement buildPrint(Expression expression) {
+    this.statType = Statement.StatType.PRINT;
+    this.expression = expression;
+    return this.build();
   }
 
-  public Statement buildPrintln() {
-    return new Statement(Statement.StatType.PRINTLN, expression);
+  public Statement buildPrintln(Expression expression) {
+    this.statType = Statement.StatType.PRINTLN;
+    this.expression = expression;
+    return this.build();
   }
 
-  public Statement buildIfThenElse() {
-    return new Statement(Statement.StatType.IF, expression, statement1, statement2);
+  public Statement buildIfThenElse(Expression expression, Statement statement1, Statement statement2) {
+    this.statType = Statement.StatType.IF;
+    this.expression = expression;
+    this.statement1 = statement1;
+    this.statement2 = statement2;
+    return this.build();
   }
 
-  public Statement buildWhile() {
-    return new Statement(Statement.StatType.WHILE, expression, statement1);
+  public Statement buildWhile(Expression expression, Statement statement1) {
+    this.statType = Statement.StatType.WHILE;
+    this.expression = expression;
+    this.statement1 = statement1;
+    return this.build();
   }
 
-  public Statement buildBegin() {
-    return new Statement(Statement.StatType.BEGIN, statement1);
+  public Statement buildBegin(Statement statement1) {
+    this.statType = Statement.StatType.BEGIN;
+    this.statement1 = statement1;
+    return this.build();
   }
 
-  public Statement buildSemiColon() {
-    return new Statement(Statement.StatType.CONCAT, statement1, statement2);
+  public Statement buildSemiColon(Statement statement1, Statement statement2) {
+    this.statType = Statement.StatType.CONCAT;
+    this.statement1 = statement1;
+    this.statement2 = statement2;
+    return this.build();
   }
 
+  public Statement build() {
+    return new Statement(statType, lhsType, lhsIdent, lhs, rhs, expression, statement1, statement2);
+  }
 
 
 }

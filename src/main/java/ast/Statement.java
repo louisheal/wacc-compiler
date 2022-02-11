@@ -11,6 +11,18 @@ public class Statement {
   private final Statement statement1;
   private final Statement statement2;
 
+  public Statement(StatType statType, Type lhsType, String lhsIdent, AssignLHS lhs, AssignRHS rhs,
+                   Expression expression, Statement statement1, Statement statement2) {
+    this.statType = statType;
+    this.lhsType = lhsType;
+    this.lhsIdent = lhsIdent;
+    this.lhs = lhs;
+    this.rhs = rhs;
+    this.expression = expression;
+    this.statement1 = statement1;
+    this.statement2 = statement2;
+  }
+
   public Statement(StatType statType) {
     this.statType = statType;
     this.lhsType = null;
