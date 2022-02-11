@@ -159,7 +159,14 @@ public class TraverseAST {
           printSemanticError();
         }
         currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
-        traverse(statement.getRHS().getExpression1());
+
+        if (getRHSType(statement.getRHS()).equals(EType.ARRAY)) {
+          for (Expression expression1 : statement.getRHS().getArray()) {
+            traverse(expression1);
+          }
+        } else {
+          traverse(statement.getRHS().getExpression1());
+        }
         break;
       case REASSIGNMENT:
         if (!currentST.contains(statement.getLhsIdent())){
