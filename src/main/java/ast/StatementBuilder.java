@@ -10,11 +10,6 @@ public class StatementBuilder {
   private Statement statement1;
   private Statement statement2;
 
-  public StatementBuilder withStatType(Statement.StatType statType) {
-    this.statType = statType;
-    return this;
-  }
-
   public StatementBuilder withLHSType(Type lhsType) {
     this.lhsType = lhsType;
     return this;
