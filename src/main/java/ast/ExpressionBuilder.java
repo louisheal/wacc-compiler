@@ -93,6 +93,34 @@ public class ExpressionBuilder {
     return this.build();
   }
 
+  public Expression buildGtExpr(Expression expression1, Expression expression2) {
+    this.exprType = Expression.ExprType.GT;
+    this.expression1 = expression1;
+    this.expression2 = expression2;
+    return this.build();
+  }
+
+  public Expression buildGteExpr(Expression expression1, Expression expression2) {
+    this.exprType = Expression.ExprType.GTE;
+    this.expression1 = expression1;
+    this.expression2 = expression2;
+    return this.build();
+  }
+
+  public Expression buildLtExpr(Expression expression1, Expression expression2) {
+    this.exprType = Expression.ExprType.LT;
+    this.expression1 = expression1;
+    this.expression2 = expression2;
+    return this.build();
+  }
+
+  public Expression buildLteExpr(Expression expression1, Expression expression2) {
+    this.exprType = Expression.ExprType.LTE;
+    this.expression1 = expression1;
+    this.expression2 = expression2;
+    return this.build();
+  }
+
   public Expression buildBracketsExpr(Expression expression) {
     this.exprType = Expression.ExprType.BRACKETS;
     this.expression1 = expression;

@@ -95,6 +95,22 @@ public class Expression {
       result.append(expression1).append(" - ").append(expression2);
     }
 
+    if (exprType == ExprType.GT) {
+      result.append(expression1).append(" > ").append(expression2);
+    }
+
+    if (exprType == ExprType.GTE) {
+      result.append(expression1).append(" >= ").append(expression2);
+    }
+
+    if (exprType == ExprType.LT) {
+      result.append(expression1).append(" < ").append(expression2);
+    }
+
+    if (exprType == ExprType.LTE) {
+      result.append(expression1).append(" <= ").append(expression2);
+    }
+
     if (exprType == ExprType.BRACKETS) {
       result.append("(").append(expression1).append(")");
     }

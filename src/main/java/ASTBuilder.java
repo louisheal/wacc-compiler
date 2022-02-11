@@ -471,6 +471,46 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return new ExpressionBuilder().buildMinusExpr(expression1, expression2);
   }
 
+  //GREATER-THAN
+  @Override
+  public Expression visitGtExpr(BasicParser.GtExprContext ctx) {
+
+    Expression expression1 = (Expression) this.visit(ctx.expr(0));
+    Expression expression2 = (Expression) this.visit(ctx.expr(1));
+
+    return new ExpressionBuilder().buildGtExpr(expression1, expression2);
+  }
+
+  //GREATER-THAN-OR-EQUAL
+  @Override
+  public Expression visitGteExpr(BasicParser.GteExprContext ctx) {
+
+    Expression expression1 = (Expression) this.visit(ctx.expr(0));
+    Expression expression2 = (Expression) this.visit(ctx.expr(1));
+
+    return new ExpressionBuilder().buildGteExpr(expression1, expression2);
+  }
+
+  //LESS-THAN
+  @Override
+  public Expression visitLtExpr(BasicParser.LtExprContext ctx) {
+
+    Expression expression1 = (Expression) this.visit(ctx.expr(0));
+    Expression expression2 = (Expression) this.visit(ctx.expr(1));
+
+    return new ExpressionBuilder().buildLtExpr(expression1, expression2);
+  }
+
+  //LESS-THAN-OR-EQUAL
+  @Override
+  public Expression visitLteExpr(BasicParser.LteExprContext ctx) {
+
+    Expression expression1 = (Expression) this.visit(ctx.expr(0));
+    Expression expression2 = (Expression) this.visit(ctx.expr(1));
+
+    return new ExpressionBuilder().buildLteExpr(expression1, expression2);
+  }
+
   //BRACKETS
   @Override
   public Expression visitBrExpr(BasicParser.BrExprContext ctx) {
