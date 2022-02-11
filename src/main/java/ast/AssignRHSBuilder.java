@@ -4,13 +4,13 @@ import java.util.List;
 
 public class AssignRHSBuilder {
 
-  AssignRHS.RHSType assignType;
-  Expression expression1;
-  Expression expression2;
-  List<Expression> array;
-  PairElem pairElem;
-  String functionIdent;
-  List<Expression> argList;
+  private AssignRHS.RHSType assignType;
+  private Expression expression1;
+  private Expression expression2;
+  private List<Expression> array;
+  private PairElem pairElem;
+  private String functionIdent;
+  private List<Expression> argList;
 
   public AssignRHSBuilder withAssignType(AssignRHS.RHSType assignType) {
     this.assignType = assignType;
