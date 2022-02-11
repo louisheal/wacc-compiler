@@ -27,31 +27,23 @@ public class TraverseAST {
   }
 
   public Type getExpressionType(Expression expression) {
-    return new Type(EType.INT);
   }
 
-  public Type getRHSType(AssignRHS rhs) {
+  public EType getRHSType(AssignRHS rhs) {
     switch(rhs.getAssignType()){
       case EXPR:
-        return getExpressionType(rhs.getExpression1());
-        break;
+        return getExpressionType(rhs.getExpression1()).getType();
       case ARRAY:
-        //TODO: match empty array to all array types
-        if(rhs.getArray().isEmpty()){
-          return new Type(EType.ARRAY);
-        }
-        return new Type(EType.ARRAY, getExpressionType(rhs.getArray().get(0)));
-        break;
+        return EType.ARRAY;
       case NEWPAIR:
-        break;
+        return EType.PAIR;
       case PAIRELEM:
-        return new Type(EType.PAIR, getExpressionType(rhs.getExpression1()), getExpressionType(rhs.getExpression2()));
-        break;
+        return getExpressionType(rhs.getPairElem().getExpression()).getType();
       case CALL:
         break;
     }
     printSemanticError();
-    return new Type(EType.INT);
+    return EType.INT;
   }
 
   public void traverse(Program program) {
