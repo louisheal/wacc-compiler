@@ -9,6 +9,7 @@ import ast.Statement;
 import ast.Type;
 import ast.Type.EType;
 import java.util.List;
+import java.util.Objects;
 
 public class TraverseAST {
   SymbolTable currentST = new SymbolTable(null);
@@ -116,6 +117,7 @@ public class TraverseAST {
   }
 
   private void traverse(Statement statement) {
+    Expression expression = statement.getExpression();
     switch (statement.getStatType()) {
       case SKIP:
         break;
@@ -145,43 +147,39 @@ public class TraverseAST {
           printSemanticError();
         }
         else{
-          traverse(statement.getExpression());
+          traverse(expression);
         }
         break;
       case RETURN:
-        traverse(statement.getExpression());
+      case PRINT:
+      case PRINTLN:
+        traverse(expression);
         break;
       case EXIT:
-        if(statement.getLhsType().getType() != EType.INT){
+        if(!getExpressionType(expression).equals(new Type(EType.INT))){
           printSemanticError();
         }
         else {
-          traverse(statement.getExpression());
+          traverse(expression);
         }
         break;
-      case PRINT:
-        traverse(statement.getExpression());
-        break;
-      case PRINTLN:
-        traverse(statement.getExpression());
-        break;
       case IF:
-        if(statement.getExpression().getExprType() != ExprType.BOOLLITER){
-          if(statement.getExpression() == null) {
+        if(expression.getExprType() != ExprType.BOOLLITER){
+          if(expression == null) {
             printSemanticError();
           }
           else {
-            traverse(statement.getExpression());
+            traverse(expression);
           }
         }
         traverse(statement.getStatement1());
         traverse(statement.getStatement2());
         break;
       case WHILE:
-        if(statement.getExpression().getExprType()  != Expression.ExprType.BOOLLITER) {
+        if(expression.getExprType()  != Expression.ExprType.BOOLLITER) {
           printSemanticError();
         }
-        traverse(statement.getExpression());
+        traverse(expression);
         traverse(statement.getStatement1());
         break;
       case BEGIN:
