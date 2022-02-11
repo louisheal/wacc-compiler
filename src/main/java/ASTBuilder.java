@@ -322,7 +322,7 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     long min = (long) -Math.pow(2, 31);
     long value = Long.parseLong(ctx.INTEGER().getText());
     if (value > max | value < min) {
-      System.out.println("#syntax_error#");
+      System.out.println("#syntax_error: Number out of bounds#");
       exit(100);
     }
     return Long.parseLong(ctx.INTEGER().getText());
