@@ -11,6 +11,7 @@ import ast.Type.EType;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class TraverseAST {
   SymbolTable currentST = new SymbolTable(null);
@@ -24,8 +25,74 @@ public class TraverseAST {
     System.out.println(errorMsg);
   }
 
+
   public Integer getNumberOfErrors() {
     return errors;
+  }
+
+
+  public Type getExpressionType(Expression expr) {
+    switch(expr.getExprType()) {
+      case INTLITER:
+      case NEG:
+      case ORD:
+      case LEN:
+      case DIVIDE:
+      case MULTIPLY:
+      case MODULO:
+      case PLUS:
+      case MINUS:
+        return new Type(EType.INT);
+      case BOOLLITER:
+      case NOT:
+      case GT:
+      case GTE:
+      case LT:
+      case LTE:
+      case EQ:
+      case NEQ:
+      case AND:
+      case OR:
+        return new Type(EType.BOOL);
+      case CHARLITER:
+      case CHR:
+        return new Type(EType.CHAR);
+      case STRINGLITER:
+        return new Type(EType.STRING);
+      //case IDENT:
+      case PAIRELEM:
+        Type fstType = getExpressionType(expr.getExpression1());
+        Type sndType = getExpressionType(expr.getExpression2());
+        if (fstType.getType() == (EType.PAIR)) {
+          fstType = new Type(EType.PAIR);
+        }
+        if (sndType.getType() == (EType.PAIR)) {
+          sndType = new Type(EType.PAIR);
+        }
+        return new Type(EType.PAIR, fstType, sndType);
+      case BRACKETS:
+        return (getExpressionType(expr.getExpression1()));
+
+
+    }
+    return null;
+  }
+
+  public EType getRHSType(AssignRHS rhs) {
+    switch(rhs.getAssignType()){
+      case EXPR:
+        return getExpressionType(rhs.getExpression1()).getType();
+      case ARRAY:
+        return EType.ARRAY;
+      case NEWPAIR:
+        return EType.PAIR;
+      case PAIRELEM:
+        return getExpressionType(rhs.getPairElem().getExpression()).getType();
+      case CALL:
+        break;
+    }
+    printSemanticError();
+    return null;
   }
 
   public void traverse(Program program) {
@@ -85,21 +152,25 @@ public class TraverseAST {
   }
 
   private void traverse(Statement statement) {
+    Expression expression = statement.getExpression();
     switch (statement.getStatType()) {
       case SKIP:
         break;
       case DECLARATION:
+        if (!statement.getLhsType().getType().equals(getRHSType(statement.getRHS()))) {
+          printSemanticError();
+        }
         currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
         traverse(statement.getRHS().getExpression1());
         break;
       case REASSIGNMENT:
-        if (currentST.contains(statement.getLhsIdent())){
-          currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
-          traverse(statement.getRHS().getExpression1());
-        }
-        else{
+        if (!currentST.contains(statement.getLhsIdent())){
+          printSemanticError();
+        } else if(!currentST.getType(statement.getLhsIdent()).getType().equals(getRHSType(statement.getRHS()))){
           printSemanticError();
         }
+        currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
+        traverse(statement.getRHS().getExpression1());
         break;
       case READ:
         break;
@@ -111,46 +182,39 @@ public class TraverseAST {
           printSemanticError();
         }
         else{
-          traverse(statement.getExpression());
+          traverse(expression);
         }
         break;
       case RETURN:
-        traverse(statement.getExpression());
+      case PRINT:
+      case PRINTLN:
+        traverse(expression);
         break;
       case EXIT:
-        if(statement.getExpression().getExprType() != ExprType.INTLITER){
-          String expr = statement.getExpression().getIdent();
-          if (!currentST.getType(expr).equals(new Type(EType.INT)) ) {
-            printSemanticError();
-          }
+        if(!getExpressionType(expression).equals(new Type(EType.INT))){
+          printSemanticError();
         }
         else {
-          traverse(statement.getExpression());
+          traverse(expression);
         }
         break;
-      case PRINT:
-        traverse(statement.getExpression());
-        break;
-      case PRINTLN:
-        traverse(statement.getExpression());
-        break;
       case IF:
-        if(statement.getExpression().getExprType() != ExprType.BOOLLITER){
-          if(statement.getExpression() == null) {
+        if(expression.getExprType() != ExprType.BOOLLITER){
+          if(expression == null) {
             printSemanticError();
           }
           else {
-            traverse(statement.getExpression());
+            traverse(expression);
           }
         }
         traverse(statement.getStatement1());
         traverse(statement.getStatement2());
         break;
       case WHILE:
-        if(statement.getExpression().getExprType()  != Expression.ExprType.BOOLLITER) {
+        if(expression.getExprType()  != Expression.ExprType.BOOLLITER) {
           printSemanticError();
         }
-        traverse(statement.getExpression());
+        traverse(expression);
         traverse(statement.getStatement1());
         break;
       case BEGIN:
