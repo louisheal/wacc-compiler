@@ -8,6 +8,8 @@ import java.util.List;
 
 public class ASTBuilder extends BasicParserBaseVisitor<Object> {
 
+  //PROGRAM
+
   @Override
   public Program visitProg(BasicParser.ProgContext ctx) {
 
@@ -21,6 +23,8 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return new Program(functions, statement);
   }
 
+  //FUNCTION
+
   @Override
   public Function visitFunc(BasicParser.FuncContext ctx) {
     Type returnType = (Type) this.visit(ctx.type());
@@ -30,6 +34,8 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
 
     return new Function(returnType, ident, params, statement);
   }
+
+  //STATEMENTS
 
   @Override
   public Statement visitSkip(BasicParser.SkipContext ctx) {
@@ -127,6 +133,8 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return new Statement(Statement.StatType.CONCAT, statement1, statement2);
   }
 
+  //PARAMS
+
   @Override
   public List<Param> visitParamList(BasicParser.ParamListContext ctx) {
     List<Param> params = new ArrayList<>();
@@ -148,6 +156,8 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     String ident = (String) this.visit(ctx.IDENT());
     return new Param(type, ident);
   }
+
+  //TYPES
 
   @Override
   public Type visitIntType(BasicParser.IntTypeContext ctx) {
@@ -205,6 +215,8 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return new Type(Type.EType.PAIR);
   }
 
+  //ASSIGN-LHS
+
   @Override
   public AssignLHS visitIdentLHS(BasicParser.IdentLHSContext ctx) {
     return new AssignLHSBuilder().buildIdentLHS(ctx.IDENT().getText());
@@ -220,6 +232,8 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return new AssignLHSBuilder().buildPairLHS((PairElem) this.visit(ctx.pairElem()));
   }
 
+  //ARRAY-ELEM
+
   @Override
   public ArrayElem visitArrayElem(BasicParser.ArrayElemContext ctx) {
     List<Expression> expressions = new ArrayList<>();
@@ -231,6 +245,8 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return new ArrayElem(ctx.IDENT().getText(), expressions);
   }
 
+  //PAIR-ELEM
+
   @Override
   public PairElem visitFstElem(BasicParser.FstElemContext ctx) {
     return new PairElem(PairElem.PairElemType.FST, (Expression) this.visit(ctx.expr()));
@@ -240,6 +256,8 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
   public PairElem visitSndElem(BasicParser.SndElemContext ctx) {
     return new PairElem(PairElem.PairElemType.SND, (Expression) this.visit(ctx.expr()));
   }
+
+  //ASSIGN-RHS
 
   @Override
   public AssignRHS visitExprRHS(BasicParser.ExprRHSContext ctx) {
@@ -287,6 +305,9 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return new AssignRHSBuilder().buildCallRHS(functionIdent, expressions);
   }
 
+  //EXPRESSIONS
+
+  //INT-EXPR
   @Override
   public Expression visitIntExpr(BasicParser.IntExprContext ctx) {
     return new ExpressionBuilder().buildIntExpr(visitIntLiter(ctx.intLiter()));
@@ -297,6 +318,7 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return Integer.parseInt(ctx.INTEGER().getText());
   }
 
+  //SIGNED-INT-EXPR
   @Override
   public Expression visitSignedIntExpr(BasicParser.SignedIntExprContext ctx) {
     return new ExpressionBuilder().buildIntExpr((Integer) this.visit(ctx.signedIntLiter()));
@@ -310,6 +332,28 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
   @Override
   public Integer visitNegativeInt(BasicParser.NegativeIntContext ctx) {
     return (-1) * Integer.parseInt(ctx.INTEGER().getText());
+  }
+
+  //BOOL-EXPR
+  @Override
+  public Expression visitBoolExpr(BasicParser.BoolExprContext ctx) {
+    return new ExpressionBuilder().buildBoolExpr(visitBoolLiter(ctx.boolLiter()));
+  }
+
+  @Override
+  public Boolean visitBoolLiter(BasicParser.BoolLiterContext ctx) {
+    return Boolean.parseBoolean(ctx.BOOL_LITER().getText());
+  }
+
+  //CHAR-EXPR
+  @Override
+  public Expression visitCharExpr(BasicParser.CharExprContext ctx) {
+    return new ExpressionBuilder().buildCharExpr(visitCharLiter(ctx.charLiter()));
+  }
+
+  @Override
+  public Character visitCharLiter(BasicParser.CharLiterContext ctx) {
+    return ctx.CHAR_LITER().getText().charAt(1);
   }
 
 }
