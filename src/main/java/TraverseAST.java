@@ -33,7 +33,47 @@ public class TraverseAST {
   }
 
   private void traverse(Expression expression) {
-
+    switch (expression.getExprType()) {
+      case INTLITER:
+        expression.getIntLiter();
+        break;
+      case BOOLLITER:
+        expression.getBoolLiter();
+        break;
+      case CHARLITER:
+        expression.getCharLiter();
+        break;
+      case STRINGLITER:
+        expression.getStringLiter();
+        break;
+      case IDENT:
+      case ARRAYELEM:
+      case PAIRLITER:
+        break;
+      case NOT:
+      case NEG:
+      case LEN:
+      case CHR:
+      case ORD:
+      case BRACKETS:
+        traverse(expression.getExpression1());
+        break;
+      case DIVIDE:
+      case MULTIPLY:
+      case MODULO:
+      case PLUS:
+      case MINUS:
+      case GT:
+      case GTE:
+      case LT:
+      case LTE:
+      case EQ:
+      case NEQ:
+      case AND:
+      case OR:
+        traverse(expression.getExpression1());
+        traverse(expression.getExpression2());
+    }
   }
 
   private void traverse(Statement statement) {
