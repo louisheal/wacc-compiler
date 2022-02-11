@@ -1,3 +1,5 @@
+import antlr.BasicParserBaseVisitor;
+
 //import static java.lang.System.exit;
 //
 //import antlr.*;
@@ -10,7 +12,7 @@
 //import java.awt.*;
 //import java.util.ArrayList;
 //
-//class SemanticChecker extends BasicParserBaseVisitor<Object> {
+class SemanticChecker extends BasicParserBaseVisitor<Object> {
 //
 //    String syntaxError = "#syntax_error#";
 //
@@ -379,4 +381,4 @@
 //        NotDefined
 //    }
 //
-//}
+}
