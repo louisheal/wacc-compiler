@@ -8,6 +8,8 @@ import ast.Program;
 import ast.Statement;
 import ast.Type;
 import ast.Type.EType;
+
+import java.util.Arrays;
 import java.util.List;
 
 public class TraverseAST {
@@ -16,7 +18,7 @@ public class TraverseAST {
   private int errors = 0;
 
   private void printSemanticError() {
-    String errorMsg = "Semantic Error";
+    String errorMsg = "#semantic_error";
     errors++;
 
     System.out.println(errorMsg);
@@ -116,8 +118,11 @@ public class TraverseAST {
         traverse(statement.getExpression());
         break;
       case EXIT:
-        if(statement.getLhsType().getType() != EType.INT){
-          printSemanticError();
+        if(statement.getExpression().getExprType() != ExprType.INTLITER){
+          String expr = statement.getExpression().getIdent();
+          if (!currentST.getType(expr).equals(new Type(EType.INT)) ) {
+            printSemanticError();
+          }
         }
         else {
           traverse(statement.getExpression());
