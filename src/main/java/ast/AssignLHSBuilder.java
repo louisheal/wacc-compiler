@@ -27,16 +27,26 @@ public class AssignLHSBuilder {
     return this;
   }
 
-  public AssignLHS buildIdent() {
-    return new AssignLHS(assignType, ident);
+  public AssignLHS buildIdentLHS(AssignLHS.LHSType assignType, String ident) {
+    this.assignType = assignType;
+    this.ident = ident;
+    return this.build();
   }
 
-  public AssignLHS buildArray() {
-    return new AssignLHS(assignType, arrayElem);
+  public AssignLHS buildArrayLHS(AssignLHS.LHSType assignType, ArrayElem arrayElem) {
+    this.assignType = assignType;
+    this.arrayElem = arrayElem;
+    return this.build();
   }
 
-  public AssignLHS buildPair() {
-    return new AssignLHS(assignType, pairElem);
+  public AssignLHS buildPairLHS(AssignLHS.LHSType assignType, PairElem pairElem) {
+    this.assignType = assignType;
+    this.pairElem = pairElem;
+    return this.build();
+  }
+
+  public AssignLHS build() {
+    return new AssignLHS(assignType, ident, arrayElem, pairElem);
   }
 
 

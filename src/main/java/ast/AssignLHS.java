@@ -7,6 +7,13 @@ public class AssignLHS {
   private final ArrayElem arrayElem;
   private final PairElem pairElem;
 
+  public AssignLHS(LHSType assignType, String ident, ArrayElem arrayElem, PairElem pairElem) {
+    this.assignType = assignType;
+    this.ident = ident;
+    this.arrayElem = arrayElem;
+    this.pairElem = pairElem;
+  }
+
   public AssignLHS(LHSType assignType, String ident) {
     this.assignType = assignType;
     this.ident = ident;
