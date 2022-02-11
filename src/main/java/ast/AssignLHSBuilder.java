@@ -7,26 +7,6 @@ public class AssignLHSBuilder {
   private ArrayElem arrayElem;
   private PairElem pairElem;
 
-  public AssignLHSBuilder withAssignType(AssignLHS.LHSType assignType) {
-    this.assignType = assignType;
-    return this;
-  }
-
-  public AssignLHSBuilder withIdent(String ident) {
-    this.ident = ident;
-    return this;
-  }
-
-  public AssignLHSBuilder withArrayElem(ArrayElem arrayElem) {
-    this.arrayElem = arrayElem;
-    return this;
-  }
-
-  public AssignLHSBuilder withPairElem(PairElem pairElem) {
-    this.pairElem = pairElem;
-    return this;
-  }
-
   public AssignLHS buildIdentLHS(AssignLHS.LHSType assignType, String ident) {
     this.assignType = assignType;
     this.ident = ident;
