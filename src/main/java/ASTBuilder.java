@@ -1,3 +1,6 @@
+import static java.lang.System.exit;
+
+
 import antlr.BasicParser;
 import antlr.BasicParserBaseVisitor;
 import ast.*;
@@ -315,6 +318,13 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
 
   @Override
   public Integer visitIntLiter(BasicParser.IntLiterContext ctx) {
+    double max = Math.pow(2, 31) - 1;
+    double min = -Math.pow(2, 31);
+    double value = Double.parseDouble(ctx.INTEGER().getText());
+    if (value > max | value < min) {
+      System.out.println("#syntax_error#");
+      exit(100);
+    }
     return Integer.parseInt(ctx.INTEGER().getText());
   }
 

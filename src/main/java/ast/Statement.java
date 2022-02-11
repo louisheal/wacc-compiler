@@ -180,16 +180,16 @@ public class Statement {
         statType == StatType.EXIT ||
         statType == StatType.PRINT ||
         statType == StatType.PRINTLN) {
-      result.append(statType.toString().toLowerCase()).append(expression);
+      result.append(statType.toString().toLowerCase()).append(" ").append(expression);
     }
 
     if (statType == StatType.IF) {
-      result.append("if ").append(expression).append("then ").append(statement1)
+      result.append("if ").append(expression).append(" then ").append(statement1)
               .append("else ").append(statement2).append("fi");
     }
 
     if (statType == StatType.WHILE) {
-      result.append("while ").append(expression).append("do").append(statement1);
+      result.append("while ").append(expression).append(" do ").append(statement1);
     }
 
     if (statType == StatType.BEGIN) {
