@@ -1,4 +1,5 @@
 import ast.AssignRHS;
+import ast.AssignRHS.RHSType;
 import ast.Expression;
 import ast.Function;
 import ast.Param;
@@ -87,12 +88,24 @@ public class TraverseAST {
         traverse(statement.getRHS().getExpression1());
         break;
       case REASSIGNMENT:
-        traverse(statement.getRHS().getExpression1());
+        if (currentST.contains(statement.getLhsIdent())){
+          currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType().getType());
+          traverse(statement.getRHS().getExpression1());
+        }
+        else{
+          errors++;
+        }
         break;
       case READ:
         break;
       case FREE:
-        traverse(statement.getExpression());
+        if(statement.getRHS().getAssignType() != RHSType.ARRAY
+            || statement.getRHS().getAssignType() != RHSType.PAIRELEM){
+          errors++;
+        }
+        else{
+          traverse(statement.getExpression());
+        }
         break;
       case RETURN:
         traverse(statement.getExpression());
