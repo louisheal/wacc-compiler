@@ -127,13 +127,13 @@ public class TraverseAST {
         traverse(statement.getRHS().getExpression1());
         break;
       case REASSIGNMENT:
-        if (currentST.contains(statement.getLhsIdent())){
-          currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
-          traverse(statement.getRHS().getExpression1());
-        }
-        else{
+        if (!currentST.contains(statement.getLhsIdent())){
+          printSemanticError();
+        } else if(!currentST.getType(statement.getLhsIdent()).getType().equals(getRHSType(statement.getRHS()))){
           printSemanticError();
         }
+        currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
+        traverse(statement.getRHS().getExpression1());
         break;
       case READ:
         break;
