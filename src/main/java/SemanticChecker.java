@@ -47,8 +47,6 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
     @Override public Object visitIntLiter(BasicParser.IntLiterContext ctx) { return visitChildren(ctx); }
 
-    @Override public Object visitSignedIntLiter(BasicParser.SignedIntLiterContext ctx) { return visitChildren(ctx); }
-
     @Override public Object visitBoolLiter(BasicParser.BoolLiterContext ctx) { return visitChildren(ctx); }
 
     @Override public Object visitCharLiter(BasicParser.CharLiterContext ctx) { return visitChildren(ctx); }
@@ -96,33 +94,21 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
     @Override public Object visitSkip(BasicParser.SkipContext ctx) { return visitChildren(ctx); }
 
     private Type getExpressionContextType(BasicParser.ExprContext expr) {
-        if (expr.intLiter() != null) {
-            return Type.INT;
-        }
-        if (expr.boolLiter() != null) {
-            return Type.BOOL;
-        }
-        if (expr.charLiter() != null) {
-            return Type.CHAR;
-        }
-        if (expr.stringLiter() != null) {
-            return Type.STRING;
-        }
         return Type.OTHER;
     }
 
     private Type getTypeContextType(BasicParser.TypeContext type) {
         if (type.baseType() != null) {
-            if (type.baseType().INT() != null) {
+            if (type.baseType() != null) {
                 return Type.INT;
             }
-            if (type.baseType().BOOL() != null) {
+            if (type.baseType() != null) {
                 return Type.BOOL;
             }
-            if (type.baseType().CHAR() != null) {
+            if (type.baseType() != null) {
                 return Type.CHAR;
             }
-            if (type.baseType().STRING() != null) {
+            if (type.baseType() != null) {
                 return Type.STRING;
             }
         }
@@ -201,55 +187,10 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
     }
 
     private Type getRHSType(BasicParser.AssignRHSContext ctx) {
-        String rhs = ctx.getText();
-
-        if (ctx.pairElem() != null) {
-            return Type.OTHER;
-        }
-
-        if (ctx.NEW_PAIR() != null) {
-          return Type.PAIR;
-        }
-
-        if (ctx.arrayLiter() != null) {
-            return Type.ARRAY;
-        }
-
-        if (ctx.expr(0) == null) {
-          return Type.OTHER;
-        }
-
-        if (ctx.expr(0).intLiter() != null) {
-            return Type.INT;
-        }
-        if (ctx.expr(0).boolLiter() != null) {
-            return Type.BOOL;
-        }
-        if (ctx.expr(0).charLiter() != null) {
-            return Type.CHAR;
-        }
-        if (ctx.expr(0).stringLiter() != null) {
-            return Type.STRING;
-        }
-        if (ctx.expr(0).pairLiter() != null) {
-            return Type.PAIR;
-        }
-
-        if (parseRHS(rhs) == null) {
-          return Type.ERROR;
-        }
-
         return Type.OTHER;
     }
 
     private Token getErrorPos(Type type, BasicParser.AssignRHSContext ctx) {
-        switch (type) {
-            case INT:    return ctx.expr(0).intLiter().INTEGER().getSymbol();
-            case BOOL:   return ctx.expr(0).boolLiter().BOOL_LITER().getSymbol();
-            case CHAR:   return ctx.expr(0).charLiter().CHAR_LITER().getSymbol();
-            case STRING: return ctx.expr(0).stringLiter().STR_LITER().getSymbol();
-            case PAIR:   return ctx.expr(0).pairLiter().NULL().getSymbol();
-        }
         return null;
     }
 
@@ -284,13 +225,6 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
 
     private boolean matchingTypes(Type type, BasicParser.ExprContext expr) {
-        switch (type) {
-            case PAIR:   return expr.pairLiter() != null;
-            case INT:    return expr.intLiter() != null;
-            case BOOL:   return expr.boolLiter() != null;
-            case CHAR:   return expr.charLiter() != null;
-            case STRING: return expr.stringLiter() != null;
-        }
         return false;
     }
 
@@ -373,35 +307,11 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
             return visitChildren(ctx);
         }
 
-        if (lhsType == Type.PAIR && rhsType == Type.PAIR) {
-          Type lhsPairFst = getPairElemType(ctx.type().pairType().pairElemType(0));
-          Type lhsPairSnd = getPairElemType(ctx.type().pairType().pairElemType(1));
-          //if (ctx.assignRHS().pairElem() == null){
-          //  return visitChildren(ctx); //short circuits and returns if the pair is null
-          // } short circuiting code doesnt work
-          if(!matchingTypes(lhsPairFst,ctx.assignRHS().expr(0))){
-            errors++;
-            printSemanticError(Error.IncompatibleTypes, lhsPairFst, rhsType,
-                ctx.assignRHS().pairElem().expr().start);
-          }
-          if(!matchingTypes(lhsPairSnd,ctx.assignRHS().expr(1))){
-            errors++;
-            printSemanticError(Error.IncompatibleTypes, lhsPairSnd, rhsType,
-                ctx.assignRHS().pairElem().expr().start);
-          }
-        }
-
-
-        if (lhsType == Type.ARRAY && rhsType == Type.ARRAY) {
-            validateArrayType(getArrayType(ctx.type().arrayType()), ctx.assignRHS().arrayLiter());
-        }
-
         if (lhsType != rhsType) {
             errors += 1;
             Token rhsToken = getErrorPos(rhsType, ctx.assignRHS());
             printSemanticError(Error.IncompatibleTypes, lhsType, rhsType, rhsToken);
         }
-        currentST.newSymbol(varName, rhsType, ctx.assignRHS());
 
         return visitChildren(ctx);
     }
@@ -430,36 +340,11 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
 
     @Override public Object visitReturn(BasicParser.ReturnContext ctx) { return visitChildren(ctx); }
 
-    @Override public Object visitAssignLHS(BasicParser.AssignLHSContext ctx) { return visitChildren(ctx); }
-
-    @Override
-    public Object visitAssignRHS(BasicParser.AssignRHSContext ctx) {
-        if (!ctx.expr().isEmpty()) { // Checks if the RHS is an expr
-            try {
-                double x = Double.parseDouble(ctx.expr(0).intLiter().INTEGER().toString());
-                double max = (Math.pow(2, 31) - 1);
-                double min = (0 - Math.pow(2, 31));
-                if (x >= max | x <= min) { // This checks if the int of an expression is in range
-                    System.out.println(syntaxError);
-                    exit(100);
-                }
-            } catch (NullPointerException ignored) {}
-        }
-        return visitChildren(ctx);
-    }
-
-    @Override public Object visitExpr(BasicParser.ExprContext ctx) { return visitChildren(ctx); }
-
     @Override public Object visitArgList(BasicParser.ArgListContext ctx) { return visitChildren(ctx); }
-
-    @Override public Object visitPairElem(BasicParser.PairElemContext ctx) { return visitChildren(ctx); }
 
     @Override public Object visitType(BasicParser.TypeContext ctx) { return visitChildren(ctx); }
 
-    @Override public Object visitBaseType(BasicParser.BaseTypeContext ctx) { return visitChildren(ctx); }
-
     @Override public Object visitBaseArrayType(BasicParser.BaseArrayTypeContext ctx) { return visitChildren(ctx); }
-
 
     @Override public Object visitNestedArrayType(BasicParser.NestedArrayTypeContext ctx) {
         return visitChildren(ctx);
@@ -468,10 +353,6 @@ class SemanticChecker extends BasicParserBaseVisitor<Object> {
     @Override public Object visitPairArrayType(BasicParser.PairArrayTypeContext ctx) { return visitChildren(ctx); }
 
     @Override public Object visitPairType(BasicParser.PairTypeContext ctx) { return visitChildren(ctx); }
-
-    @Override public Object visitPairElemType(BasicParser.PairElemTypeContext ctx) { return visitChildren(ctx); }
-
-    @Override public Object visitUnaryOper(BasicParser.UnaryOperContext ctx) { return visitChildren(ctx); }
 
     @Override public Object visitArrayElem(BasicParser.ArrayElemContext ctx) { return visitChildren(ctx); }
 

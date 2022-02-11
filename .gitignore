@@ -1,6 +1,7 @@
 #ignore generated binary files and auto-generated ANTLR code
 bin
 src/main/java/antlr/
+src/main/java/Compiler.java
 
 target
 *.class

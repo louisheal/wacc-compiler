@@ -2,10 +2,28 @@ package ast;
 
 public class PairElem {
 
-  PairElemType type;
-  Expression expression;
+  private final PairElemType type;
+  private final Expression expression;
 
-  enum PairElemType {
+  public PairElem(PairElemType type, Expression expression) {
+    this.type = type;
+    this.expression = expression;
+  }
+
+  public PairElemType getType() {
+    return type;
+  }
+
+  public Expression getExpression() {
+    return expression;
+  }
+
+  @Override
+  public String toString() {
+    return type.toString().toLowerCase() + " " + expression;
+  }
+
+  public enum PairElemType {
 
     FST,
     SND
