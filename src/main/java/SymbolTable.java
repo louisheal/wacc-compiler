@@ -13,11 +13,10 @@ public class SymbolTable {
     this.parent = parent;
   }
 
-  public boolean contains(String ident) {return variables.containsKey(ident);}
 
   public void newSymbol(String ident, Type.EType node) {
     variables.put(ident, node);
-    values.put(ident, value);
+//    values.put(ident, value);
   }
 
   public boolean contains(String ident) {
@@ -28,7 +27,7 @@ public class SymbolTable {
     return variables.get(ident);
   }
 
-  public BasicParser.AssignRHSContext getValue(String ident) {return values.get(ident);}
+//  public BasicParser.AssignRHSContext getValue(String ident) {return values.get(ident);}
 
   public SymbolTable getParent() {
     return parent;
