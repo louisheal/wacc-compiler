@@ -111,6 +111,14 @@ public class Expression {
       result.append(expression1).append(" <= ").append(expression2);
     }
 
+    if (exprType == ExprType.EQ) {
+      result.append(expression1).append(" == ").append(expression2);
+    }
+
+    if (exprType == ExprType.NEQ) {
+      result.append(expression1).append(" != ").append(expression2);
+    }
+
     if (exprType == ExprType.BRACKETS) {
       result.append("(").append(expression1).append(")");
     }

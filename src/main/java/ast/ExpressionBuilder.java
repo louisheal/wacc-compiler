@@ -50,8 +50,6 @@ public class ExpressionBuilder {
     return this.build();
   }
 
-  //TODO: UnOp Expressions
-
   public Expression buildUnOpExpr(Expression.ExprType exprType, Expression expression) {
     this.exprType = exprType;
     this.expression1 = expression;
@@ -116,6 +114,20 @@ public class ExpressionBuilder {
 
   public Expression buildLteExpr(Expression expression1, Expression expression2) {
     this.exprType = Expression.ExprType.LTE;
+    this.expression1 = expression1;
+    this.expression2 = expression2;
+    return this.build();
+  }
+
+  public Expression buildEqExpr(Expression expression1, Expression expression2) {
+    this.exprType = Expression.ExprType.EQ;
+    this.expression1 = expression1;
+    this.expression2 = expression2;
+    return this.build();
+  }
+
+  public Expression buildNeqExpr(Expression expression1, Expression expression2) {
+    this.exprType = Expression.ExprType.NEQ;
     this.expression1 = expression1;
     this.expression2 = expression2;
     return this.build();
