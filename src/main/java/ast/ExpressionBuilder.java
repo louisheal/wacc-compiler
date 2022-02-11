@@ -133,6 +133,20 @@ public class ExpressionBuilder {
     return this.build();
   }
 
+  public Expression buildAndExpr(Expression expression1, Expression expression2) {
+    this.exprType = Expression.ExprType.AND;
+    this.expression1 = expression1;
+    this.expression2 = expression2;
+    return this.build();
+  }
+
+  public Expression buildOrExpr(Expression expression1, Expression expression2) {
+    this.exprType = Expression.ExprType.OR;
+    this.expression1 = expression1;
+    this.expression2 = expression2;
+    return this.build();
+  }
+
   public Expression buildBracketsExpr(Expression expression) {
     this.exprType = Expression.ExprType.BRACKETS;
     this.expression1 = expression;

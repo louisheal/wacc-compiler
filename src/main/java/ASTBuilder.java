@@ -531,6 +531,26 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return new ExpressionBuilder().buildNeqExpr(expression1, expression2);
   }
 
+  //AND
+  @Override
+  public Expression visitAndExpr(BasicParser.AndExprContext ctx) {
+
+    Expression expression1 = (Expression) this.visit(ctx.expr(0));
+    Expression expression2 = (Expression) this.visit(ctx.expr(1));
+
+    return new ExpressionBuilder().buildAndExpr(expression1, expression2);
+  }
+
+  //OR
+  @Override
+  public Expression visitOrExpr(BasicParser.OrExprContext ctx) {
+
+    Expression expression1 = (Expression) this.visit(ctx.expr(0));
+    Expression expression2 = (Expression) this.visit(ctx.expr(1));
+
+    return new ExpressionBuilder().buildOrExpr(expression1, expression2);
+  }
+
   //BRACKETS
   @Override
   public Expression visitBrExpr(BasicParser.BrExprContext ctx) {

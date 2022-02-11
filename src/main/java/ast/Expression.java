@@ -2,16 +2,16 @@ package ast;
 
 public class Expression {
 
-  ExprType exprType;
-  int intLiter;
-  boolean boolLiter;
-  char charLiter;
-  String stringLiter;
+  private final ExprType exprType;
+  private final int intLiter;
+  private final boolean boolLiter;
+  private final char charLiter;
+  private final String stringLiter;
   // PAIR
-  String ident;
-  ArrayElem arrayElem;
-  Expression expression1;
-  Expression expression2;
+  private final String ident;
+  private final ArrayElem arrayElem;
+  private final Expression expression1;
+  private final Expression expression2;
 
   public Expression(ExprType exprType, int intLiter, boolean boolLiter, char charLiter, String stringLiter,
                     String ident, ArrayElem arrayElem, Expression expression1, Expression expression2) {
@@ -117,6 +117,14 @@ public class Expression {
 
     if (exprType == ExprType.NEQ) {
       result.append(expression1).append(" != ").append(expression2);
+    }
+
+    if (exprType == ExprType.AND) {
+      result.append(expression1).append(" && ").append(expression2);
+    }
+
+    if (exprType == ExprType.OR) {
+      result.append(expression1).append(" || ").append(expression2);
     }
 
     if (exprType == ExprType.BRACKETS) {
