@@ -22,11 +22,25 @@ public class TraverseAST {
     System.out.println(errorMsg);
   }
 
+
   public Integer getNumberOfErrors() {
     return errors;
   }
 
-  public Type getExpressionType(Expression expression) {
+
+  public Type getExpressionType(Expression expr) {
+    switch(expr.getExprType()){
+      case INTLITER:
+        return new Type(EType.INT);
+      case BOOLLITER:
+        return new Type(EType.BOOL);
+      case CHARLITER:
+        return new Type(EType.CHAR);
+      case STRINGLITER:
+        return new Type(EType.STRING);
+    }
+
+    return null;
   }
 
   public EType getRHSType(AssignRHS rhs) {
