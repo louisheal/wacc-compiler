@@ -36,7 +36,7 @@ public class Expression {
     }
 
     if (exprType == ExprType.BOOLLITER) {
-      result.append(boolLiter);
+      result.append(String.valueOf(boolLiter).toLowerCase());
     }
 
     if (exprType == ExprType.CHARLITER) {
@@ -51,7 +51,15 @@ public class Expression {
       result.append(ident);
     }
 
-    return result.toString().toLowerCase();
+    if (exprType == ExprType.ARRAYELEM) {
+      result.append(arrayElem);
+    }
+
+    if (exprType == ExprType.NOT) {
+      result.append("!").append(expression1);
+    }
+
+    return result.toString();
   }
 
   public enum ExprType {

@@ -52,6 +52,12 @@ public class ExpressionBuilder {
 
   //TODO: UnOp Expressions
 
+  public Expression buildUnOpExpr(Expression.ExprType exprType, Expression expression) {
+    this.exprType = exprType;
+    this.expression1 = expression;
+    return this.build();
+  }
+
   //TODO: IntOp Expressions
 
   //TODO: IntCharOpExpressions

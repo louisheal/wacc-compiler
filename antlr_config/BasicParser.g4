@@ -44,23 +44,29 @@ assignLHS: IDENT        #identLHS
          | pairElem     #pairLHS
          ;
 
-expr: intLiter                                      #intExpr
-    | signedIntLiter                                #signedIntExpr
-    | boolLiter                                     #boolExpr
-    | charLiter                                     #charExpr
-    | stringLiter                                   #stringExpr
-    | pairLiter                                     #pairExpr
-    | IDENT                                         #identExpr
-    | arrayElem                                     #arrayExpr
-    | unaryOper expr                                #unOp
-    | expr (DIVIDE | MULTIPLY | MODULO) expr        #intOp
-    | expr (PLUS | MINUS) expr                      #intOp
-    | expr (GREATER_THAN | GREATER_THAN_OR_EQUAL
-            | LESS_THAN | LESS_THAN_OR_EQUAL) expr  #intCharOp
-    | expr (EQUAL | NOT_EQUAL) expr                 #allOp
-    | expr AND expr                                 #boolOp
-    | expr OR expr                                  #boolOp
-    | P_OPEN expr P_CLOSE                           #brackets
+expr: intLiter                          #intExpr
+    | signedIntLiter                    #signedIntExpr
+    | boolLiter                         #boolExpr
+    | charLiter                         #charExpr
+    | stringLiter                       #stringExpr
+    | pairLiter                         #pairExpr
+    | IDENT                             #identExpr
+    | arrayElem                         #arrayExpr
+    | unaryOper expr                    #unOp
+    | expr DIVIDE expr                  #divExpr
+    | expr MULTIPLY expr                #mulExpr
+    | expr MODULO expr                  #modExpr
+    | expr PLUS expr                    #plusExpr
+    | expr MINUS expr                   #minusExpr
+    | expr GREATER_THAN expr            #gtExpr
+    | expr GREATER_THAN_OR_EQUAL expr   #gteExpr
+    | expr LESS_THAN expr               #ltExpr
+    | expr LESS_THAN_OR_EQUAL expr      #lteExpr
+    | expr EQUAL expr                   #eqExpr
+    | expr NOT_EQUAL expr               #neqExpr
+    | expr AND expr                     #andExpr
+    | expr OR expr                      #orExpr
+    | P_OPEN expr P_CLOSE               #brExpr
     ;
 
 assignRHS: expr                                     #exprRHS

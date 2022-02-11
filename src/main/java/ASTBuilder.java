@@ -373,4 +373,23 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return new ExpressionBuilder().buildIdentExpr(ctx.IDENT().getText());
   }
 
+  //ARRAY-EXPR
+  @Override
+  public Expression visitArrayExpr(BasicParser.ArrayExprContext ctx) {
+    return new ExpressionBuilder().buildArrayExpr(visitArrayElem(ctx.arrayElem()));
+  }
+
+  //UNARY-OP
+
+  @Override
+  public Expression visitUnOp(BasicParser.UnOpContext ctx) {
+    return new ExpressionBuilder().buildUnOpExpr((Expression.ExprType) this.visit(ctx.unaryOper()), (Expression) this.visit(ctx.expr()));
+  }
+
+  //NOT
+  @Override
+  public Expression.ExprType visitNot(BasicParser.NotContext ctx) {
+    return Expression.ExprType.NOT;
+  }
+
 }
