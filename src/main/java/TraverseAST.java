@@ -32,10 +32,15 @@ public class TraverseAST {
   public Type getExpressionType(Expression expr) {
     switch(expr.getExprType()){
       case INTLITER:
+      case NEG:
+      case ORD:
+      case LEN:
         return new Type(EType.INT);
       case BOOLLITER:
+      case NOT:
         return new Type(EType.BOOL);
       case CHARLITER:
+      case CHR:
         return new Type(EType.CHAR);
       case STRINGLITER:
         return new Type(EType.STRING);
@@ -50,7 +55,7 @@ public class TraverseAST {
           sndType = new Type(EType.PAIR);
         }
         return new Type(EType.PAIR,fstType,sndType);
-
+        return getExpressionType(expr.getExpression1());
 
 
     }
