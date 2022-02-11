@@ -35,16 +35,12 @@ public class TraverseAST {
   private void traverse(Expression expression) {
     switch (expression.getExprType()) {
       case INTLITER:
-        expression.getIntLiter();
         break;
       case BOOLLITER:
-        expression.getBoolLiter();
         break;
       case CHARLITER:
-        expression.getCharLiter();
         break;
       case STRINGLITER:
-        expression.getStringLiter();
         break;
       case IDENT:
       case ARRAYELEM:
@@ -86,7 +82,6 @@ public class TraverseAST {
         break;
       case REASSIGNMENT:
         traverse(statement.getRHS().getExpression1());
-        traverse(statement.getRHS().getExpression2());
         break;
       case READ:
         break;
