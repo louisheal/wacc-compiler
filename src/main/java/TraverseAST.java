@@ -1,6 +1,7 @@
 import ast.AssignRHS;
 import ast.AssignRHS.RHSType;
 import ast.Expression;
+import ast.Expression.ExprType;
 import ast.Function;
 import ast.Param;
 import ast.Program;
@@ -127,7 +128,14 @@ public class TraverseAST {
         traverse(statement.getExpression());
         break;
       case IF:
-        traverse(statement.getExpression());
+        if(statement.getExpression().getExprType() != ExprType.BOOLLITER){
+          if(statement.getExpression() == null) {
+            errors++;
+          }
+          else {
+            traverse(statement.getExpression());
+          }
+        }
         traverse(statement.getStatement1());
         traverse(statement.getStatement2());
         break;
