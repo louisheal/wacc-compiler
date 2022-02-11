@@ -112,6 +112,10 @@ public class TraverseAST {
         traverse(statement.getStatement2());
         break;
       case WHILE:
+        if(statement.getExpression().getExprType()  != Expression.ExprType.BOOLLITER) {
+          errors++;
+          printSemanticError();
+        }
         traverse(statement.getExpression());
         traverse(statement.getStatement1());
         break;
