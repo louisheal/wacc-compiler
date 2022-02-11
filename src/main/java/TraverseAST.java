@@ -30,14 +30,27 @@ public class TraverseAST {
 
 
   public Type getExpressionType(Expression expr) {
-    switch(expr.getExprType()){
+    switch(expr.getExprType()) {
       case INTLITER:
       case NEG:
       case ORD:
       case LEN:
+      case DIVIDE:
+      case MULTIPLY:
+      case MODULO:
+      case PLUS:
+      case MINUS:
         return new Type(EType.INT);
       case BOOLLITER:
       case NOT:
+      case GT:
+      case GTE:
+      case LT:
+      case LTE:
+      case EQ:
+      case NEQ:
+      case AND:
+      case OR:
         return new Type(EType.BOOL);
       case CHARLITER:
       case CHR:
@@ -48,15 +61,13 @@ public class TraverseAST {
       case PAIRELEM:
         Type fstType = getExpressionType(expr.getExpression1());
         Type sndType = getExpressionType(expr.getExpression2());
-        if(fstType.getType() == (EType.PAIR)){
+        if (fstType.getType() == (EType.PAIR)) {
           fstType = new Type(EType.PAIR);
         }
-        if(sndType.getType() == (EType.PAIR)){
+        if (sndType.getType() == (EType.PAIR)) {
           sndType = new Type(EType.PAIR);
         }
-        return new Type(EType.PAIR,fstType,sndType);
-        return getExpressionType(expr.getExpression1());
-
+        return new Type(EType.PAIR, fstType, sndType);
 
     }
     return null;
