@@ -41,8 +41,15 @@ public class TraverseAST {
         return new Type(EType.STRING);
       //case IDENT:
       case PAIRELEM:
-        return new Type(EType.PAIR,getExpressionType(expr.getExpression1()),
-            getExpressionType(expr.getExpression2()));
+        Type fstType = getExpressionType(expr.getExpression1());
+        Type sndType = getExpressionType(expr.getExpression2());
+        if(fstType.getType() == (EType.PAIR)){
+          fstType = new Type(EType.PAIR);
+        }
+        if(sndType.getType() == (EType.PAIR)){
+          sndType = new Type(EType.PAIR);
+        }
+        return new Type(EType.PAIR,fstType,sndType);
 
 
 
