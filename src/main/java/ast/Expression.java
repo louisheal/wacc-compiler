@@ -168,6 +168,10 @@ public class Expression {
     return expression2;
   }
 
+  public ArrayElem getArrayElem(){
+    return arrayElem;
+  }
+
   public String getIdent() {
     return ident;
   }

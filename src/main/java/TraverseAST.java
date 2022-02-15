@@ -24,7 +24,7 @@ public class TraverseAST {
       case DECLARATION:
         errorCause = "Declaration does not match actual type";
         break;
-      case RESSIGNMENT:
+      case REASSIGNMENT:
         errorCause = "Cannot reassign to different variable type";
         break;
       case FREE:
@@ -93,6 +93,14 @@ public class TraverseAST {
           sndType = new Type(EType.PAIR);
         }
         return new Type(EType.PAIR, fstType, sndType);
+      case ARRAYELEM:
+        if (expr.getArrayElem().getExpression().isEmpty()){
+          return new Type(EType.ARRAY);
+        }
+        else {
+          return new Type(EType.ARRAY,
+              getExpressionType(expr.getArrayElem().getExpression().get(0)));
+        }
       case BRACKETS:
         return (getExpressionType(expr.getExpression1()));
 
