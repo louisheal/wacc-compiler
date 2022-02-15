@@ -23,16 +23,22 @@ public class TraverseAST {
     switch (statement.getStatType()) {
       case DECLARATION:
         errorCause = "Declaration does not match actual type";
-      case REASSIGNMENT:
+        break;
+      case RESSIGNMENT:
         errorCause = "Cannot reassign to different variable type";
+        break;
       case FREE:
         errorCause = "Invalid type for freeing";
+        break;
       case EXIT:
         errorCause = "Exit code must be int";
+        break;
       case IF:
         errorCause = "Conditional statement for IF must be boolean";
+        break;
       case WHILE:
         errorCause = "Conditional statement for WHILE must be boolean";
+        break;
     }
 
     String errorMsg = "Semantic Error: " + errorCause + "\n";
