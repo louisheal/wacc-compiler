@@ -79,8 +79,12 @@ public class TraverseAST {
       case EXPR:
         return getExpressionType(rhs.getExpression1());
       case ARRAY:
-        //TODO: add empty array case
-        return new Type(EType.ARRAY, getExpressionType(rhs.getArray().get(0)));
+        if(rhs.getArray().isEmpty()){
+          return new Type(EType.ARRAY);
+        }
+        else {
+          return new Type(EType.ARRAY, getExpressionType(rhs.getArray().get(0)));
+        }
       case NEWPAIR:
         Type fstType = getExpressionType(rhs.getExpression1());
         Type sndType = getExpressionType(rhs.getExpression2());
