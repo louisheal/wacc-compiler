@@ -6,6 +6,7 @@ import ast.Function;
 import ast.Param;
 import ast.Program;
 import ast.Statement;
+import ast.Statement.StatType;
 import ast.Type;
 import ast.Type.EType;
 import java.util.List;
@@ -16,12 +17,36 @@ public class TraverseAST {
 
   private int errors = 0;
 
-  private void printSemanticError() {
-    String errorMsg = "Semantic Error\n";
-    errors++;
+  private void printSemanticError(Statement statement) {
+    String errorCause = "";
 
+    switch (statement.getStatType()) {
+      case DECLARATION:
+        errorCause = "Declaration does not match actual type";
+        break;
+      case REASSIGNMENT:
+        errorCause = "Cannot reassign to different variable type";
+        break;
+      case FREE:
+        errorCause = "Invalid type for freeing";
+        break;
+      case EXIT:
+        errorCause = "Exit code must be int";
+        break;
+      case IF:
+        errorCause = "Conditional statement for IF must be boolean";
+        break;
+      case WHILE:
+        errorCause = "Conditional statement for WHILE must be boolean";
+        break;
+    }
+
+    String errorMsg = "Semantic Error: " + errorCause + "\n";
+    errors++;
     System.out.println(errorMsg);
+
   }
+
 
 
   public Integer getNumberOfErrors() {
@@ -68,6 +93,14 @@ public class TraverseAST {
           sndType = new Type(EType.PAIR);
         }
         return new Type(EType.PAIR, fstType, sndType);
+      case ARRAYELEM:
+        if (expr.getArrayElem().getExpression().isEmpty()){
+          return new Type(EType.ARRAY);
+        }
+        else {
+          return new Type(EType.ARRAY,
+              getExpressionType(expr.getArrayElem().getExpression().get(0)));
+        }
       case BRACKETS:
         return (getExpressionType(expr.getExpression1()));
     }
@@ -100,7 +133,6 @@ public class TraverseAST {
       case CALL:
         break;
     }
-    printSemanticError();
     return null;
   }
 
@@ -168,7 +200,7 @@ public class TraverseAST {
       case DECLARATION:
         //TODO: possible error with nested types
         if (!statement.getLhsType().equals(getRHSType(statement.getRHS()))) {
-          printSemanticError();
+          printSemanticError(statement);
         }
         currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
 
@@ -182,9 +214,9 @@ public class TraverseAST {
         break;
       case REASSIGNMENT:
         if (!currentST.contains(statement.getLhsIdent())){
-          printSemanticError();
+          printSemanticError(statement);
         } else if(!currentST.getType(statement.getLhsIdent()).equals(getRHSType(statement.getRHS()))){
-          printSemanticError();
+          printSemanticError(statement);
         }
         currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
         traverse(statement.getRHS().getExpression1());
@@ -196,7 +228,7 @@ public class TraverseAST {
             ||statement.getRHS().getAssignType() != RHSType.ARRAY
             || statement.getRHS().getAssignType() != RHSType.PAIRELEM
             || statement.getRHS().getAssignType() != RHSType.NEWPAIR){
-          printSemanticError();
+          printSemanticError(statement);
         }
         else{
           traverse(expression);
@@ -209,27 +241,25 @@ public class TraverseAST {
         break;
       case EXIT:
         if(!getExpressionType(expression).equals(new Type(EType.INT))){
-          printSemanticError();
+          printSemanticError(statement);
         }
         else {
           traverse(expression);
         }
         break;
       case IF:
-        if(expression.getExprType() != ExprType.BOOLLITER){
-          if(expression == null) {
-            printSemanticError();
-          }
-          else {
-            traverse(expression);
-          }
+        if(!getExpressionType(expression).equals(new Type(EType.BOOL))){
+          traverse(expression);
+        }
+        else {
+          printSemanticError(statement);
         }
         traverse(statement.getStatement1());
         traverse(statement.getStatement2());
         break;
       case WHILE:
-        if(expression.getExprType()  != Expression.ExprType.BOOLLITER) {
-          printSemanticError();
+        if(!getExpressionType(expression).equals(new Type(EType.BOOL))) {
+          printSemanticError(statement);
         }
         traverse(expression);
         traverse(statement.getStatement1());
