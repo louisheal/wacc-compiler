@@ -103,22 +103,33 @@ public class TraverseAST {
         }
       case BRACKETS:
         return (getExpressionType(expr.getExpression1()));
-
-
     }
     return null;
   }
 
-  public EType getRHSType(AssignRHS rhs) {
+  public Type getRHSType(AssignRHS rhs) {
     switch(rhs.getAssignType()){
       case EXPR:
-        return getExpressionType(rhs.getExpression1()).getType();
+        return getExpressionType(rhs.getExpression1());
       case ARRAY:
-        return EType.ARRAY;
+        if(rhs.getArray().isEmpty()){
+          return new Type(EType.ARRAY);
+        }
+        else {
+          return new Type(EType.ARRAY, getExpressionType(rhs.getArray().get(0)));
+        }
       case NEWPAIR:
-        return EType.PAIR;
+        Type fstType = getExpressionType(rhs.getExpression1());
+        Type sndType = getExpressionType(rhs.getExpression2());
+        if (fstType.getType() == (EType.PAIR)) {
+          fstType = new Type(EType.PAIR);
+        }
+        if (sndType.getType() == (EType.PAIR)) {
+          sndType = new Type(EType.PAIR);
+        }
+        return new Type(EType.PAIR, fstType, sndType);
       case PAIRELEM:
-        return getExpressionType(rhs.getPairElem().getExpression()).getType();
+        return getExpressionType(rhs.getPairElem().getExpression());
       case CALL:
         break;
     }
@@ -187,12 +198,13 @@ public class TraverseAST {
       case SKIP:
         break;
       case DECLARATION:
-        if (!statement.getLhsType().getType().equals(getRHSType(statement.getRHS()))) {
+        //TODO: possible error with nested types
+        if (!statement.getLhsType().equals(getRHSType(statement.getRHS()))) {
           printSemanticError(statement);
         }
         currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
 
-        if (getRHSType(statement.getRHS()).equals(EType.ARRAY)) {
+        if (getRHSType(statement.getRHS()).getType().equals(EType.ARRAY)) {
           for (Expression expression1 : statement.getRHS().getArray()) {
             traverse(expression1);
           }
@@ -203,7 +215,7 @@ public class TraverseAST {
       case REASSIGNMENT:
         if (!currentST.contains(statement.getLhsIdent())){
           printSemanticError(statement);
-        } else if(!currentST.getType(statement.getLhsIdent()).getType().equals(getRHSType(statement.getRHS()))){
+        } else if(!currentST.getType(statement.getLhsIdent()).equals(getRHSType(statement.getRHS()))){
           printSemanticError(statement);
         }
         currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
