@@ -47,7 +47,7 @@ public class TraverseAST {
   }
 
   private Type getExpressionType(Expression expr) {
-    switch(expr.getExprType()) {
+    switch (expr.getExprType()) {
 
       case INTLITER:
       case NEG:
@@ -103,16 +103,18 @@ public class TraverseAST {
         }
 
       case BRACKETS:
-        return (getExpressionType(expr.getExpression1()));
+        return getExpressionType(expr.getExpression1());
 
     }
-    return new Type(EType.INT);
+    return null;
   }
 
   private Type getRHSType(AssignRHS rhs) {
-    switch(rhs.getAssignType()){
+    switch (rhs.getAssignType()) {
+
       case EXPR:
         return getExpressionType(rhs.getExpression1());
+
       case ARRAY:
         if(rhs.getArray().isEmpty()){
           return new Type(EType.ARRAY);
@@ -120,6 +122,7 @@ public class TraverseAST {
         else {
           return new Type(EType.ARRAY, getExpressionType(rhs.getArray().get(0)));
         }
+
       case NEWPAIR:
         Type fstType = getExpressionType(rhs.getExpression1());
         Type sndType = getExpressionType(rhs.getExpression2());
@@ -130,8 +133,10 @@ public class TraverseAST {
           sndType = new Type(EType.PAIR);
         }
         return new Type(EType.PAIR, fstType, sndType);
+
       case PAIRELEM:
         return getExpressionType(rhs.getPairElem().getExpression());
+
       case CALL:
         return new Type(EType.INT);
     }
@@ -149,7 +154,7 @@ public class TraverseAST {
           return getExpressionType(lhs.getPairElem().getExpression()).getSndType();
         }
     }
-    return new Type(EType.INT);
+    return null;
   }
 
   private void validateFunctionReturns(Statement statement) {
@@ -176,23 +181,6 @@ public class TraverseAST {
            t2.equals(new Type(EType.BOOL));
   }
 
-  private boolean bothStrings(Type t1, Type t2) {
-    return t1.equals(new Type(EType.STRING)) &&
-           t2.equals(new Type(EType.STRING));
-  }
-
-  private boolean bothEqPairs(Type t1, Type t2) {
-    return t1.getType() == EType.PAIR &&
-           t2.getType() == EType.PAIR &&
-           t1.equals(t2);
-  }
-
-  private boolean bothEqArrays(Type t1, Type t2) {
-    return t1.getType() == EType.ARRAY &&
-           t2.getType() == EType.ARRAY &&
-           t1.equals(t2);
-  }
-
   public void traverse(Program program) {
     for (Function function : program.getFunctions()) {
       traverse(function);
@@ -212,18 +200,6 @@ public class TraverseAST {
 
   private void traverse(Expression expression) {
     switch (expression.getExprType()) {
-      case INTLITER:
-        break;
-      case BOOLLITER:
-        break;
-      case CHARLITER:
-        break;
-      case STRINGLITER:
-        break;
-      case IDENT:
-      case ARRAYELEM:
-      case PAIRLITER:
-        break;
 
       case NOT:
         if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.BOOL))) {
@@ -345,9 +321,6 @@ public class TraverseAST {
   private void traverse(Statement statement) {
     Expression expression = statement.getExpression();
     switch (statement.getStatType()) {
-
-      case SKIP:
-        break;
 
       case DECLARATION:
         currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
