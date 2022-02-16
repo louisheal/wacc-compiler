@@ -234,7 +234,6 @@ public class TraverseAST {
         break;
 
       case ORD:
-        System.out.println(expression.getExpression1().getExprType());
         if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.CHAR))) {
           //TODO: Fix error messages
           System.out.println("Error: ord (order) operator can only be used on character expressions");
@@ -324,7 +323,8 @@ public class TraverseAST {
 
       case DECLARATION:
         //TODO: possible error with nested types
-        if (!statement.getLhsType().equals(getRHSType(statement.getRHS()))) {
+        if (!statement.getLhsType().equals(getRHSType(statement.getRHS())) &&
+                !(statement.getRHS().getAssignType() == RHSType.ARRAY && statement.getRHS().getArray().isEmpty())) {
           printSemanticError(statement);
         }
 
