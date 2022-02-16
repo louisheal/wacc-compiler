@@ -1,14 +1,13 @@
 import ast.*;
 import ast.AssignRHS.RHSType;
-import ast.Expression.ExprType;
 import ast.Statement.StatType;
 import ast.Type.EType;
-import jdk.swing.interop.SwingInterOpUtils;
+import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.List;
-import java.util.Objects;
 
 public class TraverseAST {
+
   SymbolTable currentST = new SymbolTable(null);
 
   private int errors = 0;
@@ -43,12 +42,9 @@ public class TraverseAST {
 
   }
 
-
-
   public Integer getNumberOfErrors() {
     return errors;
   }
-
 
   private Type getExpressionType(Expression expr) {
     switch(expr.getExprType()) {
@@ -165,6 +161,38 @@ public class TraverseAST {
     }
   }
 
+  private boolean bothIntegers(Type t1, Type t2) {
+    return t1.equals(new Type(EType.INT)) &&
+           t2.equals(new Type(EType.INT));
+  }
+
+  private boolean bothCharacters(Type t1, Type t2) {
+    return t1.equals(new Type(EType.CHAR)) &&
+           t2.equals(new Type(EType.CHAR));
+  }
+
+  private boolean bothBooleans(Type t1, Type t2) {
+    return t1.equals(new Type(EType.BOOL)) &&
+           t2.equals(new Type(EType.BOOL));
+  }
+
+  private boolean bothStrings(Type t1, Type t2) {
+    return t1.equals(new Type(EType.STRING)) &&
+           t2.equals(new Type(EType.STRING));
+  }
+
+  private boolean bothEqPairs(Type t1, Type t2) {
+    return t1.getType() == EType.PAIR &&
+           t2.getType() == EType.PAIR &&
+           t1.equals(t2);
+  }
+
+  private boolean bothEqArrays(Type t1, Type t2) {
+    return t1.getType() == EType.ARRAY &&
+           t2.getType() == EType.ARRAY &&
+           t1.equals(t2);
+  }
+
   public void traverse(Program program) {
     for (Function function : program.getFunctions()) {
       traverse(function);
@@ -247,54 +275,15 @@ public class TraverseAST {
         break;
 
       case DIVIDE:
-        if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.INT)) ||
-            !getExpressionType(expression.getExpression2()).equals(new Type(EType.INT))) {
-          //TODO: Fix error messages
-          System.out.println("Error: / (divide) operator can only be used on integer expressions");
-          errors++;
-        }
-        traverse(expression.getExpression1());
-        traverse(expression.getExpression2());
-        break;
-
-      case MULTIPLY:
-        if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.INT)) ||
-                !getExpressionType(expression.getExpression2()).equals(new Type(EType.INT))) {
-          //TODO: Fix error messages
-          System.out.println("Error: * (multiply) operator can only be used on integer expressions");
-          errors++;
-        }
-        traverse(expression.getExpression1());
-        traverse(expression.getExpression2());
-        break;
-
-      case MODULO:
-        if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.INT)) ||
-                !getExpressionType(expression.getExpression2()).equals(new Type(EType.INT))) {
-          //TODO: Fix error messages
-          System.out.println("Error: % (modulo) operator can only be used on integer expressions");
-          errors++;
-        }
-        traverse(expression.getExpression1());
-        traverse(expression.getExpression2());
-        break;
-
-      case PLUS:
-        if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.INT)) ||
-                !getExpressionType(expression.getExpression2()).equals(new Type(EType.INT))) {
-          //TODO: Fix error messages
-          System.out.println("Error: + (plus) operator can only be used on integer expressions");
-          errors++;
-        }
-        traverse(expression.getExpression1());
-        traverse(expression.getExpression2());
-        break;
-
       case MINUS:
-        if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.INT)) ||
-                !getExpressionType(expression.getExpression2()).equals(new Type(EType.INT))) {
+      case PLUS:
+      case MODULO:
+      case MULTIPLY:
+        if (!bothIntegers(getExpressionType(expression.getExpression1()),
+                getExpressionType(expression.getExpression2()))) {
           //TODO: Fix error messages
-          System.out.println("Error: - (minus) operator can only be used on integer expressions");
+          System.out.println("Error: " + expression.getExprType() +
+                  " operator can only be used on integer expressions");
           errors++;
         }
         traverse(expression.getExpression1());
@@ -305,12 +294,31 @@ public class TraverseAST {
       case GTE:
       case LT:
       case LTE:
+        if (!bothIntegers(getExpressionType(expression.getExpression1()),
+                getExpressionType(expression.getExpression2())) ||
+            !bothCharacters(getExpressionType(expression.getExpression1()),
+                getExpressionType(expression.getExpression2()))) {
+          //TODO: Fix error messages
+          System.out.println("Error: " + expression.getExprType() +
+                  " operator can only be used on integer and character expressions");
+          errors++;
+        }
+        traverse(expression.getExpression1());
+        traverse(expression.getExpression2());
+        break;
+
       case EQ:
       case NEQ:
       case AND:
       case OR:
+        if (!getExpressionType(expression.getExpression1()).equals(getExpressionType(expression.getExpression2()))) {
+          System.out.println("Error" + expression.getExprType() +
+                  " operator can only be used on expressions of equal type");
+          errors++;
+        }
         traverse(expression.getExpression1());
         traverse(expression.getExpression2());
+        break;
     }
   }
 
