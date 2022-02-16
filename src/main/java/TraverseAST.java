@@ -1,13 +1,7 @@
-import ast.AssignRHS;
+import ast.*;
 import ast.AssignRHS.RHSType;
-import ast.Expression;
 import ast.Expression.ExprType;
-import ast.Function;
-import ast.Param;
-import ast.Program;
-import ast.Statement;
 import ast.Statement.StatType;
-import ast.Type;
 import ast.Type.EType;
 import jdk.swing.interop.SwingInterOpUtils;
 
@@ -56,8 +50,9 @@ public class TraverseAST {
   }
 
 
-  public Type getExpressionType(Expression expr) {
+  private Type getExpressionType(Expression expr) {
     switch(expr.getExprType()) {
+
       case INTLITER:
       case NEG:
       case ORD:
@@ -68,6 +63,7 @@ public class TraverseAST {
       case PLUS:
       case MINUS:
         return new Type(EType.INT);
+
       case BOOLLITER:
       case NOT:
       case GT:
@@ -79,14 +75,17 @@ public class TraverseAST {
       case AND:
       case OR:
         return new Type(EType.BOOL);
+
       case CHARLITER:
       case CHR:
         return new Type(EType.CHAR);
+
       case STRINGLITER:
         return new Type(EType.STRING);
-      //TODO:
+
       case IDENT:
         return currentST.getType(expr.getIdent());
+
       case PAIRELEM:
         Type fstType = getExpressionType(expr.getExpression1());
         Type sndType = getExpressionType(expr.getExpression2());
@@ -97,6 +96,7 @@ public class TraverseAST {
           sndType = new Type(EType.PAIR);
         }
         return new Type(EType.PAIR, fstType, sndType);
+
       case ARRAYELEM:
         if (expr.getArrayElem().getExpression().isEmpty()){
           return new Type(EType.ARRAY);
@@ -105,13 +105,15 @@ public class TraverseAST {
           return new Type(EType.ARRAY,
               getExpressionType(expr.getArrayElem().getExpression().get(0)));
         }
+
       case BRACKETS:
         return (getExpressionType(expr.getExpression1()));
+
     }
-    return null;
+    return new Type(EType.INT);
   }
 
-  public Type getRHSType(AssignRHS rhs) {
+  private Type getRHSType(AssignRHS rhs) {
     switch(rhs.getAssignType()){
       case EXPR:
         return getExpressionType(rhs.getExpression1());
@@ -136,6 +138,20 @@ public class TraverseAST {
         return getExpressionType(rhs.getPairElem().getExpression());
       case CALL:
         return new Type(EType.INT);
+    }
+    return null;
+  }
+
+  private Type getLHSType(AssignLHS lhs) {
+    switch (lhs.getAssignType()) {
+      case IDENT: return currentST.getType(lhs.getIdent());
+      case ARRAYELEM: return currentST.getType(lhs.getArrayElem().getIdent());
+      case PAIRELEM:
+        if (lhs.getPairElem().getType() == PairElem.PairElemType.FST) {
+          return getExpressionType(lhs.getPairElem().getExpression()).getFstType();
+        } else {
+          return getExpressionType(lhs.getPairElem().getExpression()).getSndType();
+        }
     }
     return null;
   }
@@ -324,15 +340,13 @@ public class TraverseAST {
         break;
 
       case REASSIGNMENT:
-        if (!currentST.contains(statement.getLHS().getIdent())) {
-          //TODO: FIX ERROR MESSAGE
-          System.out.println("Error: Assigning value to undefined variable");
-          errors++;
-        } else if (!currentST.getType(statement.getLHS().getIdent()).equals(getRHSType(statement.getRHS()))) {
+        traverse(statement.getLHS());
+        if (getLHSType(statement.getLHS()).equals(getRHSType(statement.getRHS()))) {
           //TODO: FIX ERROR MESSAGE
           System.out.println("Error: Assigning value of different type to defined variable");
           errors++;
         }
+
         traverse(statement.getRHS().getExpression1());
         break;
 
@@ -390,5 +404,21 @@ public class TraverseAST {
         traverse(statement.getStatement2());
         break;
     }
+  }
+
+  private void traverse(AssignLHS lhs) {
+
+    if (lhs.getAssignType() == AssignLHS.LHSType.IDENT && !currentST.contains(lhs.getIdent())) {
+      //TODO: FIX ERROR MESSAGE
+      System.out.println("Error: Assigning value to undefined variable");
+      errors++;
+    }
+
+    if (lhs.getAssignType() == AssignLHS.LHSType.ARRAYELEM && !currentST.contains(lhs.getArrayElem().getIdent())) {
+      //TODO: FIX ERROR MESSAGE
+      System.out.println("Error: Assigning value to undefined variable");
+      errors++;
+    }
+
   }
 }
