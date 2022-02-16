@@ -222,10 +222,55 @@ public class TraverseAST {
         break;
 
       case DIVIDE:
+        if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.INT)) ||
+            !getExpressionType(expression.getExpression2()).equals(new Type(EType.INT))) {
+          //TODO: Fix error messages
+          System.out.println("Error: / (divide) operator can only be used on integer expressions");
+        }
+        traverse(expression.getExpression1());
+        traverse(expression.getExpression2());
+        break;
+
       case MULTIPLY:
+        if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.INT)) ||
+                !getExpressionType(expression.getExpression2()).equals(new Type(EType.INT))) {
+          //TODO: Fix error messages
+          System.out.println("Error: * (multiply) operator can only be used on integer expressions");
+        }
+        traverse(expression.getExpression1());
+        traverse(expression.getExpression2());
+        break;
+
       case MODULO:
+        if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.INT)) ||
+                !getExpressionType(expression.getExpression2()).equals(new Type(EType.INT))) {
+          //TODO: Fix error messages
+          System.out.println("Error: % (modulo) operator can only be used on integer expressions");
+        }
+        traverse(expression.getExpression1());
+        traverse(expression.getExpression2());
+        break;
+
       case PLUS:
+        if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.INT)) ||
+                !getExpressionType(expression.getExpression2()).equals(new Type(EType.INT))) {
+          //TODO: Fix error messages
+          System.out.println("Error: + (plus) operator can only be used on integer expressions");
+        }
+        traverse(expression.getExpression1());
+        traverse(expression.getExpression2());
+        break;
+
       case MINUS:
+        if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.INT)) ||
+                !getExpressionType(expression.getExpression2()).equals(new Type(EType.INT))) {
+          //TODO: Fix error messages
+          System.out.println("Error: - (minus) operator can only be used on integer expressions");
+        }
+        traverse(expression.getExpression1());
+        traverse(expression.getExpression2());
+        break;
+
       case GT:
       case GTE:
       case LT:
