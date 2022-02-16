@@ -342,6 +342,12 @@ public class TraverseAST {
         break;
 
       case DECLARATION:
+        currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
+
+        if(statement.getExpression() == null) {
+          break;
+        }
+
         //TODO: possible error with nested types
         if (!validDeclaration(statement.getLhsType(), statement.getRHS())) {
           printSemanticError(statement);
@@ -355,7 +361,6 @@ public class TraverseAST {
         } else if (!(statement.getRHS().getAssignType() == RHSType.CALL)) {
           traverse(statement.getRHS().getExpression1());
         }
-        currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
         break;
 
       case REASSIGNMENT:
