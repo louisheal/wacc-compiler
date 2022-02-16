@@ -198,11 +198,15 @@ public class TraverseAST {
       case SKIP:
         break;
       case DECLARATION:
-        //TODO: possible error with nested types
+        currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
+
+        if(statement.getExpression() == null) {
+          break;
+        }
+        // TODO: possible error with nested types
         if (!statement.getLhsType().equals(getRHSType(statement.getRHS()))) {
           printSemanticError(statement);
         }
-        currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
 
         if (getRHSType(statement.getRHS()).getType().equals(EType.ARRAY)) {
           for (Expression expression1 : statement.getRHS().getArray()) {
