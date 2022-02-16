@@ -295,7 +295,7 @@ public class TraverseAST {
       case LT:
       case LTE:
         if (!bothIntegers(getExpressionType(expression.getExpression1()),
-                getExpressionType(expression.getExpression2())) ||
+                getExpressionType(expression.getExpression2())) &&
             !bothCharacters(getExpressionType(expression.getExpression1()),
                 getExpressionType(expression.getExpression2()))) {
           //TODO: Fix error messages
@@ -309,9 +309,18 @@ public class TraverseAST {
 
       case EQ:
       case NEQ:
+        if (!getExpressionType(expression.getExpression1()).equals(getExpressionType(expression.getExpression2()))) {
+          System.out.println("Error" + expression.getExprType() +
+                  " operator can only be used on expressions of equal type");
+          errors++;
+        }
+        traverse(expression.getExpression1());
+        traverse(expression.getExpression2());
+        break;
       case AND:
       case OR:
-        if (!getExpressionType(expression.getExpression1()).equals(getExpressionType(expression.getExpression2()))) {
+        if (!bothBooleans(getExpressionType(expression.getExpression1()),
+                getExpressionType(expression.getExpression2()))) {
           System.out.println("Error" + expression.getExprType() +
                   " operator can only be used on expressions of equal type");
           errors++;
