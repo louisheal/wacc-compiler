@@ -9,6 +9,8 @@ import ast.Statement;
 import ast.Statement.StatType;
 import ast.Type;
 import ast.Type.EType;
+import jdk.swing.interop.SwingInterOpUtils;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -309,7 +311,6 @@ public class TraverseAST {
         if (!statement.getLhsType().equals(getRHSType(statement.getRHS()))) {
           printSemanticError(statement);
         }
-        currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
 
         if (getRHSType(statement.getRHS()).getType().equals(EType.ARRAY)) {
           for (Expression expression1 : statement.getRHS().getArray()) {
@@ -319,15 +320,19 @@ public class TraverseAST {
         } else if (!(statement.getRHS().getAssignType() == RHSType.CALL)) {
           traverse(statement.getRHS().getExpression1());
         }
+        currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
         break;
 
       case REASSIGNMENT:
-        if (!currentST.contains(statement.getLhsIdent())){
-          printSemanticError(statement);
-        } else if(!currentST.getType(statement.getLhsIdent()).equals(getRHSType(statement.getRHS()))){
-          printSemanticError(statement);
+        if (!currentST.contains(statement.getLHS().getIdent())) {
+          //TODO: FIX ERROR MESSAGE
+          System.out.println("Error: Assigning value to undefined variable");
+          errors++;
+        } else if (!currentST.getType(statement.getLHS().getIdent()).equals(getRHSType(statement.getRHS()))) {
+          //TODO: FIX ERROR MESSAGE
+          System.out.println("Error: Assigning value of different type to defined variable");
+          errors++;
         }
-        currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
         traverse(statement.getRHS().getExpression1());
         break;
 
