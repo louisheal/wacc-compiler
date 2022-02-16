@@ -159,7 +159,7 @@ public class TraverseAST {
   }
 
   private void traverse(List<Param> params) {
-
+    //TODO: Add params to function's symbol table
   }
 
   private void traverse(Expression expression) {
@@ -176,14 +176,51 @@ public class TraverseAST {
       case ARRAYELEM:
       case PAIRLITER:
         break;
+
       case NOT:
+        if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.BOOL))) {
+          //TODO: Fix error messages
+          System.out.println("Error: ! (not) operator can only be used on boolean expressions");
+        }
+        traverse(expression.getExpression1());
+        break;
+
       case NEG:
+        if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.INT))) {
+          //TODO: Fix error messages
+          System.out.println("Error: - (negate) operator can only be used on integer expressions");
+        }
+        traverse(expression.getExpression1());
+        break;
+
       case LEN:
+        if (getExpressionType(expression.getExpression1()).getType() != EType.ARRAY) {
+          //TODO: Fix error messages
+          System.out.println("Error: len (length) operator can only be used on array expressions");
+        }
+        traverse(expression.getExpression1());
+        break;
+
       case CHR:
+        if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.INT))) {
+          //TODO: Fix error messages
+          System.out.println("Error: chr (character) operator can only be used on integer expressions");
+        }
+        traverse(expression.getExpression1());
+        break;
+
       case ORD:
+        if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.CHAR))) {
+          //TODO: Fix error messages
+          System.out.println("Error: ord (order) operator can only be used on character expressions");
+        }
+        traverse(expression.getExpression1());
+        break;
+
       case BRACKETS:
         traverse(expression.getExpression1());
         break;
+
       case DIVIDE:
       case MULTIPLY:
       case MODULO:
