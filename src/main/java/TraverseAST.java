@@ -82,7 +82,9 @@ public class TraverseAST {
         return new Type(EType.CHAR);
       case STRINGLITER:
         return new Type(EType.STRING);
-      //case IDENT:
+      //TODO:
+      case IDENT:
+        return currentST.getType(expr.getIdent());
       case PAIRELEM:
         Type fstType = getExpressionType(expr.getExpression1());
         Type sndType = getExpressionType(expr.getExpression2());
@@ -181,6 +183,7 @@ public class TraverseAST {
         if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.BOOL))) {
           //TODO: Fix error messages
           System.out.println("Error: ! (not) operator can only be used on boolean expressions");
+          errors++;
         }
         traverse(expression.getExpression1());
         break;
@@ -189,6 +192,7 @@ public class TraverseAST {
         if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.INT))) {
           //TODO: Fix error messages
           System.out.println("Error: - (negate) operator can only be used on integer expressions");
+          errors++;
         }
         traverse(expression.getExpression1());
         break;
@@ -197,6 +201,7 @@ public class TraverseAST {
         if (getExpressionType(expression.getExpression1()).getType() != EType.ARRAY) {
           //TODO: Fix error messages
           System.out.println("Error: len (length) operator can only be used on array expressions");
+          errors++;
         }
         traverse(expression.getExpression1());
         break;
@@ -205,14 +210,17 @@ public class TraverseAST {
         if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.INT))) {
           //TODO: Fix error messages
           System.out.println("Error: chr (character) operator can only be used on integer expressions");
+          errors++;
         }
         traverse(expression.getExpression1());
         break;
 
       case ORD:
+        System.out.println(expression.getExpression1().getExprType());
         if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.CHAR))) {
           //TODO: Fix error messages
           System.out.println("Error: ord (order) operator can only be used on character expressions");
+          errors++;
         }
         traverse(expression.getExpression1());
         break;
@@ -226,6 +234,7 @@ public class TraverseAST {
             !getExpressionType(expression.getExpression2()).equals(new Type(EType.INT))) {
           //TODO: Fix error messages
           System.out.println("Error: / (divide) operator can only be used on integer expressions");
+          errors++;
         }
         traverse(expression.getExpression1());
         traverse(expression.getExpression2());
@@ -236,6 +245,7 @@ public class TraverseAST {
                 !getExpressionType(expression.getExpression2()).equals(new Type(EType.INT))) {
           //TODO: Fix error messages
           System.out.println("Error: * (multiply) operator can only be used on integer expressions");
+          errors++;
         }
         traverse(expression.getExpression1());
         traverse(expression.getExpression2());
@@ -246,6 +256,7 @@ public class TraverseAST {
                 !getExpressionType(expression.getExpression2()).equals(new Type(EType.INT))) {
           //TODO: Fix error messages
           System.out.println("Error: % (modulo) operator can only be used on integer expressions");
+          errors++;
         }
         traverse(expression.getExpression1());
         traverse(expression.getExpression2());
@@ -256,6 +267,7 @@ public class TraverseAST {
                 !getExpressionType(expression.getExpression2()).equals(new Type(EType.INT))) {
           //TODO: Fix error messages
           System.out.println("Error: + (plus) operator can only be used on integer expressions");
+          errors++;
         }
         traverse(expression.getExpression1());
         traverse(expression.getExpression2());
@@ -266,6 +278,7 @@ public class TraverseAST {
                 !getExpressionType(expression.getExpression2()).equals(new Type(EType.INT))) {
           //TODO: Fix error messages
           System.out.println("Error: - (minus) operator can only be used on integer expressions");
+          errors++;
         }
         traverse(expression.getExpression1());
         traverse(expression.getExpression2());
