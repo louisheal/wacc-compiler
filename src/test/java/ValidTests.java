@@ -21,13 +21,7 @@ public class ValidTests {
   }
 
   // Will ensure that the files listed are not folders
-  FileFilter folderFilter = new FileFilter() {
-    @Override
-    public boolean accept(File pathname) {
-      return !pathname.isDirectory();
-    }
-  };
-
+  FileFilter folderFilter = pathname -> !pathname.isDirectory();
 
   @Test
   public void advancedTests() throws IOException {
