@@ -145,7 +145,7 @@ public class TraverseAST {
   private Type getLHSType(AssignLHS lhs) {
     switch (lhs.getAssignType()) {
       case IDENT: return currentST.getType(lhs.getIdent());
-      case ARRAYELEM: return currentST.getType(lhs.getArrayElem().getIdent());
+      case ARRAYELEM: return currentST.getType(lhs.getArrayElem().getIdent()).getArrayType();
       case PAIRELEM:
         if (lhs.getPairElem().getType() == PairElem.PairElemType.FST) {
           return getExpressionType(lhs.getPairElem().getExpression()).getFstType();
@@ -314,6 +314,26 @@ public class TraverseAST {
     }
   }
 
+  private boolean validDeclaration(Type lhs, AssignRHS rhs) {
+    boolean sameType = lhs.equals(getRHSType(rhs));
+    boolean emptyArray = rhs.getAssignType() == RHSType.ARRAY &&
+            rhs.getArray().isEmpty() &&
+            lhs.getType() == EType.ARRAY;
+    boolean charArrayAsString = lhs.equals(new Type(EType.STRING)) &&
+            Objects.equals(getRHSType(rhs), new Type(EType.ARRAY, new Type(EType.CHAR)));
+    return sameType || emptyArray || charArrayAsString;
+  }
+
+  private boolean validReassignment(AssignLHS lhs, AssignRHS rhs) {
+    boolean sameType = getLHSType(lhs).equals(getRHSType(rhs));
+    boolean emptyArray = rhs.getAssignType() == RHSType.ARRAY &&
+            rhs.getArray().isEmpty() &&
+            getLHSType(lhs).getType() == EType.ARRAY;
+    boolean charArrayAsString = getLHSType(lhs).equals(new Type(EType.STRING)) &&
+            getRHSType(rhs).equals(new Type(EType.ARRAY, new Type(EType.CHAR)));
+    return sameType || emptyArray || charArrayAsString;
+  }
+
   private void traverse(Statement statement) {
     Expression expression = statement.getExpression();
     switch (statement.getStatType()) {
@@ -323,8 +343,7 @@ public class TraverseAST {
 
       case DECLARATION:
         //TODO: possible error with nested types
-        if (!statement.getLhsType().equals(getRHSType(statement.getRHS())) &&
-                !(statement.getRHS().getAssignType() == RHSType.ARRAY && statement.getRHS().getArray().isEmpty())) {
+        if (!validDeclaration(statement.getLhsType(), statement.getRHS())) {
           printSemanticError(statement);
         }
 
@@ -341,13 +360,13 @@ public class TraverseAST {
 
       case REASSIGNMENT:
         traverse(statement.getLHS());
-        if (getLHSType(statement.getLHS()).equals(getRHSType(statement.getRHS()))) {
+        if (!validReassignment(statement.getLHS(), statement.getRHS())) {
           //TODO: FIX ERROR MESSAGE
           System.out.println("Error: Assigning value of different type to defined variable");
           errors++;
         }
 
-        traverse(statement.getRHS().getExpression1());
+        traverse(statement.getRHS());
         break;
 
       case READ:
@@ -418,6 +437,14 @@ public class TraverseAST {
       //TODO: FIX ERROR MESSAGE
       System.out.println("Error: Assigning value to undefined variable");
       errors++;
+    }
+
+  }
+
+  private void traverse(AssignRHS rhs) {
+
+    if (rhs.getAssignType() == RHSType.EXPR) {
+      traverse(rhs.getExpression1());
     }
 
   }
