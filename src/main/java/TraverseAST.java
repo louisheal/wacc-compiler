@@ -135,7 +135,12 @@ public class TraverseAST {
         return new Type(EType.PAIR, fstType, sndType);
 
       case PAIRELEM:
-        return getExpressionType(rhs.getPairElem().getExpression());
+        Type pairType = getExpressionType(rhs.getPairElem().getExpression());
+        if (rhs.getPairElem().getType() == PairElem.PairElemType.FST) {
+          return pairType.getFstType();
+        } else {
+          return pairType.getSndType();
+        }
 
       case CALL:
         return new Type(EType.INT);
@@ -315,7 +320,8 @@ public class TraverseAST {
             lhs.getType() == EType.ARRAY;
     boolean charArrayAsString = lhs.equals(new Type(EType.STRING)) &&
             getRHSType(rhs).equals(new Type(EType.ARRAY, new Type(EType.CHAR)));
-    return sameType || emptyArray || charArrayAsString;
+    boolean nullPair = lhs.getType() == EType.PAIR && rhs.getExpression1() == null;
+    return sameType || emptyArray || charArrayAsString || nullPair;
   }
 
   private void traverse(Statement statement) {
@@ -338,10 +344,8 @@ public class TraverseAST {
           for (Expression expression1 : statement.getRHS().getArray()) {
             traverse(expression1);
           }
-        //TODO: TRAVERSE RHS?
-        } else if (!(statement.getRHS().getAssignType() == RHSType.CALL)) {
-          traverse(statement.getRHS().getExpression1());
         }
+        traverse(statement.getRHS());
         break;
 
       case REASSIGNMENT:

@@ -30,7 +30,7 @@ public class Compiler {
 
   public static void main(String[] args) throws IOException {
 
-    Path filename = Path.of(args[0]);
+    Path filename = Path.of("wacc_examples/valid/runtimeErr/nullDereference/freeNull.wacc");
 
     CharStream input = CharStreams.fromPath(filename);
 
