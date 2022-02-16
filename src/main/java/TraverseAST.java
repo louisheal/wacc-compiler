@@ -317,12 +317,13 @@ public class TraverseAST {
         traverse(expression.getExpression1());
         traverse(expression.getExpression2());
         break;
+
       case AND:
       case OR:
         if (!bothBooleans(getExpressionType(expression.getExpression1()),
                 getExpressionType(expression.getExpression2()))) {
           System.out.println("Error" + expression.getExprType() +
-                  " operator can only be used on expressions of equal type");
+                  " operator can only be used on boolean expressions");
           errors++;
         }
         traverse(expression.getExpression1());
