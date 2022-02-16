@@ -300,8 +300,10 @@ public class TraverseAST {
   private void traverse(Statement statement) {
     Expression expression = statement.getExpression();
     switch (statement.getStatType()) {
+
       case SKIP:
         break;
+
       case DECLARATION:
         //TODO: possible error with nested types
         if (!statement.getLhsType().equals(getRHSType(statement.getRHS()))) {
@@ -318,6 +320,7 @@ public class TraverseAST {
           traverse(statement.getRHS().getExpression1());
         }
         break;
+
       case REASSIGNMENT:
         if (!currentST.contains(statement.getLhsIdent())){
           printSemanticError(statement);
@@ -327,8 +330,10 @@ public class TraverseAST {
         currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
         traverse(statement.getRHS().getExpression1());
         break;
+
       case READ:
         break;
+
       case FREE:
         if(statement.getRHS() == null
             ||statement.getRHS().getAssignType() != RHSType.ARRAY
@@ -340,11 +345,13 @@ public class TraverseAST {
           traverse(expression);
         }
         break;
+
       case RETURN:
       case PRINT:
       case PRINTLN:
         traverse(expression);
         break;
+
       case EXIT:
         if(!getExpressionType(expression).equals(new Type(EType.INT))){
           printSemanticError(statement);
@@ -353,16 +360,16 @@ public class TraverseAST {
           traverse(expression);
         }
         break;
+
       case IF:
         if(!getExpressionType(expression).equals(new Type(EType.BOOL))){
-          traverse(expression);
-        }
-        else {
           printSemanticError(statement);
         }
+        traverse(expression);
         traverse(statement.getStatement1());
         traverse(statement.getStatement2());
         break;
+
       case WHILE:
         if(!getExpressionType(expression).equals(new Type(EType.BOOL))) {
           printSemanticError(statement);
