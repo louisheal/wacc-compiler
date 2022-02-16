@@ -153,7 +153,7 @@ public class TraverseAST {
           return getExpressionType(lhs.getPairElem().getExpression()).getSndType();
         }
     }
-    return null;
+    return new Type(EType.INT);
   }
 
   private void validateFunctionReturns(Statement statement) {
@@ -314,22 +314,12 @@ public class TraverseAST {
     }
   }
 
-  private boolean validDeclaration(Type lhs, AssignRHS rhs) {
+  private boolean validAssignment(Type lhs, AssignRHS rhs) {
     boolean sameType = lhs.equals(getRHSType(rhs));
     boolean emptyArray = rhs.getAssignType() == RHSType.ARRAY &&
             rhs.getArray().isEmpty() &&
             lhs.getType() == EType.ARRAY;
     boolean charArrayAsString = lhs.equals(new Type(EType.STRING)) &&
-            Objects.equals(getRHSType(rhs), new Type(EType.ARRAY, new Type(EType.CHAR)));
-    return sameType || emptyArray || charArrayAsString;
-  }
-
-  private boolean validReassignment(AssignLHS lhs, AssignRHS rhs) {
-    boolean sameType = getLHSType(lhs).equals(getRHSType(rhs));
-    boolean emptyArray = rhs.getAssignType() == RHSType.ARRAY &&
-            rhs.getArray().isEmpty() &&
-            getLHSType(lhs).getType() == EType.ARRAY;
-    boolean charArrayAsString = getLHSType(lhs).equals(new Type(EType.STRING)) &&
             getRHSType(rhs).equals(new Type(EType.ARRAY, new Type(EType.CHAR)));
     return sameType || emptyArray || charArrayAsString;
   }
@@ -349,7 +339,7 @@ public class TraverseAST {
         }
 
         //TODO: possible error with nested types
-        if (!validDeclaration(statement.getLhsType(), statement.getRHS())) {
+        if (!validAssignment(statement.getLhsType(), statement.getRHS())) {
           printSemanticError(statement);
         }
 
@@ -365,7 +355,7 @@ public class TraverseAST {
 
       case REASSIGNMENT:
         traverse(statement.getLHS());
-        if (!validReassignment(statement.getLHS(), statement.getRHS())) {
+        if (!validAssignment(getLHSType(statement.getLHS()), statement.getRHS())) {
           //TODO: FIX ERROR MESSAGE
           System.out.println("Error: Assigning value of different type to defined variable");
           errors++;
