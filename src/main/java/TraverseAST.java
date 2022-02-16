@@ -131,9 +131,18 @@ public class TraverseAST {
       case PAIRELEM:
         return getExpressionType(rhs.getPairElem().getExpression());
       case CALL:
-        break;
+        return new Type(EType.INT);
     }
     return null;
+  }
+
+  private void validateFunctionReturns(Statement statement) {
+    while (statement.getStatType() == StatType.CONCAT) {
+      statement = statement.getStatement2();
+    }
+    if (statement.getStatType() == StatType.RETURN || statement.getStatType() == StatType.EXIT) {
+      printSemanticError(statement);
+    }
   }
 
   public void traverse(Program program) {
@@ -144,6 +153,7 @@ public class TraverseAST {
   }
 
   private void traverse(Function function) {
+    validateFunctionReturns(function.getStatement());
     traverse(function.getParams());
     traverse(function.getStatement());
   }
@@ -208,7 +218,8 @@ public class TraverseAST {
           for (Expression expression1 : statement.getRHS().getArray()) {
             traverse(expression1);
           }
-        } else {
+        //TODO: TRAVERSE RHS?
+        } else if (!(statement.getRHS().getAssignType() == RHSType.CALL)) {
           traverse(statement.getRHS().getExpression1());
         }
         break;
