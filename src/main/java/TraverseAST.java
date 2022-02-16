@@ -47,6 +47,11 @@ public class TraverseAST {
   }
 
   private Type getExpressionType(Expression expr) {
+
+    if (expr == null) {
+      return null;
+    }
+
     switch (expr.getExprType()) {
 
       case INTLITER:
@@ -204,6 +209,11 @@ public class TraverseAST {
   }
 
   private void traverse(Expression expression) {
+
+    if (expression == null) {
+      return;
+    }
+
     switch (expression.getExprType()) {
 
       case NOT:
@@ -290,7 +300,8 @@ public class TraverseAST {
 
       case EQ:
       case NEQ:
-        if (!getExpressionType(expression.getExpression1()).equals(getExpressionType(expression.getExpression2()))) {
+        if (!getExpressionType(expression.getExpression1()).equals(getExpressionType(expression.getExpression2())) &&
+                expression.getExpression2() != null) {
           System.out.println("Error" + expression.getExprType() +
                   " operator can only be used on expressions of equal type");
           errors++;
