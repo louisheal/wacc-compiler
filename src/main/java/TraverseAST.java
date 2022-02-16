@@ -380,8 +380,7 @@ public class TraverseAST {
       case FREE:
         if(statement.getRHS() == null
             ||statement.getRHS().getAssignType() != RHSType.ARRAY
-            || statement.getRHS().getAssignType() != RHSType.PAIRELEM
-            || statement.getRHS().getAssignType() != RHSType.NEWPAIR){
+            || statement.getRHS().getAssignType() != RHSType.PAIRELEM){
           printSemanticError(statement);
         }
         else{
