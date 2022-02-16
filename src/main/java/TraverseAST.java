@@ -344,7 +344,7 @@ public class TraverseAST {
       case DECLARATION:
         currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
 
-        if(statement.getLhsType().getType() == EType.PAIR && statement.getExpression() == null) {
+        if(statement.getLhsType().getType() == EType.PAIR && expression == null) {
           break;
         }
 
@@ -391,7 +391,9 @@ public class TraverseAST {
       case RETURN:
       case PRINT:
       case PRINTLN:
-        traverse(expression);
+        if(expression != null) {
+          traverse(expression);
+        }
         break;
 
       case EXIT:
