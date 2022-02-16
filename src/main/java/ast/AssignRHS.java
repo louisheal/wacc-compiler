@@ -67,8 +67,8 @@ public class AssignRHS {
         for (int i = 1; i < array.size(); i++) {
           result.append(", ").append(array.get(i));
         }
-        result.append("]");
       }
+      result.append("]");
     }
 
     if (assignType == RHSType.NEWPAIR) {
