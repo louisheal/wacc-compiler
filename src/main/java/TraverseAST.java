@@ -321,7 +321,6 @@ public class TraverseAST {
     boolean charArrayAsString = lhs.equals(new Type(EType.STRING)) &&
             getRHSType(rhs).equals(new Type(EType.ARRAY, new Type(EType.CHAR)));
     boolean nullPair = lhs.getType() == EType.PAIR && rhs.getExpression1() == null;
-    System.out.println(getRHSType(rhs));
     return sameType || emptyArray || charArrayAsString || nullPair;
   }
 

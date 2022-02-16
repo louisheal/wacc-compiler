@@ -65,7 +65,10 @@ public class Type {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Type type1 = (Type) o;
-    return type == type1.type && Objects.equals(arrayType, type1.arrayType) && fstType == type1.fstType && sndType == type1.sndType;
+    return type == type1.type &&
+            Objects.equals(arrayType, type1.arrayType) &&
+            Objects.equals(fstType, type1.fstType) &&
+            Objects.equals(sndType, type1.sndType);
   }
 
   public enum EType {
