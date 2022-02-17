@@ -211,15 +211,18 @@ public class TraverseAST {
     return null;
   }
 
-  private void validateFunctionReturns(Statement statement) {
-    while (statement.getStatType() == StatType.CONCAT) {
-      statement = statement.getStatement2();
+  private boolean validFunctionReturn(Statement statement) {
+    switch (statement.getStatType()) {
+      case CONCAT:
+        return validFunctionReturn(statement.getStatement2());
+      case IF:
+        return validFunctionReturn(statement.getStatement1()) &&
+               validFunctionReturn(statement.getStatement2());
+      case RETURN:
+      case EXIT:
+        return true;
     }
-
-    if (statement.getStatType() != StatType.RETURN && statement.getStatType() != StatType.EXIT) {
-      System.out.println("Syntax Error: Function does not return");
-      exit(100);
-    }
+    return false;
   }
 
   private boolean bothIntegers(Type t1, Type t2) {
@@ -245,7 +248,10 @@ public class TraverseAST {
   }
 
   private void traverse(Function function) {
-    validateFunctionReturns(function.getStatement());
+    if (!validFunctionReturn(function.getStatement())) {
+      System.out.println("Syntax Error: Function does not return");
+      exit(100);
+    }
     currentST.newFunction(function.getIdent(), function.getParams());
     currentST.newFunctionReturn(function.getIdent(), function.getReturnType());
     traverse(function.getParams());
@@ -348,6 +354,7 @@ public class TraverseAST {
         //TODO: possible error with nested types
         if (invalidAssignment(statement.getLhsType(), statement.getRHS())) {
           //TODO
+          System.out.println("TODO: DECLARATION ERROR");
           printSemanticError((Error) null);
         }
 
