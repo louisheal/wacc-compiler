@@ -242,7 +242,6 @@ public class TraverseAST {
   public void traverse(Program program) {
 
     for (Function function : program.getFunctions()) {
-      System.out.println(function.getParams());
       functionParams.put(function.getIdent(), function.getParams());
       functionReturnTypes.put(function.getIdent(), function.getReturnType());
     }
