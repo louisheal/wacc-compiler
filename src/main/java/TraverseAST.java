@@ -2,8 +2,8 @@ import ast.*;
 import ast.AssignRHS.RHSType;
 import ast.Statement.StatType;
 import ast.Type.EType;
-import org.antlr.v4.runtime.misc.Pair;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TraverseAST {
@@ -11,39 +11,74 @@ public class TraverseAST {
   SymbolTable currentST = new SymbolTable(null);
 
   private int errors = 0;
+  private final List<String> errorMsgs = new ArrayList<>();
 
-  private void printSemanticError(Statement statement) {
-    String errorCause = "";
-
-    switch (statement.getStatType()) {
-      case DECLARATION:
-        errorCause = "Declaration does not match actual type";
+  private void printSemanticError(Error e) {
+    switch (e) {
+      case UNDEFINED:
+        errorMsgs.add("Assigning value to undefined variable");
         break;
-      case REASSIGNMENT:
-        errorCause = "Cannot reassign to different variable type";
+      case MISMATCH_TYPE:
+        errorMsgs.add("Type mismatch when assigning value to defined variable");
         break;
-      case FREE:
-        errorCause = "Invalid type for freeing";
+      case IF_NOT_BOOL:
+        errorMsgs.add("Conditional part of an if statement is not a boolean expression");
         break;
-      case EXIT:
-        errorCause = "Exit code must be int";
+      case EXIT_NOT_INT:
+        errorMsgs.add("Exit value is not an integer expression");
         break;
-      case IF:
-        errorCause = "Conditional statement for IF must be boolean";
+      case WHILE_NOT_BOOL:
+        errorMsgs.add("Conditional part of a while statement is not a boolean expression");
         break;
-      case WHILE:
-        errorCause = "Conditional statement for WHILE must be boolean";
+      case NOT_FREEABLE:
+        errorMsgs.add("Trying to free a variable that isn't an array or pair");
         break;
     }
-
-    String errorMsg = "Semantic Error: " + errorCause;
     errors++;
-    System.out.println(errorMsg);
+  }
 
+  private void printSemanticError(Expression.ExprType e) {
+    switch (e) {
+      case NOT:
+      case AND:
+      case OR:
+        errorMsgs.add(e + " operator can only be used on boolean expressions");
+        break;
+      case NEG:
+      case CHR:
+      case DIVIDE:
+      case MULTIPLY:
+      case MODULO:
+      case PLUS:
+      case MINUS:
+        errorMsgs.add(e + " operator can only be used on integer expressions");
+        break;
+      case LEN:
+        errorMsgs.add(e + " operator can only be used on array expressions");
+        break;
+      case ORD:
+        errorMsgs.add(e + " operator can only be used on character expressions");
+        break;
+      case GT:
+      case GTE:
+      case LT:
+      case LTE:
+        errorMsgs.add(e + " operator can only be used on integer and character expressions");
+        break;
+      case EQ:
+      case NEQ:
+        errorMsgs.add(e + " operator can only be used on expressions with the same type");
+        break;
+    }
+    errors++;
   }
 
   public Integer getNumberOfErrors() {
     return errors;
+  }
+
+  public List<String> getErrorMsgs() {
+    return errorMsgs;
   }
 
   private Type getExpressionType(Expression expr) {
@@ -172,7 +207,7 @@ public class TraverseAST {
       statement = statement.getStatement2();
     }
     if (statement.getStatType() == StatType.RETURN || statement.getStatType() == StatType.EXIT) {
-      printSemanticError(statement);
+      printSemanticError(Error.FUNCTION_NO_RETURN);
     }
   }
 
@@ -214,117 +249,68 @@ public class TraverseAST {
       return;
     }
 
-    switch (expression.getExprType()) {
+    boolean validNot = expression.getExprType() == Expression.ExprType.NOT &&
+                       !getExpressionType(expression.getExpression1()).equals(new Type(EType.BOOL));
+    boolean validNeg = expression.getExprType() == Expression.ExprType.NEG &&
+                       !getExpressionType(expression.getExpression1()).equals(new Type(EType.INT));
+    boolean validLen = expression.getExprType() == Expression.ExprType.LEN &&
+                       getExpressionType(expression.getExpression1()).getType() != EType.ARRAY;
+    boolean validChr = expression.getExprType() == Expression.ExprType.CHR &&
+                       !getExpressionType(expression.getExpression1()).equals(new Type(EType.INT));
+    boolean validOrd = expression.getExprType() == Expression.ExprType.ORD &&
+                       !getExpressionType(expression.getExpression1()).equals(new Type(EType.CHAR));
 
-      case NOT:
-        if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.BOOL))) {
-          //TODO: Fix error messages
-          System.out.println("Error: ! (not) operator can only be used on boolean expressions");
-          errors++;
-        }
-        traverse(expression.getExpression1());
-        break;
+    if (validNot || validNeg || validLen || validChr || validOrd) {
+      printSemanticError(expression.getExprType());
+    }
 
-      case NEG:
-        if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.INT))) {
-          //TODO: Fix error messages
-          System.out.println("Error: - (negate) operator can only be used on integer expressions");
-          errors++;
-        }
-        traverse(expression.getExpression1());
-        break;
+    traverse(expression.getExpression1());
 
-      case LEN:
-        if (getExpressionType(expression.getExpression1()).getType() != EType.ARRAY) {
-          //TODO: Fix error messages
-          System.out.println("Error: len (length) operator can only be used on array expressions");
-          errors++;
-        }
-        traverse(expression.getExpression1());
-        break;
+    if (expression.getExprType() == Expression.ExprType.DIVIDE ||
+        expression.getExprType() == Expression.ExprType.MULTIPLY ||
+        expression.getExprType() == Expression.ExprType.MODULO ||
+        expression.getExprType() == Expression.ExprType.MINUS ||
+        expression.getExprType() == Expression.ExprType.PLUS) {
+      if (!bothIntegers(getExpressionType(expression.getExpression1()),
+                        getExpressionType(expression.getExpression2()))) {
+        printSemanticError(expression.getExprType());
+      }
+      traverse(expression.getExpression2());
+    }
 
-      case CHR:
-        if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.INT))) {
-          //TODO: Fix error messages
-          System.out.println("Error: chr (character) operator can only be used on integer expressions");
-          errors++;
-        }
-        traverse(expression.getExpression1());
-        break;
+    if (expression.getExprType() == Expression.ExprType.GT ||
+        expression.getExprType() == Expression.ExprType.GTE ||
+        expression.getExprType() == Expression.ExprType.LT ||
+        expression.getExprType() == Expression.ExprType.LTE) {
+      if (!bothIntegers(getExpressionType(expression.getExpression1()),
+              getExpressionType(expression.getExpression2())) &&
+          !bothCharacters(getExpressionType(expression.getExpression1()),
+                  getExpressionType(expression.getExpression2()))) {
+        printSemanticError(expression.getExprType());
+      }
+      traverse(expression.getExpression2());
+    }
 
-      case ORD:
-        if (!getExpressionType(expression.getExpression1()).equals(new Type(EType.CHAR))) {
-          //TODO: Fix error messages
-          System.out.println("Error: ord (order) operator can only be used on character expressions");
-          errors++;
-        }
-        traverse(expression.getExpression1());
-        break;
+    if (expression.getExprType() == Expression.ExprType.EQ ||
+        expression.getExprType() == Expression.ExprType.NEQ) {
+      if (!getExpressionType(expression.getExpression1()).equals(getExpressionType(expression.getExpression2())) &&
+          expression.getExpression1() != null && expression.getExpression2() != null) {
+        printSemanticError(expression.getExprType());
+      }
+      traverse(expression.getExpression2());
+    }
 
-      case BRACKETS:
-        traverse(expression.getExpression1());
-        break;
-
-      case DIVIDE:
-      case MINUS:
-      case PLUS:
-      case MODULO:
-      case MULTIPLY:
-        if (!bothIntegers(getExpressionType(expression.getExpression1()),
-                getExpressionType(expression.getExpression2()))) {
-          //TODO: Fix error messages
-          System.out.println("Error: " + expression.getExprType() +
-                  " operator can only be used on integer expressions");
-          errors++;
-        }
-        traverse(expression.getExpression1());
-        traverse(expression.getExpression2());
-        break;
-
-      case GT:
-      case GTE:
-      case LT:
-      case LTE:
-        if (!bothIntegers(getExpressionType(expression.getExpression1()),
-                getExpressionType(expression.getExpression2())) &&
-            !bothCharacters(getExpressionType(expression.getExpression1()),
-                getExpressionType(expression.getExpression2()))) {
-          //TODO: Fix error messages
-          System.out.println("Error: " + expression.getExprType() +
-                  " operator can only be used on integer and character expressions");
-          errors++;
-        }
-        traverse(expression.getExpression1());
-        traverse(expression.getExpression2());
-        break;
-
-      case EQ:
-      case NEQ:
-        if (!getExpressionType(expression.getExpression1()).equals(getExpressionType(expression.getExpression2())) &&
-                expression.getExpression1() != null && expression.getExpression2() != null) {
-          System.out.println("Error" + expression.getExprType() +
-                  " operator can only be used on expressions of equal type");
-          errors++;
-        }
-        traverse(expression.getExpression1());
-        traverse(expression.getExpression2());
-        break;
-
-      case AND:
-      case OR:
-        if (!bothBooleans(getExpressionType(expression.getExpression1()),
-                getExpressionType(expression.getExpression2()))) {
-          System.out.println("Error" + expression.getExprType() +
-                  " operator can only be used on boolean expressions");
-          errors++;
-        }
-        traverse(expression.getExpression1());
-        traverse(expression.getExpression2());
-        break;
+    if (expression.getExprType() == Expression.ExprType.AND ||
+            expression.getExprType() == Expression.ExprType.OR) {
+      if (!bothBooleans(getExpressionType(expression.getExpression1()),
+              getExpressionType(expression.getExpression2()))) {
+        printSemanticError(expression.getExprType());
+      }
+      traverse(expression.getExpression2());
     }
   }
 
-  private boolean validAssignment(Type lhs, AssignRHS rhs) {
+  private boolean invalidAssignment(Type lhs, AssignRHS rhs) {
     boolean sameType = lhs.equals(getRHSType(rhs));
     boolean emptyArray = rhs.getAssignType() == RHSType.ARRAY &&
             rhs.getArray().isEmpty() &&
@@ -332,7 +318,7 @@ public class TraverseAST {
     boolean charArrayAsString = lhs.equals(new Type(EType.STRING)) &&
             getRHSType(rhs).equals(new Type(EType.ARRAY, new Type(EType.CHAR)));
     boolean nullPair = lhs.getType() == EType.PAIR && rhs.getExpression1() == null;
-    return sameType || emptyArray || charArrayAsString || nullPair;
+    return !sameType && !emptyArray && !charArrayAsString && !nullPair;
   }
 
   private void traverse(Statement statement) {
@@ -347,8 +333,9 @@ public class TraverseAST {
         }
 
         //TODO: possible error with nested types
-        if (!validAssignment(statement.getLhsType(), statement.getRHS())) {
-          printSemanticError(statement);
+        if (invalidAssignment(statement.getLhsType(), statement.getRHS())) {
+          //TODO
+          printSemanticError((Error) null);
         }
 
         if (getRHSType(statement.getRHS()).getType().equals(EType.ARRAY)) {
@@ -361,7 +348,7 @@ public class TraverseAST {
 
       case REASSIGNMENT:
         traverse(statement.getLHS());
-        if (!validAssignment(getLHSType(statement.getLHS()), statement.getRHS())) {
+        if (invalidAssignment(getLHSType(statement.getLHS()), statement.getRHS())) {
           //TODO: FIX ERROR MESSAGE
           System.out.println("Error: Assigning value of different type to defined variable");
           errors++;
@@ -379,7 +366,7 @@ public class TraverseAST {
         }
         if(statement.getRHS().getAssignType() != RHSType.ARRAY
             || statement.getRHS().getAssignType() != RHSType.PAIRELEM){
-          printSemanticError(statement);
+          printSemanticError(Error.NOT_FREEABLE);
         }
         else{
           traverse(expression);
@@ -396,7 +383,7 @@ public class TraverseAST {
 
       case EXIT:
         if(!getExpressionType(expression).equals(new Type(EType.INT))){
-          printSemanticError(statement);
+          printSemanticError(Error.EXIT_NOT_INT);
         }
         else {
           traverse(expression);
@@ -405,7 +392,7 @@ public class TraverseAST {
 
       case IF:
         if(!getExpressionType(expression).equals(new Type(EType.BOOL))){
-          printSemanticError(statement);
+          printSemanticError(Error.IF_NOT_BOOL);
         }
         traverse(expression);
         traverse(statement.getStatement1());
@@ -414,7 +401,7 @@ public class TraverseAST {
 
       case WHILE:
         if(!getExpressionType(expression).equals(new Type(EType.BOOL))) {
-          printSemanticError(statement);
+          printSemanticError(Error.WHILE_NOT_BOOL);
         }
         traverse(expression);
         traverse(statement.getStatement1());
@@ -432,15 +419,16 @@ public class TraverseAST {
   private void traverse(AssignLHS lhs) {
 
     if (lhs.getAssignType() == AssignLHS.LHSType.IDENT && !currentST.contains(lhs.getIdent())) {
-      //TODO: FIX ERROR MESSAGE
-      System.out.println("Error: Assigning value to undefined variable");
-      errors++;
+      printSemanticError(Error.UNDEFINED);
     }
 
     if (lhs.getAssignType() == AssignLHS.LHSType.ARRAYELEM && !currentST.contains(lhs.getArrayElem().getIdent())) {
-      //TODO: FIX ERROR MESSAGE
-      System.out.println("Error: Assigning value to undefined variable");
-      errors++;
+      printSemanticError(Error.UNDEFINED);
+    }
+
+    if (lhs.getAssignType() == AssignLHS.LHSType.PAIRELEM &&
+            !currentST.contains(lhs.getPairElem().getExpression().getIdent())) {
+      printSemanticError(Error.UNDEFINED);
     }
 
   }
@@ -451,5 +439,15 @@ public class TraverseAST {
       traverse(rhs.getExpression1());
     }
 
+  }
+
+  private enum Error {
+    UNDEFINED,
+    MISMATCH_TYPE,
+    IF_NOT_BOOL,
+    EXIT_NOT_INT,
+    NOT_FREEABLE,
+    WHILE_NOT_BOOL,
+    FUNCTION_NO_RETURN
   }
 }
