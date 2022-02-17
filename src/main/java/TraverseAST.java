@@ -140,13 +140,7 @@ public class TraverseAST {
         return new Type(EType.PAIR, fstType, sndType);
 
       case ARRAYELEM:
-        if (expr.getArrayElem().getExpression().isEmpty()){
-          return new Type(EType.ARRAY);
-        }
-        else {
-          return new Type(EType.ARRAY,
-              getExpressionType(expr.getArrayElem().getExpression().get(0)));
-        }
+        return currentST.getType(expr.getArrayElem().getIdent()).getArrayType();
 
       case BRACKETS:
         return getExpressionType(expr.getExpression1());
@@ -352,9 +346,9 @@ public class TraverseAST {
             rhs.getArray().isEmpty() &&
             lhs.getType() == EType.ARRAY;
     boolean charArrayAsString = lhs.equals(new Type(EType.STRING)) &&
-            getRHSType(rhs).equals(new Type(EType.ARRAY, new Type(EType.CHAR)));
+            Objects.equals(getRHSType(rhs), new Type(EType.ARRAY, new Type(EType.CHAR)));
     boolean nullPair = lhs.getType() == EType.PAIR && rhs.getExpression1() == null;
-    return !sameType && !emptyArray && !charArrayAsString && !nullPair;
+    return !(sameType || emptyArray || charArrayAsString || nullPair);
   }
 
   private void traverse(Statement statement) {
@@ -370,7 +364,6 @@ public class TraverseAST {
 
         //TODO: possible error with nested types
         if (invalidAssignment(statement.getLhsType(), statement.getRHS())) {
-          //TODO
           errorMsgs.add("TODO: DECLARATION ERROR");
           errors++;
           break;
@@ -378,7 +371,8 @@ public class TraverseAST {
 
         currentST.newVariable(statement.getLhsIdent(), statement.getLhsType());
 
-        if (getRHSType(statement.getRHS()).getType().equals(EType.ARRAY)) {
+        if (getRHSType(statement.getRHS()).getType().equals(EType.ARRAY) &&
+                statement.getRHS().getArray() != null) {
           for (Expression expression1 : statement.getRHS().getArray()) {
             traverse(expression1);
           }
