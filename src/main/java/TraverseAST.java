@@ -331,7 +331,7 @@ public class TraverseAST {
     switch (statement.getStatType()) {
 
       case DECLARATION:
-        currentST.newSymbol(statement.getLhsIdent(), statement.getLhsType());
+        currentST.newVariable(statement.getLhsIdent(), statement.getLhsType());
 
         if(statement.getLhsType().getType() == EType.PAIR && expression == null) {
           break;

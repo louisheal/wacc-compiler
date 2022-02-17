@@ -19,12 +19,23 @@ public class SymbolTable {
     this.parent = parent;
   }
 
-  public void newSymbol(String ident, Type node) {
+  public void newVariable(String ident, Type node) {
     variables.put(ident, node);
   }
 
   public boolean contains(String ident) {
     return variables.containsKey(ident);
+  }
+
+  public void newFunction(String ident, List<Param> params) {
+    functionToParams.put(ident, params);
+    for (Param param : params) {
+      newVariable(param.getIdent(), param.getType());
+    }
+  }
+
+  public void newFunctionReturn (String ident, Type.EType type) {
+    functionToReturnType.put(ident, type);
   }
 
   public List<Param> getFunctionParams(String ident) {
