@@ -3,6 +3,7 @@ import ast.AssignRHS.RHSType;
 import ast.Statement.StatType;
 import ast.Type.EType;
 
+import javax.print.DocFlavor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -199,8 +200,10 @@ public class TraverseAST {
 
   private Type getLHSType(AssignLHS lhs) {
     switch (lhs.getAssignType()) {
-      case IDENT: return currentST.getType(lhs.getIdent());
-      case ARRAYELEM: return currentST.getType(lhs.getArrayElem().getIdent()).getArrayType();
+      case IDENT:
+        return currentST.getType(lhs.getIdent());
+      case ARRAYELEM:
+        return currentST.getType(lhs.getArrayElem().getIdent()).getArrayType();
       case PAIRELEM:
         if (lhs.getPairElem().getType() == PairElem.PairElemType.FST) {
           return getExpressionType(lhs.getPairElem().getExpression()).getFstType();
@@ -330,6 +333,9 @@ public class TraverseAST {
   }
 
   private boolean invalidAssignment(Type lhs, AssignRHS rhs) {
+    if (lhs == null) {
+      return true;
+    }
     boolean sameType = lhs.equals(getRHSType(rhs));
     boolean emptyArray = rhs.getAssignType() == RHSType.ARRAY &&
             rhs.getArray().isEmpty() &&
@@ -354,7 +360,7 @@ public class TraverseAST {
         //TODO: possible error with nested types
         if (invalidAssignment(statement.getLhsType(), statement.getRHS())) {
           //TODO
-          System.out.println("TODO: DECLARATION ERROR");
+          errorMsgs.add("TODO: DECLARATION ERROR");
           errors++;
         }
 
@@ -370,7 +376,7 @@ public class TraverseAST {
         traverse(statement.getLHS());
         if (invalidAssignment(getLHSType(statement.getLHS()), statement.getRHS())) {
           //TODO: FIX ERROR MESSAGE
-          System.out.println("Error: Assigning value of different type to defined variable");
+          errorMsgs.add("TODO: REASSIGNMENT ERROR");
           errors++;
         }
 
