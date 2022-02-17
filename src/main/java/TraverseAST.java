@@ -338,16 +338,21 @@ public class TraverseAST {
   }
 
   private boolean invalidAssignment(Type lhs, AssignRHS rhs) {
+
     if (lhs == null) {
       return true;
     }
+
     boolean sameType = lhs.equals(getRHSType(rhs));
+
     boolean emptyArray = rhs.getAssignType() == RHSType.ARRAY &&
-            rhs.getArray().isEmpty() &&
             lhs.getType() == EType.ARRAY;
+
     boolean charArrayAsString = lhs.equals(new Type(EType.STRING)) &&
             Objects.equals(getRHSType(rhs), new Type(EType.ARRAY, new Type(EType.CHAR)));
+
     boolean nullPair = lhs.getType() == EType.PAIR && rhs.getExpression1() == null;
+
     return !(sameType || emptyArray || charArrayAsString || nullPair);
   }
 
@@ -362,7 +367,6 @@ public class TraverseAST {
           break;
         }
 
-        //TODO: possible error with nested types
         if (invalidAssignment(statement.getLhsType(), statement.getRHS())) {
           errorMsgs.add("TODO: DECLARATION ERROR");
           errors++;
@@ -371,7 +375,8 @@ public class TraverseAST {
 
         currentST.newVariable(statement.getLhsIdent(), statement.getLhsType());
 
-        if (getRHSType(statement.getRHS()).getType().equals(EType.ARRAY) &&
+        //TODO: CHECK THAT EACH EXPRESSION IN THE ARRAY MATCHES THE ARRAY TYPE
+        if (Objects.equals(getRHSType(statement.getRHS()).getType(), (EType.ARRAY)) &&
                 statement.getRHS().getArray() != null) {
           for (Expression expression1 : statement.getRHS().getArray()) {
             traverse(expression1);
@@ -421,7 +426,8 @@ public class TraverseAST {
         break;
 
       case RETURN:
-        if (getExpressionType(expression) != functionReturnTypes.get(functionIdent)) {
+        if (Objects.equals(getExpressionType(expression), functionReturnTypes.get(functionIdent)) &&
+                expression != null) {
           errorMsgs.add("Function return type does not match");
           break;
         }
