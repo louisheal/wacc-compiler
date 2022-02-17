@@ -16,14 +16,14 @@ public class InvalidSyntaxTests {
   private void runTests(File[] files) throws IOException {
     for (File file : files) {
       totalTests++;
-      System.out.println("RUNNING " + file.getName() + ": ");
+      System.out.print("RUNNING " + file.getName() + ": ");
       String[] args = {file.toString()};
       try {
         Compiler.main(args);
-        System.out.println("FAIL\n");
+        System.out.print("FAIL\n");
         failedTests++;
       } catch (SecurityException e) {
-        System.out.println("PASS\n");
+        System.out.print("PASS\n");
       }
     }
     System.out.println("--------- Tests passed: " + (totalTests - failedTests) + "/" + totalTests + " ---------\n");
