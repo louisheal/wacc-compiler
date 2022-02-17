@@ -33,6 +33,9 @@ public class TraverseAST {
       case NOT_FREEABLE:
         errorMsgs.add("Trying to free a variable that isn't an array or pair");
         break;
+      case NOT_READABLE:
+        errorMsgs.add("Trying to read a variable that is a pair or boolean");
+        break;
     }
     errors++;
   }
@@ -358,6 +361,13 @@ public class TraverseAST {
         break;
 
       case READ:
+        if(statement.getRHS() == null) {
+          return;
+        }
+        if(statement.getRHS().getAssignType() == RHSType.NEWPAIR
+                || getRHSType(statement.getRHS()).getType().equals(EType.BOOL)){
+          printSemanticError(Error.NOT_READABLE);
+        }
         break;
 
       case FREE:
@@ -448,6 +458,7 @@ public class TraverseAST {
     EXIT_NOT_INT,
     NOT_FREEABLE,
     WHILE_NOT_BOOL,
-    FUNCTION_NO_RETURN
+    FUNCTION_NO_RETURN,
+    NOT_READABLE
   }
 }
