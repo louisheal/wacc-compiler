@@ -5,18 +5,28 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class ValidTests {
+
   MySecurityManager securityManager = new MySecurityManager();
+
+  int failedTests = 0;
+  int totalTests = 0;
 
   public void runTests(File[] files) throws IOException {
     for (File file : files) {
-      System.out.println("RUNNING " + file.getName() + ": ");
+      totalTests++;
+      System.out.print("RUNNING " + file.getName() + ": ");
       String[] args = {file.toString()};
       try {
         Compiler.main(args);
-        System.out.println();
-      } catch (SecurityException e) {
-        Assert.fail();
+        System.out.print("PASS\n");
+      } catch (Exception e) {
+        System.out.print("FAIL\n");
+        failedTests++;
       }
+    }
+    System.out.println("--------- Tests passed: " + (totalTests - failedTests) + "/" + totalTests + " ---------");
+    if (failedTests > 0) {
+      Assert.fail();
     }
   }
 

@@ -36,7 +36,7 @@ public class TraverseAST {
         break;
     }
 
-    String errorMsg = "Semantic Error: " + errorCause + "\n";
+    String errorMsg = "Semantic Error: " + errorCause;
     errors++;
     System.out.println(errorMsg);
 
@@ -301,7 +301,7 @@ public class TraverseAST {
       case EQ:
       case NEQ:
         if (!getExpressionType(expression.getExpression1()).equals(getExpressionType(expression.getExpression2())) &&
-                expression.getExpression2() != null) {
+                expression.getExpression1() != null && expression.getExpression2() != null) {
           System.out.println("Error" + expression.getExprType() +
                   " operator can only be used on expressions of equal type");
           errors++;
