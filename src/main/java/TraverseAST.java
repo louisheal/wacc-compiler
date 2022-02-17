@@ -6,6 +6,8 @@ import ast.Type.EType;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.System.exit;
+
 public class TraverseAST {
 
   SymbolTable currentST = new SymbolTable(null);
@@ -214,16 +216,9 @@ public class TraverseAST {
       statement = statement.getStatement2();
     }
 
-    if (statement.getStatType() == StatType.IF) {
-      statement = statement.getStatement1();
-    }
-
-    //TODO: Would be good to check if the else branch returns as well
-
-    if (statement.getStatType() != StatType.RETURN) {
-      if (statement.getStatType() != StatType.EXIT) {
-        printSemanticError(Error.FUNCTION_NO_RETURN);
-      }
+    if (statement.getStatType() != StatType.RETURN && statement.getStatType() != StatType.EXIT) {
+      System.out.println("Syntax Error: Function does not return");
+      exit(100);
     }
   }
 
@@ -376,11 +371,17 @@ public class TraverseAST {
         break;
 
       case READ:
-        if(statement.getRHS() == null) {
+
+        if(statement.getLHS() == null) {
           return;
         }
-        if(statement.getRHS().getAssignType() == RHSType.NEWPAIR
-                || getRHSType(statement.getRHS()).getType().equals(EType.BOOL)){
+
+        if(statement.getLHS().getAssignType() != AssignLHS.LHSType.ARRAYELEM &&
+           statement.getLHS().getAssignType() != AssignLHS.LHSType.IDENT &&
+           statement.getLHS().getAssignType() != AssignLHS.LHSType.PAIRELEM) {
+          printSemanticError(Error.NOT_READABLE);
+        } else if (!getLHSType(statement.getLHS()).equals(new Type(EType.INT)) &&
+                   !getLHSType(statement.getLHS()).equals(new Type(EType.CHAR))) {
           printSemanticError(Error.NOT_READABLE);
         }
         break;

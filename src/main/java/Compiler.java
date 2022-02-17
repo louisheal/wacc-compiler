@@ -43,7 +43,6 @@ public class Compiler {
     ParseTree tree = parser.prog();
     
     if (parser.getNumberOfSyntaxErrors() > 0) {
-      System.out.println("#syntax_error#");
       exit(100);
     }
 
@@ -52,11 +51,12 @@ public class Compiler {
 
     TraverseAST traverseAST = new TraverseAST();
     traverseAST.traverse(ast);
+
     if (traverseAST.getNumberOfErrors() > 0) {
-      exit(200);
       for (String errorMsg : traverseAST.getErrorMsgs()) {
         System.out.println(errorMsg);
       }
+      exit(200);
     }
 
   }
