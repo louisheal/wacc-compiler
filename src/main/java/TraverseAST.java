@@ -1,18 +1,17 @@
 import ast.*;
 import ast.AssignRHS.RHSType;
-import ast.Statement.StatType;
 import ast.Type.EType;
 
-import javax.print.DocFlavor;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static java.lang.System.exit;
 
 public class TraverseAST {
 
-  SymbolTable currentST = new SymbolTable(null);
+  SymbolTable currentST;
+  Map<String, List<Param>> functionParams = new HashMap<>();
+  Map<String, Type> functionReturnTypes = new HashMap<>();
+  String functionIdent;
 
   private int errors = 0;
   private final List<String> errorMsgs = new ArrayList<>();
@@ -190,11 +189,7 @@ public class TraverseAST {
         }
 
       case CALL:
-        if (currentST.getFunctionReturnType(rhs.getFunctionIdent()) == null) {
-          //TODO: need to know what to when a function is called before being defined
-          return new Type(EType.INT);
-        }
-        return currentST.getFunctionReturnType(rhs.getFunctionIdent());
+        return functionReturnTypes.get(rhs.getFunctionIdent());
     }
     return null;
   }
@@ -245,25 +240,41 @@ public class TraverseAST {
   }
 
   public void traverse(Program program) {
+
+    for (Function function : program.getFunctions()) {
+      System.out.println(function.getParams());
+      functionParams.put(function.getIdent(), function.getParams());
+      functionReturnTypes.put(function.getIdent(), function.getReturnType());
+    }
+
     for (Function function : program.getFunctions()) {
       traverse(function);
     }
+
+    currentST = new SymbolTable(null);
+    functionIdent = null;
+
     traverse(program.getStatement());
   }
 
   private void traverse(Function function) {
+
+    //Check that function ends with a return statement
     if (!validFunctionReturn(function.getStatement())) {
       System.out.println("Syntax Error: Function does not return");
       exit(100);
     }
-    currentST.newFunction(function.getIdent(), function.getParams());
-    currentST.newFunctionReturn(function.getIdent(), function.getReturnType());
-    traverse(function.getParams());
-    traverse(function.getStatement());
-  }
 
-  private void traverse(List<Param> params) {
-    //TODO: Add params to function's symbol table
+    //Initialise new symbol table as root of its symbol table tree
+    currentST = new SymbolTable(null);
+
+    //Add function parameters to symbol table
+    for (Param param : function.getParams()) {
+      currentST.newVariable(param.getIdent(), param.getType());
+    }
+
+    //Check semantics of function body
+    traverse(function.getStatement());
   }
 
   private void traverse(Expression expression) {
@@ -352,9 +363,9 @@ public class TraverseAST {
     switch (statement.getStatType()) {
 
       case DECLARATION:
-        currentST.newVariable(statement.getLhsIdent(), statement.getLhsType());
 
         if(statement.getLhsType().getType() == EType.PAIR && expression == null) {
+          currentST.newVariable(statement.getLhsIdent(), statement.getLhsType());
           break;
         }
 
@@ -363,7 +374,10 @@ public class TraverseAST {
           //TODO
           errorMsgs.add("TODO: DECLARATION ERROR");
           errors++;
+          break;
         }
+
+        currentST.newVariable(statement.getLhsIdent(), statement.getLhsType());
 
         if (getRHSType(statement.getRHS()).getType().equals(EType.ARRAY)) {
           for (Expression expression1 : statement.getRHS().getArray()) {
@@ -414,6 +428,10 @@ public class TraverseAST {
         break;
 
       case RETURN:
+        if (getExpressionType(expression) != functionReturnTypes.get(functionIdent)) {
+          errorMsgs.add("Function return type does not match");
+          break;
+        }
       case PRINT:
       case PRINTLN:
         if(expression != null) {
@@ -431,24 +449,23 @@ public class TraverseAST {
         break;
 
       case IF:
-        if(!getExpressionType(expression).equals(new Type(EType.BOOL))){
-          printSemanticError(Error.IF_NOT_BOOL);
-        }
-        traverse(expression);
-        traverse(statement.getStatement1());
+        currentST = new SymbolTable(currentST);
         traverse(statement.getStatement2());
-        break;
+        currentST = currentST.getParent();
 
       case WHILE:
         if(!Objects.equals(getExpressionType(expression), new Type(EType.BOOL))) {
           printSemanticError(Error.WHILE_NOT_BOOL);
+          break;
         }
         traverse(expression);
-        traverse(statement.getStatement1());
-        break;
+
       case BEGIN:
+        currentST = new SymbolTable(currentST);
         traverse(statement.getStatement1());
+        currentST = currentST.getParent();
         break;
+
       case CONCAT:
         traverse(statement.getStatement1());
         traverse(statement.getStatement2());
@@ -458,16 +475,18 @@ public class TraverseAST {
 
   private void traverse(AssignLHS lhs) {
 
-    if (lhs.getAssignType() == AssignLHS.LHSType.IDENT && !currentST.contains(lhs.getIdent())) {
+    if (lhs.getAssignType() == AssignLHS.LHSType.IDENT &&
+            currentST.getType(lhs.getIdent()) == null) {
       printSemanticError(Error.UNDEFINED);
     }
 
-    if (lhs.getAssignType() == AssignLHS.LHSType.ARRAYELEM && !currentST.contains(lhs.getArrayElem().getIdent())) {
+    if (lhs.getAssignType() == AssignLHS.LHSType.ARRAYELEM &&
+            currentST.getType(lhs.getArrayElem().getIdent()) == null) {
       printSemanticError(Error.UNDEFINED);
     }
 
     if (lhs.getAssignType() == AssignLHS.LHSType.PAIRELEM &&
-            !currentST.contains(lhs.getPairElem().getExpression().getIdent())) {
+            currentST.getType(lhs.getPairElem().getExpression().getIdent()) == null) {
       printSemanticError(Error.UNDEFINED);
     }
 

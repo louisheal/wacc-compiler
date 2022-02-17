@@ -1,8 +1,4 @@
-import antlr.BasicParser;
-import ast.Param;
 import ast.Type;
-import java.util.List;
-import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,8 +7,6 @@ public class SymbolTable {
 
   private final SymbolTable parent;
   private final Map<String, Type> variables = new HashMap<>();
-  private final Map<String, List<Param>> functionToParams = new HashMap<>();
-  private final Map<String, Type> functionToReturnType = new HashMap<>();
 
 
   public SymbolTable(SymbolTable parent) {
@@ -27,26 +21,11 @@ public class SymbolTable {
     return variables.containsKey(ident);
   }
 
-  public void newFunction(String ident, List<Param> params) {
-    functionToParams.put(ident, params);
-    for (Param param : params) {
-      newVariable(param.getIdent(), param.getType());
-    }
-  }
-
-  public void newFunctionReturn (String ident, Type type) {
-    functionToReturnType.put(ident, type);
-  }
-
-  public List<Param> getFunctionParams(String ident) {
-    return functionToParams.get(ident);
-  }
-
-  public Type getFunctionReturnType(String ident) {
-    return functionToReturnType.get(ident);
-  }
-
   public Type getType(String ident) {
+
+    if (!variables.containsKey(ident) && parent != null) {
+      return parent.getType(ident);
+    }
     return variables.get(ident);
   }
 
