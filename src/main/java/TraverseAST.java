@@ -6,6 +6,7 @@ import ast.Type.EType;
 import javax.print.DocFlavor;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static java.lang.System.exit;
 
@@ -439,7 +440,7 @@ public class TraverseAST {
         break;
 
       case WHILE:
-        if(!getExpressionType(expression).equals(new Type(EType.BOOL))) {
+        if(!Objects.equals(getExpressionType(expression), new Type(EType.BOOL))) {
           printSemanticError(Error.WHILE_NOT_BOOL);
         }
         traverse(expression);
