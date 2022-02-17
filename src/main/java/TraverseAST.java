@@ -186,6 +186,10 @@ public class TraverseAST {
         }
 
       case CALL:
+        if (currentST.getFunctionReturnType(rhs.getFunctionIdent()) == null) {
+          //TODO: need to know what to when a function is called before being defined
+          return new Type(EType.INT);
+        }
         return currentST.getFunctionReturnType(rhs.getFunctionIdent());
     }
     return null;
@@ -209,6 +213,13 @@ public class TraverseAST {
     while (statement.getStatType() == StatType.CONCAT) {
       statement = statement.getStatement2();
     }
+
+    if (statement.getStatType() == StatType.IF) {
+      statement = statement.getStatement1();
+    }
+
+    //TODO: Would be good to check if the else branch returns as well
+
     if (statement.getStatType() != StatType.RETURN) {
       if (statement.getStatType() != StatType.EXIT) {
         printSemanticError(Error.FUNCTION_NO_RETURN);
