@@ -186,7 +186,7 @@ public class TraverseAST {
         }
 
       case CALL:
-        return new Type(EType.INT);
+        return currentST.getFunctionReturnType(rhs.getFunctionIdent());
     }
     return null;
   }
