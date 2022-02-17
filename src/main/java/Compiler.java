@@ -54,6 +54,9 @@ public class Compiler {
     traverseAST.traverse(ast);
     if (traverseAST.getNumberOfErrors() > 0) {
       exit(200);
+      for (String errorMsg : traverseAST.getErrorMsgs()) {
+        System.out.println(errorMsg);
+      }
     }
 
   }
