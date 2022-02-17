@@ -24,7 +24,7 @@ public class ValidTests {
         failedTests++;
       }
     }
-    System.out.println("--------- Tests passed: " + (totalTests - failedTests) + "/" + totalTests + " ---------");
+    System.out.println("--------- Tests passed: " + (totalTests - failedTests) + "/" + totalTests + " ---------\n");
     if (failedTests > 0) {
       Assert.fail();
     }
