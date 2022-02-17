@@ -355,7 +355,7 @@ public class TraverseAST {
         if (invalidAssignment(statement.getLhsType(), statement.getRHS())) {
           //TODO
           System.out.println("TODO: DECLARATION ERROR");
-          printSemanticError((Error) null);
+          errors++;
         }
 
         if (getRHSType(statement.getRHS()).getType().equals(EType.ARRAY)) {
