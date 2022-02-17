@@ -209,8 +209,10 @@ public class TraverseAST {
     while (statement.getStatType() == StatType.CONCAT) {
       statement = statement.getStatement2();
     }
-    if (statement.getStatType() == StatType.RETURN || statement.getStatType() == StatType.EXIT) {
-      printSemanticError(Error.FUNCTION_NO_RETURN);
+    if (statement.getStatType() != StatType.RETURN) {
+      if (statement.getStatType() != StatType.EXIT) {
+        printSemanticError(Error.FUNCTION_NO_RETURN);
+      }
     }
   }
 
