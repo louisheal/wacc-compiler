@@ -12,7 +12,7 @@ public class SymbolTable {
   private final SymbolTable parent;
   private final Map<String, Type> variables = new HashMap<>();
   private final Map<String, List<Param>> functionToParams = new HashMap<>();
-  private final Map<String, Type.EType> functionToReturnType = new HashMap<>();
+  private final Map<String, Type> functionToReturnType = new HashMap<>();
 
 
   public SymbolTable(SymbolTable parent) {
@@ -34,7 +34,7 @@ public class SymbolTable {
     }
   }
 
-  public void newFunctionReturn (String ident, Type.EType type) {
+  public void newFunctionReturn (String ident, Type type) {
     functionToReturnType.put(ident, type);
   }
 
@@ -42,7 +42,7 @@ public class SymbolTable {
     return functionToParams.get(ident);
   }
 
-  public Type.EType getFunctionReturnType(String ident) {
+  public Type getFunctionReturnType(String ident) {
     return functionToReturnType.get(ident);
   }
 

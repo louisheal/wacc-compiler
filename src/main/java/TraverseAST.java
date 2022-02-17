@@ -240,6 +240,8 @@ public class TraverseAST {
 
   private void traverse(Function function) {
     validateFunctionReturns(function.getStatement());
+    currentST.newFunction(function.getIdent(), function.getParams());
+    currentST.newFunctionReturn(function.getIdent(), function.getReturnType());
     traverse(function.getParams());
     traverse(function.getStatement());
   }
