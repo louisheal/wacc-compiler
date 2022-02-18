@@ -219,18 +219,18 @@ public class TraverseAST {
   }
 
   private boolean bothIntegers(Type t1, Type t2) {
-    return t1.equals(new Type(EType.INT)) &&
-           t2.equals(new Type(EType.INT));
+    return Objects.equals(t1, new Type(EType.INT)) &&
+           Objects.equals(t2, new Type(EType.INT));
   }
 
   private boolean bothCharacters(Type t1, Type t2) {
-    return t1.equals(new Type(EType.CHAR)) &&
-           t2.equals(new Type(EType.CHAR));
+    return Objects.equals(t1, new Type(EType.CHAR)) &&
+           Objects.equals(t2, new Type(EType.CHAR));
   }
 
   private boolean bothBooleans(Type t1, Type t2) {
-    return t1.equals(new Type(EType.BOOL)) &&
-           t2.equals(new Type(EType.BOOL));
+    return Objects.equals(t1, new Type(EType.BOOL)) &&
+           Objects.equals(t2, new Type(EType.BOOL));
   }
 
   public void traverse(Program program) {
