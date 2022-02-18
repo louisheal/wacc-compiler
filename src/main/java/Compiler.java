@@ -49,11 +49,11 @@ public class Compiler {
     ASTBuilder astBuilder = new ASTBuilder();
     Program ast = (Program) astBuilder.visit(tree);
 
-    TraverseAST traverseAST = new TraverseAST();
-    traverseAST.traverse(ast);
+    SemanticAnalysis semanticAnalysis = new SemanticAnalysis();
+    semanticAnalysis.traverse(ast);
 
-    if (traverseAST.getNumberOfErrors() > 0) {
-      for (String errorMsg : traverseAST.getErrorMsgs()) {
+    if (semanticAnalysis.getNumberOfErrors() > 0) {
+      for (String errorMsg : semanticAnalysis.getErrorMsgs()) {
         System.out.println(errorMsg);
       }
       exit(200);

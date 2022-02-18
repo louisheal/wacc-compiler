@@ -4,10 +4,9 @@ import ast.Type.EType;
 
 import java.util.*;
 
-import static java.lang.System.err;
 import static java.lang.System.exit;
 
-public class TraverseAST {
+public class SemanticAnalysis {
 
   SymbolTable currentST;
   Map<String, List<Param>> functionParams = new HashMap<>();
