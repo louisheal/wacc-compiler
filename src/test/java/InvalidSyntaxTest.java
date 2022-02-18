@@ -36,7 +36,7 @@ public class InvalidSyntaxTest {
   public void arrayTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\invalid\\syntaxErr\\array\\");
+    File directory = new File("wacc_examples/invalid/syntaxErr/array/");
     File[] examples = directory.listFiles(folderFilter);
 
     assert examples != null;
@@ -47,7 +47,7 @@ public class InvalidSyntaxTest {
   public void basicTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\invalid\\syntaxErr\\basic\\");
+    File directory = new File("wacc_examples/invalid/syntaxErr/basic/");
     File[] examples = directory.listFiles(folderFilter);
 
     assert examples != null;
@@ -58,7 +58,7 @@ public class InvalidSyntaxTest {
   public void expressionsTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\invalid\\syntaxErr\\expressions\\");
+    File directory = new File("wacc_examples/invalid/syntaxErr/expressions/");
     File[] examples = directory.listFiles(folderFilter);
 
     assert examples != null;
@@ -69,7 +69,7 @@ public class InvalidSyntaxTest {
   public void functionTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\invalid\\syntaxErr\\function\\");
+    File directory = new File("wacc_examples/invalid/syntaxErr/function/");
     File[] examples = directory.listFiles(folderFilter);
 
     assert examples != null;
@@ -80,7 +80,7 @@ public class InvalidSyntaxTest {
   public void ifTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\invalid\\syntaxErr\\if\\");
+    File directory = new File("wacc_examples/invalid/syntaxErr/if/");
     File[] examples = directory.listFiles(folderFilter);
 
     assert examples != null;
@@ -91,7 +91,7 @@ public class InvalidSyntaxTest {
   public void pairTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\invalid\\syntaxErr\\pairs\\");
+    File directory = new File("wacc_examples/invalid/syntaxErr/pairs/");
     File[] examples = directory.listFiles(folderFilter);
 
     assert examples != null;
@@ -102,7 +102,7 @@ public class InvalidSyntaxTest {
   public void printTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\invalid\\syntaxErr\\print\\");
+    File directory = new File("wacc_examples/invalid/syntaxErr/print/");
     File[] examples = directory.listFiles(folderFilter);
 
     assert examples != null;
@@ -113,7 +113,7 @@ public class InvalidSyntaxTest {
   public void sequenceTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\invalid\\syntaxErr\\sequence\\");
+    File directory = new File("wacc_examples/invalid/syntaxErr/sequence/");
     File[] examples = directory.listFiles(folderFilter);
 
     assert examples != null;
@@ -124,7 +124,7 @@ public class InvalidSyntaxTest {
   public void variablesTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\invalid\\syntaxErr\\variables\\");
+    File directory = new File("wacc_examples/invalid/syntaxErr/variables/");
     File[] examples = directory.listFiles(folderFilter);
 
     assert examples != null;
@@ -135,7 +135,7 @@ public class InvalidSyntaxTest {
   public void whileTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\invalid\\syntaxErr\\while\\");
+    File directory = new File("wacc_examples/invalid/syntaxErr/while/");
     File[] examples = directory.listFiles(folderFilter);
 
     assert examples != null;
