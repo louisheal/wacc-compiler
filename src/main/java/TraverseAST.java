@@ -525,11 +525,13 @@ public class TraverseAST {
       }
       for (int i = 0; i < rhs.getArgList().size(); i++) {
         if (!Objects.equals(getExpressionType(rhs.getArgList().get(i)),
-                functionParams.get(rhs.getFunctionIdent()).get(i).getType())) {
+                functionParams.get(rhs.getFunctionIdent()).get(i).getType()) &&
+                rhs.getArgList().get(i) != null) {
           errorMsgs.add("Type mismatch in call to function!" +
                   "\n - Expected: " + functionParams.get(rhs.getFunctionIdent()).get(i).getType() +
                   "\n - Actual: " + getExpressionType(rhs.getArgList().get(i)) +
                   "\n - In expression: " + rhs);
+          errors++;
         }
       }
     }
