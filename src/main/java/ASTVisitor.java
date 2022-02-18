@@ -11,8 +11,7 @@ import java.util.stream.Stream;
 public class ASTVisitor {
 
     /**
-     * Returns the list of assembly instructions that represents the program given
-     * to the function.
+     * Returns the list of assembly instructions that represents the given program.
      *
      * @param program a program node from the abstract syntax tree
      * @return a list of assembly instructions that represent the given program
@@ -21,23 +20,36 @@ public class ASTVisitor {
 
         List<String> functionInstructions = new ArrayList<>();
 
-        //Generate the assembly instructions for each function
+        /* Generate the assembly instructions for each function. */
         for (Function function : program.getFunctions()) {
             functionInstructions.addAll(visitFunction(function));
         }
 
-        //Generate the assembly instructions for the
+        /* Generate the assembly instructions for the program body. */
         List<String> statementInstructions = visitStatement(program.getStatement());
+
+        /* Return the function assembly instructions concatenated with the assembly instructions
+           for the program body. */
         return Stream.of(functionInstructions, statementInstructions)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
     }
 
-    //Returns the assembly instructions from function body
+    /**
+     * Returns the list of assembly instructions that represents the given function.
+     *
+     * @param function a function node from the abstract syntax tree
+     * @return a list of assembly instructions that represent the given program
+     */
     public List<String> visitFunction(Function function) {
         return visitStatement(function.getStatement());
     }
 
+    /** Calls the corresponding visit statement function based on the statement type.
+     *
+     * @param statement a statement node from the abstract syntax tree
+     * @return a list of assembly instructions that represent the given statement
+     */
     public List<String> visitStatement(Statement statement) {
         switch (statement.getStatType()) {
             case SKIP:
@@ -64,9 +76,13 @@ public class ASTVisitor {
                 return visitWhileStatement(statement);
             case BEGIN:
                 return visitBeginStatement(statement);
-            //TODO: JOIN TWO BRANCHES OF CONCAT INSTEAD OF HAVING A VISITCONCAT FUNCTION
+            /* Returns the instructions of both statements together */
+            //TODO: Apply Selthi-Ullman weights?
             case CONCAT:
-                return visitConcatStatement(statement);
+                return Stream.of(visitStatement(statement.getStatement1()),
+                                 visitStatement(statement.getStatement2()))
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toList());
         }
         return null;
     }
@@ -230,20 +246,6 @@ public class ASTVisitor {
      * @return returns the assembly instructions for a while statement
      */
     private List<String> visitBeginStatement(Statement statement) {
-        return new ArrayList<>();
-    }
-
-    /** <p>Visits a concat statement.</p>
-     *
-     * <p>Can call:</p>
-     * <p><b>getStatType()</b> - Returns a StatType enum.</p>
-     * <p><b>getStatement1()</b> - Returns the body of the first statement.</p>
-     * <p><b>getStatement2()</b> - Returns the body of the second statement.</p>
-     *
-     * @param statement while statement
-     * @return returns the assembly instructions for a while statement
-     */
-    private List<String> visitConcatStatement(Statement statement) {
         return new ArrayList<>();
     }
 
