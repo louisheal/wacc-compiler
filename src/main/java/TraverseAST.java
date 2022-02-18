@@ -379,6 +379,11 @@ public class TraverseAST {
         if (Objects.equals(getRHSType(statement.getRHS()).getType(), (EType.ARRAY)) &&
                 statement.getRHS().getArray() != null) {
           for (Expression expression1 : statement.getRHS().getArray()) {
+            if (Objects.equals(getExpressionType(expression1), statement.getLhsType()) && expression1 != null) {
+              errorMsgs.add("Array Mismatch");
+              errors++;
+              break;
+            }
             traverse(expression1);
           }
         }
