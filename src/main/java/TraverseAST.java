@@ -241,6 +241,7 @@ public class TraverseAST {
     }
 
     for (Function function : program.getFunctions()) {
+      functionIdent = function.getIdent();
       traverse(function);
     }
 
@@ -431,9 +432,11 @@ public class TraverseAST {
         break;
 
       case RETURN:
-        if (Objects.equals(getExpressionType(expression), functionReturnTypes.get(functionIdent)) &&
+
+        if (!Objects.equals(getExpressionType(expression), functionReturnTypes.get(functionIdent)) &&
                 expression != null) {
           errorMsgs.add("Function return type does not match");
+          errors++;
           break;
         }
       case PRINT:
