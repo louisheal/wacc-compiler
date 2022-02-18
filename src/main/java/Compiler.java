@@ -1,5 +1,8 @@
 import antlr.*;
 import ast.Program;
+import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.List;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -32,6 +35,8 @@ public class Compiler {
 
     Path filename = Path.of(args[0]);
 
+    List<String> instructionList = new ArrayList<>();
+
     CharStream input = CharStreams.fromPath(filename);
 
     BasicLexer lexer = new BasicLexer(input);
@@ -58,6 +63,14 @@ public class Compiler {
       }
       exit(200);
     }
+    String fileNameWithExtension = filename.getFileName().toString();
+    String fileName = fileNameWithExtension.substring(0,fileNameWithExtension.lastIndexOf("."))
+        + ".s";
+    FileWriter binFileWriter = new FileWriter(fileName);
+    for (String instruction: instructionList){
+      binFileWriter.write(instruction);
+    }
+    binFileWriter.close();
 
   }
 
