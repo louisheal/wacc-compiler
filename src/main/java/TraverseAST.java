@@ -368,7 +368,8 @@ public class TraverseAST {
           break;
         }
 
-        if (invalidAssignment(statement.getLhsType(), statement.getRHS())) {
+        if (invalidAssignment(statement.getLhsType(), statement.getRHS()) ||
+                currentST.contains(statement.getLhsIdent())) {
           errorMsgs.add("TODO: DECLARATION ERROR");
           errors++;
           break;
@@ -376,7 +377,6 @@ public class TraverseAST {
 
         currentST.newVariable(statement.getLhsIdent(), statement.getLhsType());
 
-        //TODO: CHECK THAT EACH EXPRESSION IN THE ARRAY MATCHES THE ARRAY TYPE
         if (Objects.equals(getRHSType(statement.getRHS()).getType(), (EType.ARRAY)) &&
                 statement.getRHS().getArray() != null) {
           for (Expression expression1 : statement.getRHS().getArray()) {
