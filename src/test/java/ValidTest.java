@@ -37,7 +37,7 @@ public class ValidTest {
   public void advancedTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\valid\\advanced\\");
+    File directory = new File("wacc_examples/valid/advanced/");
     File[] examples = directory.listFiles();
 
     assert examples != null;
@@ -48,7 +48,7 @@ public class ValidTest {
   public void arrayTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\valid\\array\\");
+    File directory = new File("wacc_examples/valid/array/");
     File[] examples = directory.listFiles();
 
     assert examples != null;
@@ -59,7 +59,7 @@ public class ValidTest {
   public void basicExitTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\valid\\basic\\exit\\");
+    File directory = new File("wacc_examples/valid/basic/exit/");
     File[] examples = directory.listFiles();
 
     assert examples != null;
@@ -70,7 +70,7 @@ public class ValidTest {
   public void basicSkipTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\valid\\basic\\skip\\");
+    File directory = new File("wacc_examples/valid/basic/skip/");
     File[] examples = directory.listFiles();
 
     assert examples != null;
@@ -81,7 +81,7 @@ public class ValidTest {
   public void expressionsTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\valid\\expressions\\");
+    File directory = new File("wacc_examples/valid/expressions/");
     File[] examples = directory.listFiles();
 
     assert examples != null;
@@ -92,7 +92,7 @@ public class ValidTest {
   public void nestedFunctionTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\valid\\function\\nested_functions\\");
+    File directory = new File("wacc_examples/valid/function/nested_functions/");
     File[] examples = directory.listFiles();
 
     assert examples != null;
@@ -103,7 +103,7 @@ public class ValidTest {
   public void simpleFunctionTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\valid\\function\\simple_functions\\");
+    File directory = new File("wacc_examples/valid/function/simple_functions/");
     File[] examples = directory.listFiles();
 
     assert examples != null;
@@ -114,7 +114,7 @@ public class ValidTest {
   public void ifTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\valid\\if\\");
+    File directory = new File("wacc_examples/valid/if/");
     File[] examples = directory.listFiles();
 
     assert examples != null;
@@ -126,7 +126,7 @@ public class ValidTest {
     System.setSecurityManager(securityManager);
 
 
-    File directory = new File("wacc_examples\\valid\\IO\\");
+    File directory = new File("wacc_examples/valid/IO/");
     File[] examples = directory.listFiles(folderFilter);
 
     assert examples != null;
@@ -138,7 +138,7 @@ public class ValidTest {
     System.setSecurityManager(securityManager);
 
 
-    File directory = new File("wacc_examples\\valid\\IO\\print");
+    File directory = new File("wacc_examples/valid/IO/print");
     File[] examples = directory.listFiles();
 
     assert examples != null;
@@ -150,7 +150,7 @@ public class ValidTest {
     System.setSecurityManager(securityManager);
 
 
-    File directory = new File("wacc_examples\\valid\\IO\\read");
+    File directory = new File("wacc_examples/valid/IO/read");
     File[] examples = directory.listFiles();
 
     assert examples != null;
@@ -161,7 +161,7 @@ public class ValidTest {
   public void pairsTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\valid\\pairs\\");
+    File directory = new File("wacc_examples/valid/pairs/");
     File[] examples = directory.listFiles();
 
     assert examples != null;
@@ -174,7 +174,7 @@ public class ValidTest {
   public void runtimeErrorOutOfBoundsTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\valid\\runtimeErr\\arrayOutOfBounds\\");
+    File directory = new File("wacc_examples/valid/runtimeErr/arrayOutOfBounds/");
     File[] examples = directory.listFiles();
 
     assert examples != null;
@@ -186,7 +186,7 @@ public class ValidTest {
   public void runtimeErrorDivideByZeroTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\valid\\runtimeErr\\divideByZero\\");
+    File directory = new File("wacc_examples/valid/runtimeErr/divideByZero/");
     File[] examples = directory.listFiles();
 
     assert examples != null;
@@ -198,7 +198,7 @@ public class ValidTest {
   public void runtimeErrorIntegerOverflowTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\valid\\runtimeErr\\integerOverflow\\");
+    File directory = new File("wacc_examples/valid/runtimeErr/integerOverflow/");
     File[] examples = directory.listFiles();
 
     assert examples != null;
@@ -210,7 +210,7 @@ public class ValidTest {
   public void runtimeErrorNullDereferenceTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\valid\\runtimeErr\\nullDereference\\");
+    File directory = new File("wacc_examples/valid/runtimeErr/nullDereference/");
     File[] examples = directory.listFiles();
 
     assert examples != null;
@@ -221,7 +221,7 @@ public class ValidTest {
   public void scopeTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\valid\\scope\\");
+    File directory = new File("wacc_examples/valid/scope/");
     File[] examples = directory.listFiles();
 
     assert examples != null;
@@ -232,7 +232,7 @@ public class ValidTest {
   public void sequenceTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\valid\\sequence\\");
+    File directory = new File("wacc_examples/valid/sequence/");
     File[] examples = directory.listFiles();
 
     assert examples != null;
@@ -243,7 +243,7 @@ public class ValidTest {
   public void variablesTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\valid\\variables\\");
+    File directory = new File("wacc_examples/valid/variables/");
     File[] examples = directory.listFiles();
 
     assert examples != null;
@@ -254,7 +254,7 @@ public class ValidTest {
   public void whileTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\valid\\while\\");
+    File directory = new File("wacc_examples/valid/while/");
     File[] examples = directory.listFiles();
 
     assert examples != null;
