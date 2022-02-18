@@ -452,7 +452,7 @@ public class TraverseAST {
         break;
 
       case EXIT:
-        if(!getExpressionType(expression).equals(new Type(EType.INT))){
+        if(!Objects.equals(getExpressionType(expression), new Type(EType.INT))){
           printSemanticError(Error.EXIT_NOT_INT);
         }
         else {
