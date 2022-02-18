@@ -336,6 +336,12 @@ public class TraverseAST {
       }
       traverse(expression.getExpression2());
     }
+
+    if (expression.getExprType() == Expression.ExprType.IDENT &&
+            currentST.getType(expression.getIdent()) == null) {
+      errorMsgs.add("Variable not defined: " + expression.getIdent() + "\n In expression: " + expression);
+      errors++;
+    }
   }
 
   private boolean invalidAssignment(Type lhs, AssignRHS rhs) {
@@ -432,7 +438,6 @@ public class TraverseAST {
         break;
 
       case RETURN:
-
         if (!Objects.equals(getExpressionType(expression), functionReturnTypes.get(functionIdent)) &&
                 expression != null) {
           errorMsgs.add("Function return type does not match");
