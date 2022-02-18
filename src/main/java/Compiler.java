@@ -63,8 +63,8 @@ public class Compiler {
       }
       exit(200);
     }
-    String fileName = "WACC_22/" + args[0].substring(args[0].lastIndexOf("/"),
-        args[0].length() - 4) + "s";
+    String fileNameWithExtension = filename.getFileName().toString();
+    String fileName = fileNameWithExtension.substring(0,fileNameWithExtension.lastIndexOf("."));
     FileWriter binFileWriter = new FileWriter(fileName);
     for (String instruction: instructionList){
       binFileWriter.write(instruction);
