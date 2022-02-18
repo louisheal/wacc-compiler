@@ -176,9 +176,12 @@ public class TraverseAST {
 
       case PAIRELEM:
         Type pairType = getExpressionType(rhs.getPairElem().getExpression());
+        if (pairType == null) {
+          break;
+        }
         if (rhs.getPairElem().getType() == PairElem.PairElemType.FST) {
           return pairType.getFstType();
-        } else {
+        } else if (rhs.getPairElem().getType() == PairElem.PairElemType.SND) {
           return pairType.getSndType();
         }
 
@@ -418,21 +421,18 @@ public class TraverseAST {
            statement.getLHS().getAssignType() != AssignLHS.LHSType.IDENT &&
            statement.getLHS().getAssignType() != AssignLHS.LHSType.PAIRELEM) {
           printSemanticError(Error.NOT_READABLE);
-        } else if (!getLHSType(statement.getLHS()).equals(new Type(EType.INT)) &&
-                   !getLHSType(statement.getLHS()).equals(new Type(EType.CHAR))) {
+        } else if (!Objects.equals(getLHSType(statement.getLHS()), new Type(EType.INT)) &&
+                   !Objects.equals(getLHSType(statement.getLHS()), new Type(EType.CHAR))) {
           printSemanticError(Error.NOT_READABLE);
         }
         break;
 
       case FREE:
-        if(statement.getRHS() == null){
-          break;
-        }
-        if(statement.getRHS().getAssignType() != RHSType.ARRAY
-            || statement.getRHS().getAssignType() != RHSType.PAIRELEM){
+        if (expression != null &&
+            getExpressionType(expression).getType() != EType.ARRAY &&
+            getExpressionType(expression).getType() != EType.PAIR) {
           printSemanticError(Error.NOT_FREEABLE);
-        }
-        else{
+        } else {
           traverse(expression);
         }
         break;
