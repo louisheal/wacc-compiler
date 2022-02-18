@@ -4,6 +4,7 @@ import ast.Type.EType;
 
 import java.util.*;
 
+import static java.lang.System.err;
 import static java.lang.System.exit;
 
 public class TraverseAST {
@@ -516,6 +517,22 @@ public class TraverseAST {
       traverse(rhs.getExpression1());
     }
 
+    if (rhs.getAssignType() == RHSType.CALL) {
+      if (rhs.getArgList().size() != functionParams.get(rhs.getFunctionIdent()).size()) {
+        errorMsgs.add("Wrong number of arguments in call to function: " + rhs);
+        errors++;
+        return;
+      }
+      for (int i = 0; i < rhs.getArgList().size(); i++) {
+        if (!Objects.equals(getExpressionType(rhs.getArgList().get(i)),
+                functionParams.get(rhs.getFunctionIdent()).get(i).getType())) {
+          errorMsgs.add("Type mismatch in call to function!" +
+                  "\n - Expected: " + functionParams.get(rhs.getFunctionIdent()).get(i).getType() +
+                  "\n - Actual: " + getExpressionType(rhs.getArgList().get(i)) +
+                  "\n - In expression: " + rhs);
+        }
+      }
+    }
   }
 
   private enum Error {
