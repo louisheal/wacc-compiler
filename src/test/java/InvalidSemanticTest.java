@@ -4,9 +4,8 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class InvalidSyntaxTests {
-
-  SecurityManagerSyntaxCheck securityManager = new SecurityManagerSyntaxCheck();
+public class InvalidSemanticTest {
+  SecurityManagerSemanticCheck securityManager = new SecurityManagerSemanticCheck();
   int failedTests = 0;
   int totalTests = 0;
 
@@ -33,21 +32,10 @@ public class InvalidSyntaxTests {
   }
 
   @Test
-  public void arrayTests() throws IOException {
+  public void exitTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\invalid\\syntaxErr\\array\\");
-    File[] examples = directory.listFiles(folderFilter);
-
-    assert examples != null;
-    runTests(examples);
-  }
-
-  @Test
-  public void basicTests() throws IOException {
-    System.setSecurityManager(securityManager);
-
-    File directory = new File("wacc_examples\\invalid\\syntaxErr\\basic\\");
+    File directory = new File("wacc_examples\\invalid\\semanticErr\\exit\\");
     File[] examples = directory.listFiles(folderFilter);
 
     assert examples != null;
@@ -58,7 +46,7 @@ public class InvalidSyntaxTests {
   public void expressionsTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\invalid\\syntaxErr\\expressions\\");
+    File directory = new File("wacc_examples\\invalid\\semanticErr\\expressions\\");
     File[] examples = directory.listFiles(folderFilter);
 
     assert examples != null;
@@ -69,7 +57,7 @@ public class InvalidSyntaxTests {
   public void functionTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\invalid\\syntaxErr\\function\\");
+    File directory = new File("wacc_examples\\invalid\\semanticErr\\function\\");
     File[] examples = directory.listFiles(folderFilter);
 
     assert examples != null;
@@ -80,7 +68,7 @@ public class InvalidSyntaxTests {
   public void ifTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\invalid\\syntaxErr\\if\\");
+    File directory = new File("wacc_examples\\invalid\\semanticErr\\if\\");
     File[] examples = directory.listFiles(folderFilter);
 
     assert examples != null;
@@ -88,10 +76,32 @@ public class InvalidSyntaxTests {
   }
 
   @Test
-  public void pairTests() throws IOException {
+  public void IOTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\invalid\\syntaxErr\\pairs\\");
+    File directory = new File("wacc_examples\\invalid\\semanticErr\\IO\\");
+    File[] examples = directory.listFiles(folderFilter);
+
+    assert examples != null;
+    runTests(examples);
+  }
+
+  @Test
+  public void multipleTests() throws IOException {
+    System.setSecurityManager(securityManager);
+
+    File directory = new File("wacc_examples\\invalid\\semanticErr\\multiple\\");
+    File[] examples = directory.listFiles(folderFilter);
+
+    assert examples != null;
+    runTests(examples);
+  }
+
+  @Test
+  public void pairsTests() throws IOException {
+    System.setSecurityManager(securityManager);
+
+    File directory = new File("wacc_examples\\invalid\\semanticErr\\pairs\\");
     File[] examples = directory.listFiles(folderFilter);
 
     assert examples != null;
@@ -102,7 +112,7 @@ public class InvalidSyntaxTests {
   public void printTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\invalid\\syntaxErr\\print\\");
+    File directory = new File("wacc_examples\\invalid\\semanticErr\\print\\");
     File[] examples = directory.listFiles(folderFilter);
 
     assert examples != null;
@@ -110,10 +120,21 @@ public class InvalidSyntaxTests {
   }
 
   @Test
-  public void sequenceTests() throws IOException {
+  public void readTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\invalid\\syntaxErr\\sequence\\");
+    File directory = new File("wacc_examples\\invalid\\semanticErr\\read\\");
+    File[] examples = directory.listFiles(folderFilter);
+
+    assert examples != null;
+    runTests(examples);
+  }
+
+  @Test
+  public void scopeTests() throws IOException {
+    System.setSecurityManager(securityManager);
+
+    File directory = new File("wacc_examples\\invalid\\semanticErr\\scope\\");
     File[] examples = directory.listFiles(folderFilter);
 
     assert examples != null;
@@ -124,7 +145,7 @@ public class InvalidSyntaxTests {
   public void variablesTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\invalid\\syntaxErr\\variables\\");
+    File directory = new File("wacc_examples\\invalid\\semanticErr\\variables\\");
     File[] examples = directory.listFiles(folderFilter);
 
     assert examples != null;
@@ -135,12 +156,11 @@ public class InvalidSyntaxTests {
   public void whileTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples\\invalid\\syntaxErr\\while\\");
+    File directory = new File("wacc_examples\\invalid\\semanticErr\\while\\");
     File[] examples = directory.listFiles(folderFilter);
 
     assert examples != null;
     runTests(examples);
   }
-
 
 }

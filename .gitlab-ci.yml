@@ -3,7 +3,22 @@ compile-job:
   script:
     - make compile
 
-test-job:
+testAnalysis-job:
   stage: test
   script:
-    - make test
+    - make testAnalysis
+
+testValid-job:
+  stage: test
+  script:
+    - make testValid
+
+testSyntax-job:
+  stage: test
+  script:
+    - make testSyntax
+
+testSemantics-job:
+  stage: test
+  script:
+    - make testSemantics

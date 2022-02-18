@@ -28,8 +28,25 @@ all: antlr
 compile: antlr
 	mvn compile
 
-test: antlr
+testAll: antlr
 	mvn test
+
+testAnalysis: antlr
+	mvn test -Dtest="BinaryLexerTest"
+	mvn test -Dtest="BinOpPrecedenceTest"
+	mvn test -Dtest="FunctionTest"
+	mvn test -Dtest="IntLiterTest"
+	mvn test -Dtest="StatTest"
+	mvn test -Dtest="UnaryOperLexerTest"
+
+testValid: antlr
+	mvn test -Dtest="ValidTest"
+
+testSyntax: antlr
+	mvn test -Dtest="InvalidSyntaxTest"#
+
+testSemantics: antlr
+	mvn test -Dtest="InvalidSemanticTest"
 
 antlr:
 	cd $(ANTLR_DIR) && ./$(ANTLR) 

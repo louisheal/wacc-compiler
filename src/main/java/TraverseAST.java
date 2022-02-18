@@ -529,7 +529,7 @@ public class TraverseAST {
                 rhs.getArgList().get(i) != null) {
           errorMsgs.add("Type mismatch in call to function!" +
                   "\n - Expected: " + functionParams.get(rhs.getFunctionIdent()).get(i).getType() +
-                  "\n - Actual: " + getExpressionType(rhs.getArgList().get(i)) +
+                  "\n - Actual: " + rhs.getArgList().get(i) + ":" + getExpressionType(rhs.getArgList().get(i)) +
                   "\n - In expression: " + rhs);
           errors++;
         }

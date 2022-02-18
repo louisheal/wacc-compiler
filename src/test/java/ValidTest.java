@@ -4,7 +4,7 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class ValidTests {
+public class ValidTest {
 
   MySecurityManager securityManager = new MySecurityManager();
 
