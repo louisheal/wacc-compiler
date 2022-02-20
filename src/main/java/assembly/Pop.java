@@ -1,7 +1,6 @@
 package assembly;
 
-public class Pop {
-  Register dest;
+public class Pop extends Instruction {
 
   public Pop(Register dest) {
     this.dest = dest;
