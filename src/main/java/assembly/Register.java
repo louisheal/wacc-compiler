@@ -16,4 +16,9 @@ public class Register {
     return new Register(number - 1);
   }
 
+  @Override
+  public String toString() {
+    return "r" + number;
+  }
+
 }
