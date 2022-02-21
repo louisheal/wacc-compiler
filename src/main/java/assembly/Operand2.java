@@ -28,6 +28,13 @@ public class Operand2 {
 
   @Override
   public String toString() {
+
+    if (shift == null && register == null) { // the operand is an immediate value
+      return "#" + immediateValue;
+    } else if (shift != null && register != null) { // the operand is a register shift
+      return "%" + register + ", %" + shift + ", #" + amount;
+    }
+
     return "%" + register;
   }
 
