@@ -32,10 +32,10 @@ public class Operand2 {
     if (shift == null && register == null) { // the operand is an immediate value
       return "#" + immediateValue + "\n";
     } else if (shift != null && register != null) { // the operand is a register shift
-      return "%" + register + ", %" + shift + ", #" + amount + "\n";
+      return register + ", " + shift + ", #" + amount + "\n";
     }
 
-    return "%" + register + "\n";
+    return register + "\n";
   }
 
 }

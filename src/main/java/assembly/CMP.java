@@ -1,6 +1,7 @@
 package assembly;
 
-public class CMP {
+// Compare
+public class CMP extends Instruction {
 
   Register register;
   private Operand2 op2;
@@ -21,9 +22,9 @@ public class CMP {
   @Override
   public String toString() {
     if (op2 == null) { // Case for when register compared with integer
-      return "CMP %" + register + ", #" + i + "\n";
+      return "CMP " + register + ", #" + i + "\n";
     }
-    return "CMP %" + register + ", %" + op2 + "\n";
+    return "CMP " + register + ", " + op2 + "\n";
   }
 
 
