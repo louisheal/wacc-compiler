@@ -3,7 +3,7 @@ package assembly;
 public class CMP {
 
   Register register;
-  private Operand op2;
+  private Operand2 op2;
   private int i;
 
   // This is the case for when the value of a register is compared with an integer
