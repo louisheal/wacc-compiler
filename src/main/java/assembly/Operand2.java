@@ -30,12 +30,12 @@ public class Operand2 {
   public String toString() {
 
     if (shift == null && register == null) { // the operand is an immediate value
-      return "#" + immediateValue;
+      return "#" + immediateValue + "\n";
     } else if (shift != null && register != null) { // the operand is a register shift
-      return "%" + register + ", %" + shift + ", #" + amount;
+      return "%" + register + ", %" + shift + ", #" + amount + "\n";
     }
 
-    return "%" + register;
+    return "%" + register + "\n";
   }
 
 }

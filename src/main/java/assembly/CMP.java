@@ -12,11 +12,18 @@ public class CMP {
     this.i = i;
   }
 
-  //TODO: Create the case when a register is compared with another operand (op2)
+  // This is the case when the value of a register is compared with a
+  public CMP(Register register, Operand2 op2) {
+    this.register = register;
+    this.op2 = op2;
+  }
 
   @Override
   public String toString() {
-    return "CMP %" + register + ", %" + i + "\n";
+    if (op2 == null) { // Case for when register compared with integer
+      return "CMP %" + register + ", #" + i + "\n";
+    }
+    return "CMP %" + register + ", %" + op2 + "\n";
   }
 
 
