@@ -6,10 +6,8 @@ import ast.Expression;
 import ast.Function;
 import ast.Program;
 import ast.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -77,9 +75,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitIntLiterExp(Expression expression) {
-    List<Instruction> instructionList = new ArrayList<>();
-    instructionList.add(new Instruction(InstrType.MOV, r2, expression.getIntLiter()));
-    return instructionList;
+    return new ArrayList<>(List.of(new Instruction(InstrType.MOV, r2, expression.getIntLiter())));
   }
 
   @Override
