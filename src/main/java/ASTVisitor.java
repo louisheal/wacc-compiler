@@ -305,10 +305,10 @@ public class ASTVisitor<T> {
     /** <p>Visits an intLiter expression.</p>
      *
      * <p>Can call:</p>
-     * <p><b>getExprType()</b> - Returns a StatType enum.</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
      * <p><b>getIntLiter()</b> - Returns the value of the integer.</p>
      *
-     * @param expression intLiter statement
+     * @param expression intLiter expression
      * @return returns the assembly instructions for an intLiter expression
      */
     public T visitIntLiterExp(Expression expression) {
@@ -318,10 +318,10 @@ public class ASTVisitor<T> {
     /** <p>Visits a boolLiter expression.</p>
      *
      * <p>Can call:</p>
-     * <p><b>getExprType()</b> - Returns a StatType enum.</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
      * <p><b>getBoolLiter()</b> - Returns the value of the bool.</p>
      *
-     * @param expression boolLiter statement
+     * @param expression boolLiter expression
      * @return returns the assembly instructions for a boolLiter expression
      */
     public T visitBoolLiterExp(Expression expression) {
@@ -331,10 +331,10 @@ public class ASTVisitor<T> {
     /** <p>Visits a charLiter expression.</p>
      *
      * <p>Can call:</p>
-     * <p><b>getExprType()</b> - Returns a StatType enum.</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
      * <p><b>getCharLiter()</b> - Returns the value of the char.</p>
      *
-     * @param expression charLiter statement
+     * @param expression charLiter expression
      * @return returns the assembly instructions for a charLiter expression
      */
     public T visitCharLiterExp(Expression expression) {
@@ -344,105 +344,285 @@ public class ASTVisitor<T> {
     /** <p>Visits a stringLiter expression.</p>
      *
      * <p>Can call:</p>
-     * <p><b>getExprType()</b> - Returns a StatType enum.</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
      * <p><b>getStringLiter()</b> - Returns the value of the string.</p>
      *
-     * @param expression stringLiter statement
+     * @param expression stringLiter expression
      * @return returns the assembly instructions for a stringLiter expression
      */
     public T visitStringLiterExp(Expression expression) {
         return null;
     }
 
-    /** <p>Visits a stringLiter expression.</p>
+    /** <p>Visits an identity expression.</p>
      *
      * <p>Can call:</p>
-     * <p><b>getExprType()</b> - Returns a StatType enum.</p>
-     * <p><b>getIntLiter()</b> - Returns the value of the string.</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
+     * <p><b>getIdent()</b> - Returns the string of the identity.</p>
      *
-     * @param expression stringLiter statement
-     * @return returns the assembly instructions for a stringLiter expression
+     * @param expression identity expression
+     * @return returns the assembly instructions for an identity expression
      */
     public T visitIdentExp(Expression expression) {
         return null;
     }
 
-    public T visitPairElemExp(Expression expression) {
-        return null;
-    }
-
+    /** <p>Visits an array element expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
+     * <p><b>getArrayElem()</b> - Returns the ArrayElem object.</p>
+     *
+     * @param expression array element expression
+     * @return returns the assembly instructions for an array element expression
+     */
     public T visitArrayElemExp(Expression expression) {
         return null;
     }
 
+    /** <p>Visits a not expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
+     * <p><b>getExpression1()</b> - Returns the argument expression.</p>
+     *
+     * @param expression not expression
+     * @return returns the assembly instructions for a not expression
+     */
     public T visitNotExp(Expression expression) {
         return null;
     }
 
+    /** <p>Visits a negate expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
+     * <p><b>getExpression1()</b> - Returns the argument expression.</p>
+     *
+     * @param expression negate expression
+     * @return returns the assembly instructions for a negate expression
+     */
     public T visitNegExp(Expression expression) {
         return null;
     }
 
+    /** <p>Visits a length expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
+     * <p><b>getExpression1()</b> - Returns the argument expression.</p>
+     *
+     * @param expression length expression
+     * @return returns the assembly instructions for a length expression
+     */
     public T visitLenExp(Expression expression) {
         return null;
     }
 
+    /** <p>Visits an ord expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
+     * <p><b>getExpression1()</b> - Returns the argument expression.</p>
+     *
+     * @param expression ord expression
+     * @return returns the assembly instructions for an ord expression
+     */
     public T visitOrdExp(Expression expression) {
         return null;
     }
 
+    /** <p>Visits a chr expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
+     * <p><b>getExpression1()</b> - Returns the argument expression.</p>
+     *
+     * @param expression chr expression
+     * @return returns the assembly instructions for a chr expression
+     */
     public T visitChrExp(Expression expression) {
         return null;
     }
 
+    /** <p>Visits a divide expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
+     * <p><b>getExpression1()</b> - Returns the first expression.</p>
+     * <p><b>getExpression1()</b> - Returns the second expression.</p>
+     *
+     * @param expression divide expression
+     * @return returns the assembly instructions for a divide expression
+     */
     public T visitDivExp(Expression expression) {
         return null;
     }
 
+    /** <p>Visits a multiply expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
+     * <p><b>getExpression1()</b> - Returns the first expression.</p>
+     * <p><b>getExpression1()</b> - Returns the second expression.</p>
+     *
+     * @param expression multiply expression
+     * @return returns the assembly instructions for a multiply expression
+     */
     public T visitMulExp(Expression expression) {
         return null;
     }
 
+    /** <p>Visits a modulo expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
+     * <p><b>getExpression1()</b> - Returns the first expression.</p>
+     * <p><b>getExpression1()</b> - Returns the second expression.</p>
+     *
+     * @param expression modulo expression
+     * @return returns the assembly instructions for a modulo expression
+     */
     public T visitModExp(Expression expression) {
         return null;
     }
 
+    /** <p>Visits a plus expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
+     * <p><b>getExpression1()</b> - Returns the first expression.</p>
+     * <p><b>getExpression1()</b> - Returns the second expression.</p>
+     *
+     * @param expression plus expression
+     * @return returns the assembly instructions for a plus expression
+     */
     public T visitPlusExp(Expression expression) {
         return null;
     }
 
+    /** <p>Visits a minus expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
+     * <p><b>getExpression1()</b> - Returns the first expression.</p>
+     * <p><b>getExpression1()</b> - Returns the second expression.</p>
+     *
+     * @param expression minus expression
+     * @return returns the assembly instructions for a minus expression
+     */
     public T visitMinusExp(Expression expression) {
         return null;
     }
 
+    /** <p>Visits a greater than expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
+     * <p><b>getExpression1()</b> - Returns the first expression.</p>
+     * <p><b>getExpression1()</b> - Returns the second expression.</p>
+     *
+     * @param expression greater than expression
+     * @return returns the assembly instructions for a greater than expression
+     */
     public T visitGreaterExp(Expression expression) {
         return null;
     }
 
+    /** <p>Visits a greater than or equal expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
+     * <p><b>getExpression1()</b> - Returns the first expression.</p>
+     * <p><b>getExpression1()</b> - Returns the second expression.</p>
+     *
+     * @param expression greater than or equal expression
+     * @return returns the assembly instructions for a greater than or equal expression
+     */
     public T visitGreaterEqExp(Expression expression) {
         return null;
     }
 
+    /** <p>Visits a less than expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
+     * <p><b>getExpression1()</b> - Returns the first expression.</p>
+     * <p><b>getExpression1()</b> - Returns the second expression.</p>
+     *
+     * @param expression less than expression
+     * @return returns the assembly instructions for a less than expression
+     */
     public T visitLessExp(Expression expression) {
         return null;
     }
 
+    /** <p>Visits a less than or equal expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
+     * <p><b>getExpression1()</b> - Returns the first expression.</p>
+     * <p><b>getExpression1()</b> - Returns the second expression.</p>
+     *
+     * @param expression less than or equal expression
+     * @return returns the assembly instructions for a less than or equal expression
+     */
     public T visitLessEqExp(Expression expression) {
         return null;
     }
 
+    /** <p>Visits an equal expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
+     * <p><b>getExpression1()</b> - Returns the first expression.</p>
+     * <p><b>getExpression1()</b> - Returns the second expression.</p>
+     *
+     * @param expression equal expression
+     * @return returns the assembly instructions for an equal expression
+     */
     public T visitEqExp(Expression expression) {
         return null;
     }
 
+    /** <p>Visits a not equal expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
+     * <p><b>getExpression1()</b> - Returns the first expression.</p>
+     * <p><b>getExpression1()</b> - Returns the second expression.</p>
+     *
+     * @param expression not equal expression
+     * @return returns the assembly instructions for a not equal expression
+     */
     public T visitNeqExp(Expression expression) {
         return null;
     }
 
+    /** <p>Visits an and expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
+     * <p><b>getExpression1()</b> - Returns the first expression.</p>
+     * <p><b>getExpression1()</b> - Returns the second expression.</p>
+     *
+     * @param expression and expression
+     * @return returns the assembly instructions for an and expression
+     */
     public T visitAndExp(Expression expression) {
         return null;
     }
 
+    /** <p>Visits an or expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
+     * <p><b>getExpression1()</b> - Returns the first expression.</p>
+     * <p><b>getExpression1()</b> - Returns the second expression.</p>
+     *
+     * @param expression or expression
+     * @return returns the assembly instructions for an or expression
+     */
     public T visitOrExp(Expression expression) {
         return null;
     }
