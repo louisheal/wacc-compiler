@@ -6,14 +6,14 @@ public class Instruction {
 
   InstrType type;
   Register dest;
-  Long immValue;
+  long immValue;
   Register operand1;
   Operand2 operand2;
 
   //CMP{cond} dest, immValue
   //MOV{cond} dest, immValue
   //LDR dest, immValue
-  public Instruction(InstrType type, Register dest, Long immValue) {
+  public Instruction(InstrType type, Register dest, long immValue) {
     this.type = type;
     this.dest = dest;
     this.immValue = immValue;
@@ -72,7 +72,7 @@ public class Instruction {
 
     if (type == InstrType.LDR) { //LDR instruction format
       if (operand2 == null) {
-        return type + " " + dest + ", =" + immValue.toString().substring(1);
+        return type + " " + dest + ", =" + immValue;
       } else {
         return  type + " " + dest + ", [" + operand2 + "]";
       }
