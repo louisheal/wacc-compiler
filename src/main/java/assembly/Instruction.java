@@ -1,11 +1,14 @@
 package assembly;
 
+import javax.lang.model.element.ModuleElement.Directive;
+
 public class Instruction {
 
   InstrType type;
   Register dest;
   Integer immValue;
   Operand2 operand2;
+  String directive;
 
   private Instruction(InstrType type, Register dest, Integer immValue, Operand2 operand2) {
     this.type = type;
@@ -55,12 +58,33 @@ public class Instruction {
       //With immValue format
       return type + " " + dest + ", " + immValue;
     }
+
     return null;
   }
 
   public enum InstrType {
     PUSH, POP,
-    MOV, CMP, ADD, SUB
+    MOV, CMP, ADD, SUB,
+    TEXT{
+      public String toString() {
+        return ".text";
+      }
+    },
+    DATA{
+      public String toString() {
+        return ".data";
+      }
+    },
+   LTORG{
+      public String toString() {
+        return ".ltorg";
+      }
+    },
+    GLOBAL_MAIN{
+      public String toString() {
+        return ".global main";
+      }
+    }
   }
 
 }
