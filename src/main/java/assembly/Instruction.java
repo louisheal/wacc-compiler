@@ -72,7 +72,7 @@ public class Instruction {
       // STR src dest
       return type + " " + operand2 + ", [" + dest + "]";
     }
-    return null;
+    return type.toString();
   }
 
   public enum InstrType {
