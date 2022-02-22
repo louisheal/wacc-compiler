@@ -8,13 +8,12 @@ public class Expression {
   private final char charLiter;
   private final String stringLiter;
   private final String ident;
-  private final PairElem pairElem;
   private final ArrayElem arrayElem;
   private final Expression expression1;
   private final Expression expression2;
 
   public Expression(ExprType exprType, long intLiter, boolean boolLiter, char charLiter, String stringLiter
-                    ,String ident,PairElem pairElem, ArrayElem arrayElem, Expression expression1,
+                    ,String ident, ArrayElem arrayElem, Expression expression1,
       Expression expression2) {
     this.exprType = exprType;
     this.intLiter = intLiter;
@@ -22,7 +21,6 @@ public class Expression {
     this.charLiter = charLiter;
     this.stringLiter = stringLiter;
     this.ident = ident;
-    this.pairElem = pairElem;
     this.arrayElem = arrayElem;
     this.expression1 = expression1;
     this.expression2 = expression2;
@@ -51,10 +49,6 @@ public class Expression {
 
     if (exprType == ExprType.IDENT) {
       result.append(ident);
-    }
-
-    if (exprType == ExprType.PAIRELEM) {
-      result.append(pairElem);
     }
 
     if (exprType == ExprType.ARRAYELEM) {
@@ -182,9 +176,7 @@ public class Expression {
     BOOLLITER,
     CHARLITER,
     STRINGLITER,
-    PAIRLITER,
     IDENT,
-    PAIRELEM,
     ARRAYELEM,
     NOT,
     NEG,

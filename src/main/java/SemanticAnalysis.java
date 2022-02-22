@@ -128,17 +128,6 @@ public class SemanticAnalysis {
       case IDENT:
         return currentST.getType(expr.getIdent());
 
-      case PAIRELEM:
-        Type fstType = getExpressionType(expr.getExpression1());
-        Type sndType = getExpressionType(expr.getExpression2());
-        if (fstType.getType() == (EType.PAIR)) {
-          fstType = new Type(EType.PAIR);
-        }
-        if (sndType.getType() == (EType.PAIR)) {
-          sndType = new Type(EType.PAIR);
-        }
-        return new Type(EType.PAIR, fstType, sndType);
-
       case ARRAYELEM:
         return currentST.getType(expr.getArrayElem().getIdent()).getArrayType();
 

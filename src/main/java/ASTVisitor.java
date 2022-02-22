@@ -1,3 +1,4 @@
+import ast.Expression;
 import ast.Program;
 import ast.Function;
 import ast.Statement;
@@ -62,7 +63,7 @@ public class ASTVisitor<T> {
             case BEGIN:
                 return visitBeginStatement(statement);
             /* Returns the instructions of both statements appended together */
-            //TODO: Apply Selthi-Ullman weights?
+            //TODO: Apply Sethi-Ullman weights?
             case CONCAT:
                 return visitConcatStatement(statement);
         }
@@ -242,6 +243,207 @@ public class ASTVisitor<T> {
      * @return returns the assembly instructions for a while statement
      */
     public T visitConcatStatement(Statement statement) {
+        return null;
+    }
+
+    public T visitExpression(Expression expression) {
+        switch (expression.getExprType()) {
+            case INTLITER:
+                return visitIntLiterExp(expression);
+            case BOOLLITER:
+                return visitBoolLiterExp(expression);
+            case CHARLITER:
+                return visitCharLiterExp(expression);
+            case STRINGLITER:
+                return visitStringLiterExp(expression);
+            case IDENT:
+                return visitIdentExp(expression);
+            case ARRAYELEM:
+                return visitArrayElemExp(expression);
+            case NOT:
+                return visitNotExp(expression);
+            case NEG:
+                return visitNegExp(expression);
+            case LEN:
+                return visitLenExp(expression);
+            case ORD:
+                return visitOrdExp(expression);
+            case CHR:
+                return visitChrExp(expression);
+            case DIVIDE:
+                return visitDivExp(expression);
+            case MULTIPLY:
+                return visitMulExp(expression);
+            case MODULO:
+                return visitModExp(expression);
+            case PLUS:
+                return visitPlusExp(expression);
+            case MINUS:
+                return visitMinusExp(expression);
+            case GT:
+                return visitGreaterExp(expression);
+            case GTE:
+                return visitGreaterEqExp(expression);
+            case LT:
+                return visitLessExp(expression);
+            case LTE:
+                return visitLessEqExp(expression);
+            case EQ:
+                return visitEqExp(expression);
+            case NEQ:
+                return visitNeqExp(expression);
+            case AND:
+                return visitAndExp(expression);
+            case OR:
+                return visitOrExp(expression);
+            case BRACKETS:
+                return visitExpression(expression.getExpression1());
+        }
+        return null;
+    }
+
+    /** <p>Visits an intLiter expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns a StatType enum.</p>
+     * <p><b>getIntLiter()</b> - Returns the value of the integer.</p>
+     *
+     * @param expression intLiter statement
+     * @return returns the assembly instructions for an intLiter expression
+     */
+    public T visitIntLiterExp(Expression expression) {
+        return null;
+    }
+
+    /** <p>Visits a boolLiter expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns a StatType enum.</p>
+     * <p><b>getBoolLiter()</b> - Returns the value of the bool.</p>
+     *
+     * @param expression boolLiter statement
+     * @return returns the assembly instructions for a boolLiter expression
+     */
+    public T visitBoolLiterExp(Expression expression) {
+        return null;
+    }
+
+    /** <p>Visits a charLiter expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns a StatType enum.</p>
+     * <p><b>getCharLiter()</b> - Returns the value of the char.</p>
+     *
+     * @param expression charLiter statement
+     * @return returns the assembly instructions for a charLiter expression
+     */
+    public T visitCharLiterExp(Expression expression) {
+        return null;
+    }
+
+    /** <p>Visits a stringLiter expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns a StatType enum.</p>
+     * <p><b>getStringLiter()</b> - Returns the value of the string.</p>
+     *
+     * @param expression stringLiter statement
+     * @return returns the assembly instructions for a stringLiter expression
+     */
+    public T visitStringLiterExp(Expression expression) {
+        return null;
+    }
+
+    /** <p>Visits a stringLiter expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns a StatType enum.</p>
+     * <p><b>getIntLiter()</b> - Returns the value of the string.</p>
+     *
+     * @param expression stringLiter statement
+     * @return returns the assembly instructions for a stringLiter expression
+     */
+    public T visitIdentExp(Expression expression) {
+        return null;
+    }
+
+    public T visitPairElemExp(Expression expression) {
+        return null;
+    }
+
+    public T visitArrayElemExp(Expression expression) {
+        return null;
+    }
+
+    public T visitNotExp(Expression expression) {
+        return null;
+    }
+
+    public T visitNegExp(Expression expression) {
+        return null;
+    }
+
+    public T visitLenExp(Expression expression) {
+        return null;
+    }
+
+    public T visitOrdExp(Expression expression) {
+        return null;
+    }
+
+    public T visitChrExp(Expression expression) {
+        return null;
+    }
+
+    public T visitDivExp(Expression expression) {
+        return null;
+    }
+
+    public T visitMulExp(Expression expression) {
+        return null;
+    }
+
+    public T visitModExp(Expression expression) {
+        return null;
+    }
+
+    public T visitPlusExp(Expression expression) {
+        return null;
+    }
+
+    public T visitMinusExp(Expression expression) {
+        return null;
+    }
+
+    public T visitGreaterExp(Expression expression) {
+        return null;
+    }
+
+    public T visitGreaterEqExp(Expression expression) {
+        return null;
+    }
+
+    public T visitLessExp(Expression expression) {
+        return null;
+    }
+
+    public T visitLessEqExp(Expression expression) {
+        return null;
+    }
+
+    public T visitEqExp(Expression expression) {
+        return null;
+    }
+
+    public T visitNeqExp(Expression expression) {
+        return null;
+    }
+
+    public T visitAndExp(Expression expression) {
+        return null;
+    }
+
+    public T visitOrExp(Expression expression) {
         return null;
     }
 
