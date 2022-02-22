@@ -1,11 +1,17 @@
 import assembly.Instruction;
 import assembly.Register;
+import ast.Function;
+import ast.Program;
 import ast.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 // This class will be used to generate assembly code from WACC code
-public class Converter {
+public class Converter extends ASTVisitor<List<Instruction>>{
+
   List<Instruction> instructions = new ArrayList<>();
 
   private Register r0 = new Register(0);
@@ -27,6 +33,45 @@ public class Converter {
   public void translateDeclaration(Statement statement) {
 
   }
+
+  //TODO: Change to ASTVisitor<List<Instruction>>
+
+  @Override
+  public List<Instruction> visitProgram(Program program) {
+    List<Instruction> functionInstructions = new ArrayList<>();
+
+    /* Generate the assembly instructions for each function. */
+    for (Function function : program.getFunctions()) {
+      functionInstructions.addAll(visitFunction(function));
+    }
+
+    /* Generate the assembly instructions for the program body. */
+    List<Instruction> statementInstructions = visitStatement(program.getStatement());
+
+      /* Return the function assembly instructions concatenated with the assembly instructions
+         for the program body. */
+    return Stream.of(functionInstructions, statementInstructions)
+        .flatMap(Collection::stream)
+        .collect(Collectors.toList());
+  }
+
+  //TODO: ADD FUNCTION PARAMETERS TO SYMBOL TABLE
+  @Override
+  public List<Instruction> visitFunction(Function function) {
+    return visitStatement(function.getStatement());
+  }
+
+  @Override
+  public List<Instruction> visitConcatStatement(Statement statement) {
+      /* Generate, concatenate and return the assembly instructions for both statements either
+         side of the semicolon */
+    return Stream.of(visitStatement(statement.getStatement1()),
+            visitStatement(statement.getStatement2()))
+        .flatMap(Collection::stream)
+        .collect(Collectors.toList());
+  }
+
+
 
 
 }
