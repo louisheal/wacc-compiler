@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ASTVisitor {
+public class ASTVisitor<T> {
 
     /**
      * Returns the list of assembly instructions that represents the given program.
@@ -16,23 +16,8 @@ public class ASTVisitor {
      * @param program a program node from the abstract syntax tree
      * @return a list of assembly instructions that represent the given program
      */
-    public List<String> visitProgram(Program program) {
-
-        List<String> functionInstructions = new ArrayList<>();
-
-        /* Generate the assembly instructions for each function. */
-        for (Function function : program.getFunctions()) {
-            functionInstructions.addAll(visitFunction(function));
-        }
-
-        /* Generate the assembly instructions for the program body. */
-        List<String> statementInstructions = visitStatement(program.getStatement());
-
-        /* Return the function assembly instructions concatenated with the assembly instructions
-           for the program body. */
-        return Stream.of(functionInstructions, statementInstructions)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+    public T visitProgram(Program program) {
+        return null;
     }
 
     /**
@@ -41,7 +26,7 @@ public class ASTVisitor {
      * @param function a function node from the abstract syntax tree
      * @return a list of assembly instructions that represent the given program
      */
-    public List<String> visitFunction(Function function) {
+    public T visitFunction(Function function) {
         return visitStatement(function.getStatement());
     }
 
@@ -50,7 +35,7 @@ public class ASTVisitor {
      * @param statement a statement node from the abstract syntax tree
      * @return a list of assembly instructions that represent the given statement
      */
-    public List<String> visitStatement(Statement statement) {
+    public T visitStatement(Statement statement) {
         switch (statement.getStatType()) {
             case SKIP:
                 return visitSkipStatement(statement);
@@ -76,13 +61,10 @@ public class ASTVisitor {
                 return visitWhileStatement(statement);
             case BEGIN:
                 return visitBeginStatement(statement);
-            /* Returns the instructions of both statements together */
+            /* Returns the instructions of both statements appended together */
             //TODO: Apply Selthi-Ullman weights?
             case CONCAT:
-                return Stream.of(visitStatement(statement.getStatement1()),
-                                 visitStatement(statement.getStatement2()))
-                        .flatMap(Collection::stream)
-                        .collect(Collectors.toList());
+                return visitConcatStatement(statement);
         }
         return null;
     }
@@ -95,8 +77,8 @@ public class ASTVisitor {
      * @param statement skip statement
      * @return returns the assembly instructions for a skip statement
      */
-    public List<String> visitSkipStatement(Statement statement) {
-        return new ArrayList<>();
+    public T visitSkipStatement(Statement statement) {
+        return null;
     }
 
     /** <p>Visits a declaration statement.</p>
@@ -110,8 +92,8 @@ public class ASTVisitor {
      * @param statement declaration statement
      * @return returns the assembly instructions for a declaration statement
      */
-    private List<String> visitDeclarationStatement(Statement statement) {
-        return new ArrayList<>();
+    public T visitDeclarationStatement(Statement statement) {
+        return null;
     }
 
     /** <p>Visits a reassignment statement.</p>
@@ -124,8 +106,8 @@ public class ASTVisitor {
      * @param statement reassignment statement
      * @return returns the assembly instructions for a reassignment statement
      */
-    private List<String> visitReassignmentStatement(Statement statement) {
-        return new ArrayList<>();
+    public T visitReassignmentStatement(Statement statement) {
+        return null;
     }
 
     /** <p>Visits a read statement.</p>
@@ -137,8 +119,8 @@ public class ASTVisitor {
      * @param statement read statement
      * @return returns the assembly instructions for a read statement
      */
-    private List<String> visitReadStatement(Statement statement) {
-        return new ArrayList<>();
+    public T visitReadStatement(Statement statement) {
+        return null;
     }
 
     /** <p>Visits a free statement.</p>
@@ -150,8 +132,8 @@ public class ASTVisitor {
      * @param statement free statement
      * @return returns the assembly instructions for a free statement
      */
-    private List<String> visitFreeStatement(Statement statement) {
-        return new ArrayList<>();
+    public T visitFreeStatement(Statement statement) {
+        return null;
     }
 
     /** <p>Visits a return statement.</p>
@@ -163,8 +145,8 @@ public class ASTVisitor {
      * @param statement return statement
      * @return returns the assembly instructions for a return statement
      */
-    private List<String> visitReturnStatement(Statement statement) {
-        return new ArrayList<>();
+    public T visitReturnStatement(Statement statement) {
+        return null;
     }
 
     /** <p>Visits an exit statement.</p>
@@ -177,8 +159,8 @@ public class ASTVisitor {
      * @param statement exit statement
      * @return returns the assembly instructions for an exit statement
      */
-    private List<String> visitExitStatement(Statement statement) {
-        return new ArrayList<>();
+    public T visitExitStatement(Statement statement) {
+        return null;
     }
 
     /** <p>Visits a print statement.</p>
@@ -190,8 +172,8 @@ public class ASTVisitor {
      * @param statement print statement
      * @return returns the assembly instructions for a print statement
      */
-    private List<String> visitPrintStatement(Statement statement) {
-        return new ArrayList<>();
+    public T visitPrintStatement(Statement statement) {
+        return null;
     }
 
     /** <p>Visits a println statement.</p>
@@ -203,8 +185,8 @@ public class ASTVisitor {
      * @param statement println statement
      * @return returns the assembly instructions for a println statement
      */
-    private List<String> visitPrintlnStatement(Statement statement) {
-        return new ArrayList<>();
+    public T visitPrintlnStatement(Statement statement) {
+        return null;
     }
 
     /** <p>Visits an if statement.</p>
@@ -218,8 +200,8 @@ public class ASTVisitor {
      * @param statement if statement
      * @return returns the assembly instructions for an if statement
      */
-    private List<String> visitIfStatement(Statement statement) {
-        return new ArrayList<>();
+    public T visitIfStatement(Statement statement) {
+        return null;
     }
 
     /** <p>Visits a while statement.</p>
@@ -232,8 +214,8 @@ public class ASTVisitor {
      * @param statement while statement
      * @return returns the assembly instructions for a while statement
      */
-    private List<String> visitWhileStatement(Statement statement) {
-        return new ArrayList<>();
+    public T visitWhileStatement(Statement statement) {
+        return null;
     }
 
     /** <p>Visits a begin statement.</p>
@@ -245,8 +227,22 @@ public class ASTVisitor {
      * @param statement while statement
      * @return returns the assembly instructions for a while statement
      */
-    private List<String> visitBeginStatement(Statement statement) {
-        return new ArrayList<>();
+    public T visitBeginStatement(Statement statement) {
+        return null;
+    }
+
+    /** <p>Visits a concatenation statement.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getStatType()</b> - Returns a StatType enum.</p>
+     * <p><b>getStatement1()</b> - Returns the body of the first statement.</p>
+     * <p><b>getStatement2()</b> - Returns the body of the second statement.</p>
+     *
+     * @param statement while statement
+     * @return returns the assembly instructions for a while statement
+     */
+    public T visitConcatStatement(Statement statement) {
+        return null;
     }
 
 }
