@@ -17,6 +17,7 @@ public class Instruction {
   //CMP{cond} dest, immValue
   //MOV{cond} dest, immValue
   //ADD{cond} dest, immValue
+  //SUB{cond} dest, immValue
   public static Instruction getInstruction(InstrType type, Register dest, Integer immValue) {
     return new Instruction(type, dest, immValue, null);
   }
@@ -24,6 +25,7 @@ public class Instruction {
   //CMP{cond} dest, operand
   //MOV{cond} dest, operand
   //ADD{cond} dest, operand
+  //SUB{cond} dest, operand
   public static Instruction getInstruction(InstrType type, Register dest, Operand2 operand2) {
     return new Instruction(type, dest, null, operand2);
   }
@@ -42,8 +44,8 @@ public class Instruction {
       return type + " {" + dest + "}";
     }
 
-    //CMP, MOV, ADD instruction format
-    if (type == InstrType.CMP || type == InstrType.MOV || type == InstrType.ADD) {
+    //CMP, MOV, ADD. SUB instruction format
+    if (type == InstrType.CMP || type == InstrType.MOV || type == InstrType.ADD || type == InstrType.SUB) {
 
       //With operand format
       if (operand2 == null) {
@@ -58,7 +60,7 @@ public class Instruction {
 
   public enum InstrType {
     PUSH, POP,
-    MOV, CMP, ADD
+    MOV, CMP, ADD, SUB
   }
 
 }
