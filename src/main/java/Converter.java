@@ -78,23 +78,31 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return new ArrayList<>(List.of(new Instruction(InstrType.MOV, r2, expression.getIntLiter())));
   }
 
-  @Override
-  public List<Instruction> visitGreaterExp(Expression expression) {
+  private List<Instruction> translateBinaryExpression(Expression expression) {
     List<Instruction> instructions = new ArrayList<>();
 
-    /* Generate assembly instructions for the first expression */
+    /* Generate assembly instructions for the first expression. */
     instructions.addAll(visitExpression(expression.getExpression1())); //Assume expression value is stored in r1
 
-    /* Generate assembly instructions for the second expression */
+    /* Generate assembly instructions for the second expression. */
     instructions.addAll(visitExpression(expression.getExpression2())); //Assume expression value is stored in r2
 
-    /* CMP r1, r2 */
+    return instructions;
+  }
+
+  @Override
+  public List<Instruction> visitGreaterExp(Expression expression) {
+
+    /* Generate assembly code to evaluate both expressions. */
+    List<Instruction> instructions = translateBinaryExpression(expression);
+
+    // CMP r1, r2
     instructions.add(new Instruction(InstrType.CMP, r1, new Operand2(r2)));
 
-    /* MOV r1, #0 */
+    // MOV r1, #0
     instructions.add(new Instruction(InstrType.MOV, r1, 0));
 
-    /* MOVGT r1, #0 */
+    // MOVGT r1, #0
     //TODO: CREATE CONDITION CODE ENUMS
     instructions.add(new Instruction(InstrType.MOV, r1, 1));
 
