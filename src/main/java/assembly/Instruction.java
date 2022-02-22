@@ -8,22 +8,16 @@ public class Instruction {
   Register dest;
   Integer immValue;
   Operand2 operand2;
-  String directive;
-
-  private Instruction(InstrType type, Register dest, Integer immValue, Operand2 operand2) {
-    this.type = type;
-    this.dest = dest;
-    this.immValue = immValue;
-    this.operand2 = operand2;
-  }
 
   //CMP{cond} dest, immValue
   //MOV{cond} dest, immValue
   //ADD{cond} dest, immValue
   //SUB{cond} dest, immValue
   //LDR dest, immValue
-  public static Instruction getInstruction(InstrType type, Register dest, Integer immValue) {
-    return new Instruction(type, dest, immValue, null);
+  public Instruction(InstrType type, Register dest, Integer immValue) {
+    this.type = type;
+    this.dest = dest;
+    this.immValue = immValue;
   }
 
   //CMP{cond} dest, operand
@@ -32,14 +26,17 @@ public class Instruction {
   //SUB{cond} dest, operand
   //STR src, dest
   //LDR dest, operand
-  public static Instruction getInstruction(InstrType type, Register dest, Operand2 operand2) {
-    return new Instruction(type, dest, null, operand2);
+  public Instruction(InstrType type, Register dest, Operand2 operand2) {
+    this.type = type;
+    this.dest = dest;
+    this.operand2 = operand2;
   }
 
   //PUSH {dest}
   //POP {dest}
-  public static Instruction getInstruction(InstrType type, Register dest) {
-    return new Instruction(type, dest, null, null);
+  public Instruction(InstrType type, Register dest) {
+    this.type = type;
+    this.dest = dest;
   }
 
   @Override
