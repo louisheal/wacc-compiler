@@ -261,34 +261,6 @@ public class ASTVisitor<T> {
             case ARRAYELEM:
                 return visitArrayElemExp(expression);
             case NOT:
-            case NEG:
-            case LEN:
-            case ORD:
-            case CHR:
-                return visitUnaryExpression(expression);
-            case DIVIDE:
-            case MULTIPLY:
-            case MODULO:
-            case PLUS:
-            case MINUS:
-            case GT:
-            case GTE:
-            case LT:
-            case LTE:
-            case EQ:
-            case NEQ:
-            case AND:
-            case OR:
-                return visitBinaryExpression(expression);
-            case BRACKETS:
-                return visitExpression(expression.getExpression1());
-        }
-        return null;
-    }
-
-    public T visitUnaryExpression(Expression expression) {
-        switch (expression.getExprType()) {
-            case NOT:
                 return visitNotExp(expression);
             case NEG:
                 return visitNegExp(expression);
@@ -298,12 +270,6 @@ public class ASTVisitor<T> {
                 return visitOrdExp(expression);
             case CHR:
                 return visitChrExp(expression);
-        }
-        return null;
-    }
-
-    public T visitBinaryExpression(Expression expression) {
-        switch (expression.getExprType()) {
             case DIVIDE:
                 return visitDivExp(expression);
             case MULTIPLY:
@@ -330,6 +296,8 @@ public class ASTVisitor<T> {
                 return visitAndExp(expression);
             case OR:
                 return visitOrExp(expression);
+            case BRACKETS:
+                return visitExpression(expression.getExpression1());
         }
         return null;
     }
