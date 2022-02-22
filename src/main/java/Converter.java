@@ -39,13 +39,27 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   public List<Instruction> visitProgram(Program program) {
     List<Instruction> instructions = new ArrayList<>();
 
+    //TODO: ADD CONSTRUCTOR FOR DIRECTIVES
+    instructions.add(new Instruction(InstrType.DATA, ""));
+
+    //TODO: ADD VARIABLE INSTRUCTIONS HERE
+
+    instructions.add(new Instruction(InstrType.TEXT, ""));
+
+    instructions.add(new Instruction(InstrType.GLOBAL_MAIN, ""));
+
     /* Generate the assembly instructions for each function. */
     for (Function function : program.getFunctions()) {
       instructions.addAll(visitFunction(function));
     }
 
+    //TODO: ADD ENUM FOR LABEL
+    instructions.add(new Instruction(InstrType.DATA, "main"));
+
     /* Generate the assembly instructions for the program body. */
     instructions.addAll(visitStatement(program.getStatement()));
+
+    instructions.add(new Instruction(InstrType.LTORG, ""));
 
     return instructions;
   }
