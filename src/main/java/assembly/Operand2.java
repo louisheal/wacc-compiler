@@ -52,4 +52,7 @@ public class Operand2 {
     return register.toString();
   }
 
+  public int getImmediateValue() {
+    return immediateValue;
+  }
 }

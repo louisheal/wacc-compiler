@@ -21,6 +21,7 @@ public class Instruction {
   //MOV{cond} dest, immValue
   //ADD{cond} dest, immValue
   //SUB{cond} dest, immValue
+  //LDR dest, immValue
   public static Instruction getInstruction(InstrType type, Register dest, Integer immValue) {
     return new Instruction(type, dest, immValue, null);
   }
@@ -30,6 +31,7 @@ public class Instruction {
   //ADD{cond} dest, operand
   //SUB{cond} dest, operand
   //STR src, dest
+  //LDR dest, operand
   public static Instruction getInstruction(InstrType type, Register dest, Operand2 operand2) {
     return new Instruction(type, dest, null, operand2);
   }
@@ -60,9 +62,13 @@ public class Instruction {
       return type + " " + dest + ", " + operand2;
     }
 
-
-    //STR instruction format
-    if (type == InstrType.STR) {
+    if (type == InstrType.LDR) { //LDR instruction format
+      if (operand2 == null) {
+        return type + " " + dest + ", =" + immValue.toString().substring(1);
+      } else {
+        return  type + " " + dest + ", [" + operand2 + "]";
+      }
+    } else if (type == InstrType.STR) { //STR instruction format
       // STR src dest
       return type + " " + operand2 + ", [" + dest + "]";
     }
