@@ -102,7 +102,7 @@ public class Compiler {
         + ".s";
     FileWriter binFileWriter = new FileWriter(fileName);
     for (Instruction instruction: instructions){
-      binFileWriter.write(instruction.toString());
+      binFileWriter.write(instruction.toString() + '\n');
     }
     binFileWriter.close();
 
