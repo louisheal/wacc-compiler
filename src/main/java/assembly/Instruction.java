@@ -6,7 +6,7 @@ public class Instruction {
 
   InstrType type;
   Register dest;
-  Integer immValue;
+  Long immValue;
   Operand2 operand2;
 
   //CMP{cond} dest, immValue
@@ -14,7 +14,7 @@ public class Instruction {
   //ADD{cond} dest, immValue
   //SUB{cond} dest, immValue
   //LDR dest, immValue
-  public Instruction(InstrType type, Register dest, Integer immValue) {
+  public Instruction(InstrType type, Register dest, Long immValue) {
     this.type = type;
     this.dest = dest;
     this.immValue = immValue;
