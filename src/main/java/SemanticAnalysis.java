@@ -385,8 +385,7 @@ public class SemanticAnalysis {
 
         if (invalidAssignment(statement.getLhsType(), statement.getRHS()) ||
                 currentST.contains(statement.getLhsIdent())) {
-          errorMsgs.add("TODO: DECLARATION ERROR");
-          errors++;
+          printSemanticError(Error.MISMATCH_TYPE);
           break;
         }
 
@@ -409,9 +408,7 @@ public class SemanticAnalysis {
       case REASSIGNMENT:
         traverse(statement.getLHS());
         if (invalidAssignment(getLHSType(statement.getLHS()), statement.getRHS())) {
-          //TODO: FIX ERROR MESSAGE
-          errorMsgs.add("TODO: REASSIGNMENT ERROR");
-          errors++;
+          printSemanticError(Error.MISMATCH_TYPE);
         }
 
         traverse(statement.getRHS());
