@@ -1,12 +1,11 @@
-import antlr.BasicParser;
 import assembly.Instruction;
 import assembly.Instruction.InstrType;
+import assembly.Operand2;
 import assembly.Register;
 import ast.Expression;
 import ast.Function;
 import ast.Program;
 import ast.Statement;
-import ast.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -14,8 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-// This class will be used to generate assembly code from WACC code
-public class Converter extends ASTVisitor<List<Instruction>>{
+public class Converter extends ASTVisitor<List<Instruction>> {
 
   List<Instruction> instructions = new ArrayList<>();
 
@@ -39,25 +37,19 @@ public class Converter extends ASTVisitor<List<Instruction>>{
 
   }
 
-  //TODO: Change to ASTVisitor<List<Instruction>>
-
   @Override
   public List<Instruction> visitProgram(Program program) {
-    List<Instruction> functionInstructions = new ArrayList<>();
+    List<Instruction> instructions = new ArrayList<>();
 
     /* Generate the assembly instructions for each function. */
     for (Function function : program.getFunctions()) {
-      functionInstructions.addAll(visitFunction(function));
+      instructions.addAll(visitFunction(function));
     }
 
     /* Generate the assembly instructions for the program body. */
-    List<Instruction> statementInstructions = visitStatement(program.getStatement());
+    instructions.addAll(visitStatement(program.getStatement()));
 
-      /* Return the function assembly instructions concatenated with the assembly instructions
-         for the program body. */
-    return Stream.of(functionInstructions, statementInstructions)
-        .flatMap(Collection::stream)
-        .collect(Collectors.toList());
+    return instructions;
   }
 
   //TODO: ADD FUNCTION PARAMETERS TO SYMBOL TABLE
@@ -68,17 +60,18 @@ public class Converter extends ASTVisitor<List<Instruction>>{
 
   @Override
   public List<Instruction> visitConcatStatement(Statement statement) {
-      /* Generate, concatenate and return the assembly instructions for both statements either
-         side of the semicolon */
-    return Stream.of(visitStatement(statement.getStatement1()),
-            visitStatement(statement.getStatement2()))
-        .flatMap(Collection::stream)
-        .collect(Collectors.toList());
+    List<Instruction> instructions = new ArrayList<>();
+
+    /* Generate the assembly code for each statement in the concatenated statement. */
+    instructions.addAll(visitStatement(statement.getStatement1()));
+    instructions.addAll(visitStatement(statement.getStatement2()));
+
+    return instructions;
   }
 
   @Override
   public List<Instruction> visitSkipStatement(Statement statement) {
-    /* Generate instructions when a skip statement is found, that is, no instructions */
+    /* Generate instructions when a skip statement is found, that is, no instructions. */
     return Collections.emptyList();
   }
 
@@ -89,8 +82,45 @@ public class Converter extends ASTVisitor<List<Instruction>>{
     return instructionList;
   }
 
+  @Override
+  public List<Instruction> visitGreaterExp(Expression expression) {
 
+    /* Generate assembly instructions for the first expression */
+    List<Instruction> firstInstructions = visitExpression(expression.getExpression1()); //Assume expression value is stored in r1
 
+    /* Generate assembly instructions for the second expression */
+    List<Instruction> secondInstructions = visitExpression(expression.getExpression2()); //Assume expression value is stored in r2
 
+    /* Create new instruction list and add the assembly to evaluate the first and second expressions */
+    List<Instruction> instructions = new ArrayList<>();
+    instructions.addAll(firstInstructions);
+    instructions.addAll(secondInstructions);
 
+    /* CMP r1, r2 */
+    instructions.add(new Instruction(InstrType.CMP, r1, new Operand2(r2)));
+
+    /* MOV r1, #0 */
+    instructions.add(new Instruction(InstrType.MOV, r1, 0));
+
+    /* MOVGT r1, #0 */
+    //TODO: CREATE CONDITION CODE ENUMS
+    instructions.add(new Instruction(InstrType.MOV, r1, 1));
+
+    return instructions;
+  }
+
+  @Override
+  public List<Instruction> visitGreaterEqExp(Expression expression) {
+    return super.visitGreaterEqExp(expression);
+  }
+
+  @Override
+  public List<Instruction> visitLessExp(Expression expression) {
+    return super.visitLessExp(expression);
+  }
+
+  @Override
+  public List<Instruction> visitLessEqExp(Expression expression) {
+    return super.visitLessEqExp(expression);
+  }
 }
