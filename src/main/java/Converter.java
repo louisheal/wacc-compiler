@@ -5,6 +5,7 @@ import ast.Program;
 import ast.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -70,6 +71,13 @@ public class Converter extends ASTVisitor<List<Instruction>>{
         .flatMap(Collection::stream)
         .collect(Collectors.toList());
   }
+
+  @Override
+  public List<Instruction> visitSkipStatement(Statement statement) {
+    /* Generate instructions when a skip statement is found, that is, no instructions */
+    return Collections.emptyList();
+  }
+
 
 
 
