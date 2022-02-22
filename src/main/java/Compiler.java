@@ -66,27 +66,11 @@ public class Compiler {
     return ast;
   }
 
-  public static void main(String[] args) throws IOException {
-
-    Path filename = Path.of("test.wacc");
-
-    String program = "begin\n" +
-            "skip\n" +
-            "end";
+  public static Program compileProgram(String program) {
 
     CharStream input = CharStreams.fromString(program);
 
-    BasicLexer lexer = new BasicLexer(input);
-
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-
-    BasicParser parser = new BasicParser(tokens);
-
-    ParseTree tree = parser.prog();
-
-    if (parser.getNumberOfSyntaxErrors() > 0) {
-      exit(100);
-    }
+    ParseTree tree = parse(tokenize(input));
 
     ASTBuilder astBuilder = new ASTBuilder();
     Program ast = (Program) astBuilder.visit(tree);
@@ -100,6 +84,15 @@ public class Compiler {
       }
       exit(200);
     }
+
+    return ast;
+  }
+
+  public static void main(String[] args) throws IOException {
+
+    Path filename = Path.of(args[0]);
+
+    Program ast = compile(filename.getFileName().toString());
 
     Converter converter = new Converter();
     List<Instruction> instructions = converter.visitProgram(ast);
