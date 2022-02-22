@@ -1,8 +1,12 @@
+import antlr.BasicParser;
 import assembly.Instruction;
+import assembly.Instruction.InstrType;
 import assembly.Register;
+import ast.Expression;
 import ast.Function;
 import ast.Program;
 import ast.Statement;
+import ast.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -76,6 +80,17 @@ public class Converter extends ASTVisitor<List<Instruction>>{
   public List<Instruction> visitSkipStatement(Statement statement) {
     /* Generate instructions when a skip statement is found, that is, no instructions */
     return Collections.emptyList();
+  }
+
+  @Override
+  public List<Instruction> visitIntLiterExp(Expression expression) {
+    List<Instruction> instructionList = new ArrayList<>();
+    instructionList.add(new Instruction(
+        InstrType.MOV
+        , new Register(2)
+        , Math.toIntExact(expression.getIntLiter())
+    ));
+    return instructionList;
   }
 
 
