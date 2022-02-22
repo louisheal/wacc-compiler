@@ -85,11 +85,7 @@ public class Converter extends ASTVisitor<List<Instruction>>{
   @Override
   public List<Instruction> visitIntLiterExp(Expression expression) {
     List<Instruction> instructionList = new ArrayList<>();
-    instructionList.add(new Instruction(
-        InstrType.MOV
-        , new Register(2)
-        , Math.toIntExact(expression.getIntLiter())
-    ));
+    instructionList.add(new Instruction(InstrType.MOV, r2, expression.getIntLiter()));
     return instructionList;
   }
 
