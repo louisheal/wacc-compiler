@@ -9,15 +9,7 @@ public class Instruction {
   long immValue;
   Register operand1;
   Operand2 operand2;
-
-  //CMP{cond} dest, immValue
-  //MOV{cond} dest, immValue
-  //LDR dest, immValue
-  public Instruction(InstrType type, Register dest, long immValue) {
-    this.type = type;
-    this.dest = dest;
-    this.immValue = immValue;
-  }
+  String label;
 
   //ADD{cond} dest, operand1, operand2
   //SUB{cond} dest, operand1, operand2
@@ -28,14 +20,29 @@ public class Instruction {
     this.operand2 = operand2;
   }
 
+  //CMP{cond} dest, immValue
+  //MOV{cond} dest, immValue
+  //LDR dest, immValue
+  public Instruction(InstrType type, Register dest, long immValue) {
+    this.type = type;
+    this.dest = dest;
+    this.immValue = immValue;
+  }
+
   //CMP{cond} dest, operand
   //MOV{cond} dest, operand
-  //STR src, dest
-  //LDR dest, operand
+  //STR{cond} src, dest
+  //LDR{cond} dest, operand
   public Instruction(InstrType type, Register dest, Operand2 operand2) {
     this.type = type;
     this.dest = dest;
     this.operand2 = operand2;
+  }
+
+  //BL label
+  public Instruction(InstrType type, String label) {
+    this.type = type;
+    this.label = label;
   }
 
   //PUSH {dest}
@@ -51,6 +58,10 @@ public class Instruction {
     //PUSH, POP instruction format
     if (type == InstrType.PUSH || type == InstrType.POP) {
       return type + " {" + dest + "}";
+    }
+
+    if (type == InstrType.BL) {
+      return type + " " + label;
     }
 
     //ADD, SUB instruction format
@@ -85,7 +96,10 @@ public class Instruction {
 
   public enum InstrType {
     PUSH, POP,
-    MOV, CMP, ADD, SUB, LDR, STR,
+    MOV, CMP,
+    ADD, SUB,
+    LDR, STR,
+    BL,
     TEXT{
       public String toString() {
         return ".text";
