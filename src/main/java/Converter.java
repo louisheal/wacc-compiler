@@ -80,17 +80,13 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitGreaterExp(Expression expression) {
+    List<Instruction> instructions = new ArrayList<>();
 
     /* Generate assembly instructions for the first expression */
-    List<Instruction> firstInstructions = visitExpression(expression.getExpression1()); //Assume expression value is stored in r1
+    instructions.addAll(visitExpression(expression.getExpression1())); //Assume expression value is stored in r1
 
     /* Generate assembly instructions for the second expression */
-    List<Instruction> secondInstructions = visitExpression(expression.getExpression2()); //Assume expression value is stored in r2
-
-    /* Create new instruction list and add the assembly to evaluate the first and second expressions */
-    List<Instruction> instructions = new ArrayList<>();
-    instructions.addAll(firstInstructions);
-    instructions.addAll(secondInstructions);
+    instructions.addAll(visitExpression(expression.getExpression2())); //Assume expression value is stored in r2
 
     /* CMP r1, r2 */
     instructions.add(new Instruction(InstrType.CMP, r1, new Operand2(r2)));
