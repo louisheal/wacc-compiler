@@ -13,6 +13,7 @@ target
 .settings
 .project
 .DS_Store
+*.s
 
 #ignore other junk files
 *~
