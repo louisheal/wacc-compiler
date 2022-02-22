@@ -29,6 +29,7 @@ public class Instruction {
   //MOV{cond} dest, operand
   //ADD{cond} dest, operand
   //SUB{cond} dest, operand
+  //STR src, dest
   public static Instruction getInstruction(InstrType type, Register dest, Operand2 operand2) {
     return new Instruction(type, dest, null, operand2);
   }
@@ -50,21 +51,27 @@ public class Instruction {
     //CMP, MOV, ADD. SUB instruction format
     if (type == InstrType.CMP || type == InstrType.MOV || type == InstrType.ADD || type == InstrType.SUB) {
 
-      //With operand format
+      //With immValue format
       if (operand2 == null) {
         return type + " " + dest + ", #" + immValue;
       }
 
-      //With immValue format
-      return type + " " + dest + ", " + immValue;
+      //With operand format
+      return type + " " + dest + ", " + operand2;
     }
 
+
+    //STR instruction format
+    if (type == InstrType.STR) {
+      // STR src dest
+      return type + " " + operand2 + ", [" + dest + "]";
+    }
     return null;
   }
 
   public enum InstrType {
     PUSH, POP,
-    MOV, CMP, ADD, SUB,
+    MOV, CMP, ADD, SUB, LDR, STR,
     TEXT{
       public String toString() {
         return ".text";
