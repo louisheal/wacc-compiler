@@ -15,9 +15,8 @@ public class ValidTest {
     for (File file : files) {
       totalTests++;
       System.out.print("RUNNING " + file.getName() + ": ");
-      String[] args = {file.toString()};
       try {
-        Compiler.main(args);
+        Compiler.compile(file.toString());
         System.out.print("PASS\n");
       } catch (Exception e) {
         System.out.print("FAIL\n");

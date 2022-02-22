@@ -17,9 +17,8 @@ public class InvalidSyntaxTest {
     for (File file : files) {
       totalTests++;
       System.out.print("RUNNING " + file.getName() + ": ");
-      String[] args = {file.toString()};
       try {
-        Compiler.main(args);
+        Compiler.compile(file.toString());
         System.out.print("FAIL\n");
         failedTests++;
       } catch (SecurityException e) {

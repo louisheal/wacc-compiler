@@ -2,7 +2,6 @@ import antlr.*;
 import assembly.Instruction;
 import ast.Program;
 import java.io.FileWriter;
-import java.util.ArrayList;
 import java.util.List;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -21,22 +20,61 @@ public class Compiler {
     return new CommonTokenStream(lexer);
   }
 
-  public static String parse(CommonTokenStream tokens) {
+  public static String parseTree(CommonTokenStream tokens) {
     BasicParser parser = new BasicParser(tokens);
     ParseTree tree = parser.prog();
     return tree.toStringTree(parser);
   }
+
+  public static ParseTree parse(CommonTokenStream tokens) {
+    BasicParser parser = new BasicParser(tokens);
+    ParseTree tree = parser.prog();
+
+    if (parser.getNumberOfSyntaxErrors() > 0) {
+      exit(100);
+    }
+
+    return tree;
+  }
   
   public static String lexAnalyse(String program) {
     CharStream input = CharStreams.fromString(program);
-    return parse(tokenize(input));
+    return parseTree(tokenize(input));
+  }
+
+  public static Program compile(String filename) throws IOException {
+
+    Path filepath = Path.of(filename);
+
+    CharStream input = CharStreams.fromPath(filepath);
+
+    ParseTree tree = parse(tokenize(input));
+
+    ASTBuilder astBuilder = new ASTBuilder();
+    Program ast = (Program) astBuilder.visit(tree);
+
+    SemanticAnalysis semanticAnalysis = new SemanticAnalysis();
+    semanticAnalysis.traverse(ast);
+
+    if (semanticAnalysis.getNumberOfErrors() > 0) {
+      for (String errorMsg : semanticAnalysis.getErrorMsgs()) {
+        System.out.println(errorMsg);
+      }
+      exit(200);
+    }
+
+    return ast;
   }
 
   public static void main(String[] args) throws IOException {
 
-    Path filename = Path.of(args[0]);
+    Path filename = Path.of("test.wacc");
 
-    CharStream input = CharStreams.fromPath(filename);
+    String program = "begin\n" +
+            "skip\n" +
+            "end";
+
+    CharStream input = CharStreams.fromString(program);
 
     BasicLexer lexer = new BasicLexer(input);
 
@@ -45,7 +83,7 @@ public class Compiler {
     BasicParser parser = new BasicParser(tokens);
 
     ParseTree tree = parser.prog();
-    
+
     if (parser.getNumberOfSyntaxErrors() > 0) {
       exit(100);
     }
