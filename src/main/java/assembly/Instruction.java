@@ -48,13 +48,13 @@ public class Instruction {
     //CMP, MOV, ADD. SUB instruction format
     if (type == InstrType.CMP || type == InstrType.MOV || type == InstrType.ADD || type == InstrType.SUB) {
 
-      //With operand format
+      //With immValue format
       if (operand2 == null) {
         return type + " " + dest + ", #" + immValue;
       }
 
-      //With immValue format
-      return type + " " + dest + ", " + immValue;
+      //With operand format
+      return type + " " + dest + ", " + operand2;
     }
 
     //STR instruction format
