@@ -26,6 +26,7 @@ public class Instruction {
   //MOV{cond} dest, operand
   //ADD{cond} dest, operand
   //SUB{cond} dest, operand
+  //STR src, dest
   public static Instruction getInstruction(InstrType type, Register dest, Operand2 operand2) {
     return new Instruction(type, dest, null, operand2);
   }
@@ -55,12 +56,20 @@ public class Instruction {
       //With immValue format
       return type + " " + dest + ", " + immValue;
     }
+
+    //STR instruction format
+    if (type == InstrType.STR) {
+      // STR src dest
+      return type + " " + operand2 + ", [" + dest + "]";
+    }
+
     return null;
   }
 
   public enum InstrType {
     PUSH, POP,
-    MOV, CMP, ADD, SUB
+    MOV, CMP, ADD, SUB,
+    LDR, STR
   }
 
 }
