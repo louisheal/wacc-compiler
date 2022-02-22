@@ -30,6 +30,12 @@ public class TmpConverter extends ASTVisitor<List<String>> {
                 .collect(Collectors.toList());
     }
 
+    //TODO: ADD FUNCTION PARAMETERS TO SYMBOL TABLE
+    @Override
+    public List<String> visitFunction(Function function) {
+        return visitStatement(function.getStatement());
+    }
+
     @Override
     public List<String> visitConcatStatement(Statement statement) {
         /* Generate, concatenate and return the assembly instructions for both statements either

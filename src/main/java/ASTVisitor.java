@@ -27,7 +27,7 @@ public class ASTVisitor<T> {
      * @return a list of assembly instructions that represent the given program
      */
     public T visitFunction(Function function) {
-        return visitStatement(function.getStatement());
+        return null;
     }
 
     /** Calls the corresponding visit statement function based on the statement type.
