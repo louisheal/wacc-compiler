@@ -23,8 +23,8 @@ public class ADD extends Instruction {
   @Override
   public String toString() {
     if (op2 == null) {
-      return "ADD " + dest + ", " + op1 + ", "  + value + "\n";
+      return "ADD " + dest + ", " + op1 + ", "  + value;
     }
-    return "ADD " + dest + ", " + op1 + ", " + op2 + "\n";
+    return "ADD " + dest + ", " + op1 + ", " + op2;
   }
 }

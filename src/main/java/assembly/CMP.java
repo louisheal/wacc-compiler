@@ -22,9 +22,9 @@ public class CMP extends Instruction {
   @Override
   public String toString() {
     if (op2 == null) { // Case for when register compared with integer
-      return "CMP " + register + ", #" + i + "\n";
+      return "CMP " + register + ", #" + i;
     }
-    return "CMP " + register + ", " + op2 + "\n";
+    return "CMP " + register + ", " + op2;
   }
 
 

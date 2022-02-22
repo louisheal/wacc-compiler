@@ -7,7 +7,7 @@ public class Push extends Instruction {
   }
 
   public String toString() {
-    return "PUSH {" + dest + "}\n";
+    return "PUSH {" + dest + "}";
   }
 
 }

@@ -7,7 +7,7 @@ public class Pop extends Instruction {
   }
 
   public String toString() {
-    return "POP {" + dest + "}\n";
+    return "POP {" + dest + "}";
   }
 
 }

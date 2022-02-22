@@ -1,7 +1,7 @@
 package assembly;
 
 // Move register or constant
-public class MOV extends Instruction {
+public class  MOV extends Instruction {
 
   private int constant;
   private Operand2 operand;
@@ -21,9 +21,9 @@ public class MOV extends Instruction {
   @Override
   public String toString() {
     if (operand == null) {
-      return "MOV " + dest + ", #" + constant + "\n";
+      return "MOV " + dest + ", #" + constant;
     } else {
-      return "MOV " + dest + ", " + operand + "\n";
+      return "MOV " + dest + ", " + operand;
     }
   }
 
