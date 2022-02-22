@@ -7,12 +7,11 @@ public class Instruction {
   InstrType type;
   Register dest;
   Long immValue;
+  Register operand1;
   Operand2 operand2;
 
   //CMP{cond} dest, immValue
   //MOV{cond} dest, immValue
-  //ADD{cond} dest, immValue
-  //SUB{cond} dest, immValue
   //LDR dest, immValue
   public Instruction(InstrType type, Register dest, Long immValue) {
     this.type = type;
@@ -20,10 +19,17 @@ public class Instruction {
     this.immValue = immValue;
   }
 
+  //ADD{cond} dest, operand1, operand2
+  //SUB{cond} dest, operand1, operand2
+  public Instruction(InstrType type, Register dest, Register operand1, Operand2 operand2) {
+    this.type = type;
+    this.dest = dest;
+    this.operand1 = operand1;
+    this.operand2 = operand2;
+  }
+
   //CMP{cond} dest, operand
   //MOV{cond} dest, operand
-  //ADD{cond} dest, operand
-  //SUB{cond} dest, operand
   //STR src, dest
   //LDR dest, operand
   public Instruction(InstrType type, Register dest, Operand2 operand2) {
@@ -47,8 +53,13 @@ public class Instruction {
       return type + " {" + dest + "}";
     }
 
-    //CMP, MOV, ADD. SUB instruction format
-    if (type == InstrType.CMP || type == InstrType.MOV || type == InstrType.ADD || type == InstrType.SUB) {
+    //ADD, SUB instruction format
+    if (type == InstrType.ADD || type == InstrType.SUB) {
+      return type + " " + dest + ", " + operand1 + ", " + operand2;
+    }
+
+    //CMP, MOV instruction format
+    if (type == InstrType.CMP || type == InstrType.MOV) {
 
       //With immValue format
       if (operand2 == null) {
