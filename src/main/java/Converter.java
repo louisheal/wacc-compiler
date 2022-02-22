@@ -111,16 +111,58 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitGreaterEqExp(Expression expression) {
-    return super.visitGreaterEqExp(expression);
+
+    /* Generate assembly code to evaluate both expressions. */
+    List<Instruction> instructions = translateBinaryExpression(expression);
+
+    // CMP r1, r2
+    instructions.add(new Instruction(InstrType.CMP, r1, new Operand2(r2)));
+
+    // MOV r1, #0
+    instructions.add(new Instruction(InstrType.MOV, r1, 0));
+
+    // MOVGE r1, #0
+    //TODO: CREATE CONDITION CODE ENUMS
+    instructions.add(new Instruction(InstrType.MOV, r1, 1));
+
+    return instructions;
   }
 
   @Override
   public List<Instruction> visitLessExp(Expression expression) {
-    return super.visitLessExp(expression);
+
+    /* Generate assembly code to evaluate both expressions. */
+    List<Instruction> instructions = translateBinaryExpression(expression);
+
+    // CMP r1, r2
+    instructions.add(new Instruction(InstrType.CMP, r1, new Operand2(r2)));
+
+    // MOV r1, #0
+    instructions.add(new Instruction(InstrType.MOV, r1, 0));
+
+    // MOVLT r1, #0
+    //TODO: CREATE CONDITION CODE ENUMS
+    instructions.add(new Instruction(InstrType.MOV, r1, 1));
+
+    return instructions;
   }
 
   @Override
   public List<Instruction> visitLessEqExp(Expression expression) {
-    return super.visitLessEqExp(expression);
+
+    /* Generate assembly code to evaluate both expressions. */
+    List<Instruction> instructions = translateBinaryExpression(expression);
+
+    // CMP r1, r2
+    instructions.add(new Instruction(InstrType.CMP, r1, new Operand2(r2)));
+
+    // MOV r1, #0
+    instructions.add(new Instruction(InstrType.MOV, r1, 0));
+
+    // MOVLE r1, #0
+    //TODO: CREATE CONDITION CODE ENUMS
+    instructions.add(new Instruction(InstrType.MOV, r1, 1));
+
+    return instructions;
   }
 }
