@@ -32,6 +32,8 @@ public class TmpConverter extends ASTVisitor<List<String>> {
 
     @Override
     public List<String> visitConcatStatement(Statement statement) {
+        /* Generate, concatenate and return the assembly instructions for both statements either
+           side of the semicolon */
         return Stream.of(visitStatement(statement.getStatement1()),
                         visitStatement(statement.getStatement2()))
                 .flatMap(Collection::stream)
