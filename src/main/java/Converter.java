@@ -7,6 +7,8 @@ import ast.Function;
 import ast.Program;
 import ast.Statement;
 
+import ast.Type;
+import ast.Type.EType;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -17,6 +19,58 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   List<Register> generalRegisters = initialiseGeneralRegisters();
   private Register sp = new Register(13);
   private Register pc = new Register(15);
+  SymbolTable currentST;
+
+  private Type getExpressionType(Expression expr) {
+
+    if (expr == null) {
+      return null;
+    }
+
+    switch (expr.getExprType()) {
+
+      case INTLITER:
+      case NEG:
+      case ORD:
+      case LEN:
+      case DIVIDE:
+      case MULTIPLY:
+      case MODULO:
+      case PLUS:
+      case MINUS:
+        return new Type(EType.INT);
+
+      case BOOLLITER:
+      case NOT:
+      case GT:
+      case GTE:
+      case LT:
+      case LTE:
+      case EQ:
+      case NEQ:
+      case AND:
+      case OR:
+        return new Type(EType.BOOL);
+
+      case CHARLITER:
+      case CHR:
+        return new Type(EType.CHAR);
+
+      case STRINGLITER:
+        return new Type(EType.STRING);
+
+      case IDENT:
+        return currentST.getType(expr.getIdent());
+
+      case ARRAYELEM:
+        return currentST.getType(expr.getArrayElem().getIdent()).getArrayType();
+
+      case BRACKETS:
+        return getExpressionType(expr.getExpression1());
+
+    }
+    return null;
+  }
 
 
 
