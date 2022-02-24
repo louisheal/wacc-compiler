@@ -98,7 +98,11 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return new ArrayList<>(List.of(new Instruction(InstrType.MOV, r2, boolVal)));
   }
 
-  
+  @Override
+  public List<Instruction> visitCharLiterExp(Expression expression) {
+    long charVal = Character.getNumericValue(expression.getCharLiter());
+    return new ArrayList<>(List.of(new Instruction(InstrType.MOV, r2, charVal)));
+  }
 
 
 
