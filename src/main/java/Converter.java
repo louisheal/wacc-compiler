@@ -21,7 +21,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   private Register pc = new Register(15);
   SymbolTable currentST;
 
-  private Type getExpressionType(Expression expr) {
+  private List<Instruction> getInstructionFromExpression(Expression expr) {
 
     if (expr == null) {
       return null;
@@ -38,7 +38,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       case MODULO:
       case PLUS:
       case MINUS:
-        return new Type(EType.INT);
+        return visitIntLiterExp(expr);
 
       case BOOLLITER:
       case NOT:
@@ -50,23 +50,47 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       case NEQ:
       case AND:
       case OR:
-        return new Type(EType.BOOL);
+        return visitBoolLiterExp(expr);
 
       case CHARLITER:
       case CHR:
-        return new Type(EType.CHAR);
+        return visitCharLiterExp(expr);
 
       case STRINGLITER:
-        return new Type(EType.STRING);
+        return visitStringLiterExp(expr);
 
       case IDENT:
-        return currentST.getType(expr.getIdent());
+        switch (currentST.getType(expr.getIdent()).getType()){
+          case INT:
+            return visitIntLiterExp(expr);
+          case BOOL:
+            return visitBoolLiterExp(expr);
+          case CHAR:
+            return visitCharLiterExp(expr);
+          case STRING:
+            return visitStringLiterExp(expr);
+          case PAIR:
+            List<Instruction> pairInstructions = new ArrayList<>();
+            pairInstructions.addAll(getInstructionFromExpression(expr.getExpression1()));
+            pairInstructions.addAll(getInstructionFromExpression(expr.getExpression2()));
+            return pairInstructions;
+          case ARRAY:
+            List<Instruction> arrayInstructions = new ArrayList<>();
+            for (Expression arrayExp: expr.getArrayElem().getExpression()){
+              arrayInstructions.addAll(getInstructionFromExpression(arrayExp));
+            }
+            return arrayInstructions;
+        }
 
       case ARRAYELEM:
-        return currentST.getType(expr.getArrayElem().getIdent()).getArrayType();
+        List<Instruction> arrayInstructions = new ArrayList<>();
+        for (Expression arrayExp: expr.getArrayElem().getExpression()){
+          arrayInstructions.addAll(getInstructionFromExpression(arrayExp));
+        }
+        return arrayInstructions;
 
       case BRACKETS:
-        return getExpressionType(expr.getExpression1());
+        return getInstructionFromExpression(expr.getExpression1());
 
     }
     return null;
