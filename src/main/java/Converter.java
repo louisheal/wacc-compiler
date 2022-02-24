@@ -190,6 +190,16 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
+  @Override
+  public List<Instruction> visitIdentExp(Expression expression) {
+    return getInstructionFromExpression(expression);
+  }
+
+  @Override
+  public List<Instruction> visitArrayElemExp(Expression expression) {
+    return getInstructionFromExpression(expression);
+  }
+
 
 
   private List<Instruction> translateBinaryExpression(Expression expression) {
