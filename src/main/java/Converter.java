@@ -109,6 +109,11 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     int i = 0;
     long charVal;
     for (char c : expression.getStringLiter().toCharArray()){
+      //This is a temporary fix, which would cut off if it detects that the string will overflow
+      // the general registers.
+      if (i == generalRegisters.size()){
+        return instructions;
+      }
       charVal = Character.getNumericValue(c);
       instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(i), charVal));
       i++;
