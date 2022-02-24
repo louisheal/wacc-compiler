@@ -14,22 +14,20 @@ import java.util.stream.Stream;
 public class Converter extends ASTVisitor<List<Instruction>> {
 
   List<Instruction> instructions = new ArrayList<>();
-
-  private Register r0 = new Register(0);
-  private Register r1 = new Register(1);
-  private Register r2 = new Register(2);
-  private Register r3 = new Register(3);
-  private Register r4 = new Register(4);
-  private Register r5 = new Register(5);
-  private Register r6 = new Register(6);
-  private Register r7 = new Register(7);
-  private Register r8 = new Register(8);
-  private Register r9 = new Register(9);
-  private Register r10 = new Register(10);
-  private Register r11 = new Register(11);
-  private Register r12 = new Register(12);
+  List<Register> generalRegisters = initialiseGeneralRegisters();
   private Register sp = new Register(13);
   private Register pc = new Register(15);
+
+
+
+  private List<Register> initialiseGeneralRegisters(){
+    List<Register> regs = new ArrayList<>();
+    for(int i = 0; i != 13; i++){
+      regs.add(new Register(i));
+    }
+    return regs;
+  }
+
 
   public void translateDeclaration(Statement statement) {
 
@@ -89,20 +87,23 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitIntLiterExp(Expression expression) {
-    return new ArrayList<>(List.of(new Instruction(InstrType.MOV, r2, expression.getIntLiter())));
+    return new ArrayList<>(List.of(new Instruction(InstrType.MOV, generalRegisters.get(2),
+        expression.getIntLiter())));
   }
 
   @Override
   public List<Instruction> visitBoolLiterExp(Expression expression) {
     long boolVal = expression.getBoolLiter() ? 1 : 0;
-    return new ArrayList<>(List.of(new Instruction(InstrType.MOV, r2, boolVal)));
+    return new ArrayList<>(List.of(new Instruction(InstrType.MOV, generalRegisters.get(2), boolVal)));
   }
 
   @Override
   public List<Instruction> visitCharLiterExp(Expression expression) {
     long charVal = Character.getNumericValue(expression.getCharLiter());
-    return new ArrayList<>(List.of(new Instruction(InstrType.MOV, r2, charVal)));
+    return new ArrayList<>(List.of(new Instruction(InstrType.MOV, generalRegisters.get(2), charVal)));
   }
+
+  
 
 
 
@@ -125,14 +126,15 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     List<Instruction> instructions = translateBinaryExpression(expression);
 
     // CMP r1, r2
-    instructions.add(new Instruction(InstrType.CMP, r1, new Operand2(r2)));
+    instructions.add(new Instruction(InstrType.CMP, generalRegisters.get(1),
+        new Operand2(generalRegisters.get(2))));
 
     // MOV r1, #0
-    instructions.add(new Instruction(InstrType.MOV, r1, 0));
+    instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(1), 0));
 
     // MOVGT r1, #0
     //TODO: CREATE CONDITION CODE ENUMS
-    instructions.add(new Instruction(InstrType.MOV, r1, 1));
+    instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(1), 1));
 
     return instructions;
   }
@@ -144,14 +146,15 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     List<Instruction> instructions = translateBinaryExpression(expression);
 
     // CMP r1, r2
-    instructions.add(new Instruction(InstrType.CMP, r1, new Operand2(r2)));
+    instructions.add(new Instruction(InstrType.CMP, generalRegisters.get(1),
+        new Operand2(generalRegisters.get(2))));
 
     // MOV r1, #0
-    instructions.add(new Instruction(InstrType.MOV, r1, 0));
+    instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(1), 0));
 
     // MOVGE r1, #0
     //TODO: CREATE CONDITION CODE ENUMS
-    instructions.add(new Instruction(InstrType.MOV, r1, 1));
+    instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(1), 1));
 
     return instructions;
   }
@@ -163,14 +166,15 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     List<Instruction> instructions = translateBinaryExpression(expression);
 
     // CMP r1, r2
-    instructions.add(new Instruction(InstrType.CMP, r1, new Operand2(r2)));
+    instructions.add(new Instruction(InstrType.CMP, generalRegisters.get(1),
+        new Operand2(generalRegisters.get(2))));
 
     // MOV r1, #0
-    instructions.add(new Instruction(InstrType.MOV, r1, 0));
+    instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(1), 0));
 
     // MOVLT r1, #0
     //TODO: CREATE CONDITION CODE ENUMS
-    instructions.add(new Instruction(InstrType.MOV, r1, 1));
+    instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(1), 1));
 
     return instructions;
   }
@@ -182,14 +186,15 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     List<Instruction> instructions = translateBinaryExpression(expression);
 
     // CMP r1, r2
-    instructions.add(new Instruction(InstrType.CMP, r1, new Operand2(r2)));
+    instructions.add(new Instruction(InstrType.CMP, generalRegisters.get(1),
+        new Operand2(generalRegisters.get(2))));
 
     // MOV r1, #0
-    instructions.add(new Instruction(InstrType.MOV, r1, 0));
+    instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(1), 0));
 
     // MOVLE r1, #0
     //TODO: CREATE CONDITION CODE ENUMS
-    instructions.add(new Instruction(InstrType.MOV, r1, 1));
+    instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(1), 1));
 
     return instructions;
   }
