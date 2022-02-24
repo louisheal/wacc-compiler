@@ -39,6 +39,13 @@ public class Instruction {
     this.operand2 = operand2;
   }
 
+  //LDR{cond} dest, operand
+  public Instruction(InstrType type, Register dest, String label) {
+    this.type = type;
+    this.dest = dest;
+    this.label = label;
+  }
+
   //BL label
   public Instruction(InstrType type, String label) {
     this.type = type;
