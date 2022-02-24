@@ -92,6 +92,16 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return new ArrayList<>(List.of(new Instruction(InstrType.MOV, r2, expression.getIntLiter())));
   }
 
+  @Override
+  public List<Instruction> visitBoolLiterExp(Expression expression) {
+    long boolVal = expression.getBoolLiter() ? 1 : 0;
+    return new ArrayList<>(List.of(new Instruction(InstrType.MOV, r2, boolVal)));
+  }
+
+  
+
+
+
   private List<Instruction> translateBinaryExpression(Expression expression) {
     List<Instruction> instructions = new ArrayList<>();
 
