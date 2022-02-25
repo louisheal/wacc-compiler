@@ -11,6 +11,13 @@ public class Instruction {
   Operand2 operand2;
   String label;
 
+  //TODO: OPTIMIZE USE OF FIELDS
+
+  Register rdLo;
+  Register rdHi;
+  Register rn;
+  Register rm;
+
   //ADD{cond} dest, operand1, operand2
   //SUB{cond} dest, operand1, operand2
   public Instruction(InstrType type, Register dest, Register operand1, Operand2 operand2) {
@@ -18,6 +25,15 @@ public class Instruction {
     this.dest = dest;
     this.operand1 = operand1;
     this.operand2 = operand2;
+  }
+
+  //SMULL{S}{cond} RdLo, RdHi, Rn, Rm
+  public Instruction(InstrType type, Register rdLo, Register rdHi, Register rn, Register rm) {
+    this.type = type;
+    this.rdLo = rdLo;
+    this.rdHi = rdHi;
+    this.rn = rn;
+    this.rm = rm;
   }
 
   //CMP{cond} dest, immValue
@@ -76,6 +92,10 @@ public class Instruction {
       return type + " " + dest + ", " + operand1 + ", " + operand2;
     }
 
+    if (type == InstrType.SMULL) {
+      return type + " " + rdLo + ", " + rdHi + ", " + rn + ", " + rm;
+    }
+
     //CMP, MOV instruction format
     if (type == InstrType.CMP || type == InstrType.MOV) {
 
@@ -105,6 +125,7 @@ public class Instruction {
     PUSH, POP,
     MOV, CMP,
     ADD, SUB,
+    SMULL,
     LDR, STR,
     BL,
     TEXT{

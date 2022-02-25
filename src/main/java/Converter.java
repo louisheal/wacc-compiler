@@ -106,11 +106,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return regs;
   }
 
-
-  public void translateDeclaration(Statement statement) {
-
-  }
-
   @Override
   public List<Instruction> visitProgram(Program program) {
     List<Instruction> instructions = new ArrayList<>();
@@ -144,6 +139,12 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   @Override
   public List<Instruction> visitFunction(Function function) {
     return visitStatement(function.getStatement());
+  }
+
+  //TODO: ADD RHS VISIT FUNCTION
+  @Override
+  public List<Instruction> visitDeclarationStatement(Statement statement) {
+    return visitExpression(statement.getRHS().getExpression1());
   }
 
   @Override
@@ -222,7 +223,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     List<Instruction> instructions = translateBinaryExpression(expression);
 
     // SMULL Rn, Rn+1, Rn, Rn+1
-    //instructions.add(new Instruction());
+    Register rn = generalRegisters.get(1);
+    Register rm = generalRegisters.get(2);
+    instructions.add(new Instruction(InstrType.SMULL, rn, rm, rn, rm));
 
     // CMP Rn+1, Rn, ASR #31
 
