@@ -106,11 +106,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return regs;
   }
 
-
-  public void translateDeclaration(Statement statement) {
-
-  }
-
   @Override
   public List<Instruction> visitProgram(Program program) {
     List<Instruction> instructions = new ArrayList<>();
@@ -144,6 +139,12 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   @Override
   public List<Instruction> visitFunction(Function function) {
     return visitStatement(function.getStatement());
+  }
+
+  //TODO: ADD RHS VISIT FUNCTION
+  @Override
+  public List<Instruction> visitDeclarationStatement(Statement statement) {
+    return visitExpression(statement.getRHS().getExpression1());
   }
 
   @Override
@@ -206,10 +207,31 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     List<Instruction> instructions = new ArrayList<>();
 
     /* Generate assembly instructions for the first expression. */
-    instructions.addAll(visitExpression(expression.getExpression1())); //Assume expression value is stored in r1
+    instructions.addAll(visitExpression(expression.getExpression1())); //Store result in Rn
 
     /* Generate assembly instructions for the second expression. */
-    instructions.addAll(visitExpression(expression.getExpression2())); //Assume expression value is stored in r2
+    instructions.addAll(visitExpression(expression.getExpression2())); //Store result in Rn+1
+
+    return instructions;
+  }
+
+  //TODO: Add SMULL instruction
+  @Override
+  public List<Instruction> visitMulExp(Expression expression) {
+
+    /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
+    List<Instruction> instructions = translateBinaryExpression(expression);
+
+    // SMULL Rn, Rn+1, Rn, Rn+1
+    Register rn = generalRegisters.get(1);
+    Register rm = generalRegisters.get(2);
+    instructions.add(new Instruction(InstrType.SMULL, rn, rm, rn, rm));
+
+    // CMP Rn+1, Rn, ASR #31
+
+    // BLNE p_throw_overflow_error
+    //TODO: Add NE condition code
+    instructions.add(new Instruction(InstrType.BL, "p_throw_overflow_error"));
 
     return instructions;
   }
@@ -217,17 +239,17 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   @Override
   public List<Instruction> visitGreaterExp(Expression expression) {
 
-    /* Generate assembly code to evaluate both expressions. */
+    /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
     List<Instruction> instructions = translateBinaryExpression(expression);
 
-    // CMP r1, r2
+    // CMP Rn, Rn+1
     instructions.add(new Instruction(InstrType.CMP, generalRegisters.get(1),
         new Operand2(generalRegisters.get(2))));
 
-    // MOV r1, #0
+    // MOVLE Rn, #0
     instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(1), 0));
 
-    // MOVGT r1, #0
+    // MOVGT Rn, #1
     //TODO: CREATE CONDITION CODE ENUMS
     instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(1), 1));
 
@@ -237,17 +259,17 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   @Override
   public List<Instruction> visitGreaterEqExp(Expression expression) {
 
-    /* Generate assembly code to evaluate both expressions. */
+    /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
     List<Instruction> instructions = translateBinaryExpression(expression);
 
-    // CMP r1, r2
+    // CMP Rn, Rn+1
     instructions.add(new Instruction(InstrType.CMP, generalRegisters.get(1),
         new Operand2(generalRegisters.get(2))));
 
-    // MOV r1, #0
+    // MOVLT Rn, #0
     instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(1), 0));
 
-    // MOVGE r1, #0
+    // MOVGE Rn, #1
     //TODO: CREATE CONDITION CODE ENUMS
     instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(1), 1));
 
@@ -257,17 +279,17 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   @Override
   public List<Instruction> visitLessExp(Expression expression) {
 
-    /* Generate assembly code to evaluate both expressions. */
+    /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
     List<Instruction> instructions = translateBinaryExpression(expression);
 
-    // CMP r1, r2
+    // CMP Rn, Rn+1
     instructions.add(new Instruction(InstrType.CMP, generalRegisters.get(1),
         new Operand2(generalRegisters.get(2))));
 
-    // MOV r1, #0
+    // MOVGE Rn, #0
     instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(1), 0));
 
-    // MOVLT r1, #0
+    // MOVLT Rn, #1
     //TODO: CREATE CONDITION CODE ENUMS
     instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(1), 1));
 
@@ -277,17 +299,17 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   @Override
   public List<Instruction> visitLessEqExp(Expression expression) {
 
-    /* Generate assembly code to evaluate both expressions. */
+    /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
     List<Instruction> instructions = translateBinaryExpression(expression);
 
-    // CMP r1, r2
+    // CMP Rn, Rn+1
     instructions.add(new Instruction(InstrType.CMP, generalRegisters.get(1),
         new Operand2(generalRegisters.get(2))));
 
-    // MOV r1, #0
+    // MOVGT Rn, #0
     instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(1), 0));
 
-    // MOVLE r1, #0
+    // MOVLE Rn, #1
     //TODO: CREATE CONDITION CODE ENUMS
     instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(1), 1));
 
