@@ -123,16 +123,20 @@ public class Converter extends ASTVisitor<List<Instruction>> {
             }
             return arrayInstructions;
           case PAIR:
+            //TODO find out a way to actually put correct byte size in register 0 rather than 8
             arrayInstructions.add(new Instruction(InstrType.LDR, generalRegisters.get(0), 8));
             arrayInstructions.add(new Instruction(InstrType.BL, "malloc"));
-            for (Expression element: expr.getArrayElem().getExpression()){
-              arrayInstructions.addAll(visitIntLiterExp(element));
+            for (Expression element : expr.getArrayElem().getExpression()) {
+              arrayInstructions.addAll(getInstructionFromExpression(element.getExpression1()));
+              arrayInstructions.addAll(getInstructionFromExpression(element.getExpression2()));
             }
             return arrayInstructions;
           case ARRAY:
-            // List<Instruction> arrayInstructions = new ArrayList<>();
-            for (Expression arrayExp : expr.getArrayElem().getExpression()) {
-              arrayInstructions.addAll(getInstructionFromExpression(arrayExp));
+            //TODO find out a way to actually put correct byte size in register 0 rather than 8
+            arrayInstructions.add(new Instruction(InstrType.LDR, generalRegisters.get(0), 8));
+            arrayInstructions.add(new Instruction(InstrType.BL, "malloc"));
+            for (Expression element : expr.getArrayElem().getExpression()) {
+              arrayInstructions.addAll(getInstructionFromExpression(element));
             }
             return arrayInstructions;
         }
