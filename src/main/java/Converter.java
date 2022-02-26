@@ -73,18 +73,16 @@ public class Converter extends ASTVisitor<List<Instruction>> {
             return visitStringLiterExp(expr);
           case PAIR:
             List<Instruction> pairInstructions = new ArrayList<>();
-            //TODO find out a way to actually put correct byte size in register 0 rather than 8
             pairInstructions.add(new Instruction(InstrType.LDR, generalRegisters.get(0),
-                8));
+                calculateMallocSize(expr, currentST.getType(expr.getIdent()))));
             pairInstructions.add(new Instruction(InstrType.BL, "malloc"));
             pairInstructions.addAll(getInstructionFromExpression(expr.getExpression1()));
             pairInstructions.addAll(getInstructionFromExpression(expr.getExpression2()));
             return pairInstructions;
           case ARRAY:
             List<Instruction> arrayInstructions = new ArrayList<>();
-            //TODO find out a way to actually put correct byte size in register 0 rather than 8
             arrayInstructions.add(new Instruction(InstrType.LDR, generalRegisters.get(0),
-                8));
+                calculateMallocSize(expr, currentST.getType(expr.getIdent()))));
             arrayInstructions.add(new Instruction(InstrType.BL, "malloc"));
             for (Expression arrayExp: expr.getArrayElem().getExpression()){
               arrayInstructions.addAll(getInstructionFromExpression(arrayExp));
@@ -131,8 +129,14 @@ public class Converter extends ASTVisitor<List<Instruction>> {
             }
             return arrayInstructions;
           case PAIR:
-            //TODO find out a way to actually put correct byte size in register 0 rather than 8
-            arrayInstructions.add(new Instruction(InstrType.LDR, generalRegisters.get(0), 8));
+            long pairMallocSize = 0;
+
+            for (Expression element : expr.getArrayElem().getExpression()) {
+              pairMallocSize += calculateMallocSize(element,
+                  currentST.getType(expr.getArrayElem().getIdent()));
+            }
+
+            arrayInstructions.add(new Instruction(InstrType.LDR, generalRegisters.get(0), pairMallocSize));
             arrayInstructions.add(new Instruction(InstrType.BL, "malloc"));
             for (Expression element : expr.getArrayElem().getExpression()) {
               arrayInstructions.addAll(getInstructionFromExpression(element.getExpression1()));
@@ -140,8 +144,14 @@ public class Converter extends ASTVisitor<List<Instruction>> {
             }
             return arrayInstructions;
           case ARRAY:
-            //TODO find out a way to actually put correct byte size in register 0 rather than 8
-            arrayInstructions.add(new Instruction(InstrType.LDR, generalRegisters.get(0), 8));
+            long arrayMallocSize = 0;
+
+            for (Expression element : expr.getArrayElem().getExpression()) {
+              pairMallocSize += calculateMallocSize(element,
+                  currentST.getType(expr.getArrayElem().getIdent()));
+            }
+
+            arrayInstructions.add(new Instruction(InstrType.LDR, generalRegisters.get(0), arrayMallocSize));
             arrayInstructions.add(new Instruction(InstrType.BL, "malloc"));
             for (Expression element : expr.getArrayElem().getExpression()) {
               arrayInstructions.addAll(getInstructionFromExpression(element));
@@ -154,6 +164,33 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     }
     return null;
+  }
+
+  private long calculateMallocSize(Expression exp, Type type){
+    switch(type.getType()){
+      case INT:
+        return 8;
+
+      case BOOL:
+      case CHAR:
+        return 1;
+
+      case STRING:
+        return exp.getStringLiter().length();
+
+      case PAIR:
+        return calculateMallocSize(exp, type.getFstType()) + calculateMallocSize(exp,
+            type.getSndType());
+
+      case ARRAY:
+        long size = 0;
+        for (Expression arrayExpression : exp.getArrayElem().getExpression()){
+          size += calculateMallocSize(arrayExpression, type.getArrayType());
+        }
+        return size;
+    }
+    return 0;
+
   }
 
 
