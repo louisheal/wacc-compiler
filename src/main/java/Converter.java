@@ -16,6 +16,8 @@ import java.util.stream.Stream;
 public class Converter extends ASTVisitor<List<Instruction>> {
 
   List<Instruction> instructions = new ArrayList<>();
+
+  //TODO: ONLY USE FOLLOWING REGISTERS FOR EVALUATION: 4,5,6,7,8,9,10,11
   List<Register> generalRegisters = initialiseGeneralRegisters();
   private Register sp = new Register(13);
   private Register pc = new Register(15);
@@ -215,7 +217,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
-  //TODO: Add SMULL instruction
   @Override
   public List<Instruction> visitMulExp(Expression expression) {
 
@@ -232,6 +233,35 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     // BLNE p_throw_overflow_error
     //TODO: Add NE condition code
     instructions.add(new Instruction(InstrType.BL, "p_throw_overflow_error"));
+
+    return instructions;
+  }
+
+  //TODO: MAKE R1 AND R0 RESERVED REGISTERS FOR FUNCTION CALLS
+  @Override
+  public List<Instruction> visitDivExp(Expression expression) {
+
+    /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
+    List<Instruction> instructions = translateBinaryExpression(expression);
+
+    // SMULL Rn, Rn+1, Rn, Rn+1
+    Register rn = generalRegisters.get(4);
+    Register rm = generalRegisters.get(5);
+
+    // MOV R0, Rn
+    instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(0), new Operand2(rn)));
+
+    // MOV R1, Rn+1
+    instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(1), new Operand2(rm)));
+
+    // BL p_check_divide_by_zero
+    instructions.add(new Instruction(InstrType.BL, "p_check_divide_by_zero"));
+
+    // BL __aeabi_idiv
+    instructions.add(new Instruction(InstrType.BL, "__aeabi_idiv"));
+
+    // MOV Rn, R0
+    instructions.add(new Instruction(InstrType.MOV, rn, new Operand2(generalRegisters.get(0))));
 
     return instructions;
   }
