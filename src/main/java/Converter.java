@@ -86,10 +86,56 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
       case ARRAYELEM:
         List<Instruction> arrayInstructions = new ArrayList<>();
-        for (Expression arrayExp: expr.getArrayElem().getExpression()){
-          arrayInstructions.addAll(getInstructionFromExpression(arrayExp));
+        switch (currentST.getType(expr.getArrayElem().getIdent()).getArrayType().getType()) {
+          case INT:
+            arrayInstructions.add(new Instruction(InstrType.LDR, generalRegisters.get(0),
+                8L * expr.getArrayElem().getExpression().size()));
+            arrayInstructions.add(new Instruction(InstrType.BL, "malloc"));
+            for (Expression element: expr.getArrayElem().getExpression()){
+              arrayInstructions.addAll(visitIntLiterExp(element));
+            }
+            return arrayInstructions;
+          case BOOL:
+            arrayInstructions.add(new Instruction(InstrType.LDR, generalRegisters.get(0),
+                expr.getArrayElem().getExpression().size()));
+            arrayInstructions.add(new Instruction(InstrType.BL, "malloc"));
+            for (Expression element: expr.getArrayElem().getExpression()){
+              arrayInstructions.addAll(visitBoolLiterExp(element));
+            }
+            return arrayInstructions;
+          case CHAR:
+            arrayInstructions.add(new Instruction(InstrType.LDR, generalRegisters.get(0),
+                expr.getArrayElem().getExpression().size()));
+            arrayInstructions.add(new Instruction(InstrType.BL, "malloc"));
+            for (Expression element: expr.getArrayElem().getExpression()){
+              arrayInstructions.addAll(visitCharLiterExp(element));
+            }
+            return arrayInstructions;
+          case STRING:
+            long charCount = 0;
+            for (Expression element: expr.getArrayElem().getExpression()){
+              charCount += element.getStringLiter().length();
+            }
+            arrayInstructions.add(new Instruction(InstrType.LDR, generalRegisters.get(0), charCount));
+            arrayInstructions.add(new Instruction(InstrType.BL, "malloc"));
+            for (Expression element: expr.getArrayElem().getExpression()){
+              arrayInstructions.addAll(visitStringLiterExp(element));
+            }
+            return arrayInstructions;
+          case PAIR:
+            arrayInstructions.add(new Instruction(InstrType.LDR, generalRegisters.get(0), 8));
+            arrayInstructions.add(new Instruction(InstrType.BL, "malloc"));
+            for (Expression element: expr.getArrayElem().getExpression()){
+              arrayInstructions.addAll(visitIntLiterExp(element));
+            }
+            return arrayInstructions;
+          case ARRAY:
+            // List<Instruction> arrayInstructions = new ArrayList<>();
+            for (Expression arrayExp : expr.getArrayElem().getExpression()) {
+              arrayInstructions.addAll(getInstructionFromExpression(arrayExp));
+            }
+            return arrayInstructions;
         }
-        return arrayInstructions;
 
       case BRACKETS:
         return getInstructionFromExpression(expr.getExpression1());
