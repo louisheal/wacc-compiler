@@ -73,6 +73,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
             return visitStringLiterExp(expr);
           case PAIR:
             List<Instruction> pairInstructions = new ArrayList<>();
+            //TODO find out a way to actually put correct byte size in register 0 rather than 8
+            pairInstructions.add(new Instruction(InstrType.LDR, generalRegisters.get(0),
+                8));
+            pairInstructions.add(new Instruction(InstrType.BL, "malloc"));
             pairInstructions.addAll(getInstructionFromExpression(expr.getExpression1()));
             pairInstructions.addAll(getInstructionFromExpression(expr.getExpression2()));
             return pairInstructions;
