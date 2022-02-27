@@ -4,5 +4,6 @@ public enum Flags {
   Z,
   C,
   S,
-  V
+  V,
+  VS
 }

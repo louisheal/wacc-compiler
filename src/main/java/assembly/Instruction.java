@@ -9,6 +9,7 @@ public class Instruction {
   long immValue;
   Register operand1;
   Operand2 operand2;
+  String flag = "";
   String label;
 
   //TODO: OPTIMIZE USE OF FIELDS
@@ -25,6 +26,16 @@ public class Instruction {
     this.dest = dest;
     this.operand1 = operand1;
     this.operand2 = operand2;
+  }
+
+  //ADD{S}{cond} dest, operand1, operand2
+  //SUB{S}{cond} dest, operand1, operand2
+  public Instruction(InstrType type, Register dest, Register operand1, Operand2 operand2, Flags flag) {
+    this.type = type;
+    this.dest = dest;
+    this.operand1 = operand1;
+    this.operand2 = operand2;
+    this.flag = flag.toString();
   }
 
   //SMULL{S}{cond} RdLo, RdHi, Rn, Rm
@@ -90,7 +101,7 @@ public class Instruction {
 
     //ADD, SUB, EOR, RSBS instruction format
     if (type == InstrType.ADD || type == InstrType.SUB || type == InstrType.EOR || type == InstrType.RSBS) {
-      return type + " " + dest + ", " + operand1 + ", " + operand2;
+      return type + flag + " " + dest + ", " + operand1 + ", " + operand2;
     }
 
     if (type == InstrType.SMULL) {

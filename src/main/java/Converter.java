@@ -1,3 +1,4 @@
+import assembly.Flags;
 import assembly.Instruction;
 import assembly.Instruction.InstrType;
 import assembly.Operand2;
@@ -434,11 +435,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     Register rn = generalRegisters.get(4);
     Register rm = generalRegisters.get(5);
 
-    //TODO: Add {S} condition code
     //ADDS Rn, Rn, Rn+1
-    instructions.add(new Instruction(InstrType.ADD, rn, rn, new Operand2(rm)));
+    instructions.add(new Instruction(InstrType.ADD, rn, rn, new Operand2(rm), Flags.S));
 
-    //TODO: Add VS condition code
     //BLVS p_throw_overflow_error
     instructions.add(new Instruction(InstrType.BL, "p_throw_overflow_error"));
 
@@ -453,9 +452,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     Register rn = generalRegisters.get(4);
     Register rm = generalRegisters.get(5);
 
-    //TODO: Add {S} condition code
     //SUBS Rn, Rn, Rn+1
-    instructions.add(new Instruction(InstrType.SUB, rn, rn, new Operand2(rm)));
+    instructions.add(new Instruction(InstrType.SUB, rn, rn, new Operand2(rm), Flags.S));
 
     //TODO: Add VS condition code
     //BLVS p_throw_overflow_error
