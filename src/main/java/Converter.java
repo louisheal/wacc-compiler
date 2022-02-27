@@ -308,9 +308,24 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   }
 
   @Override
+  public List<Instruction> visitNotExp(Expression expression) {
+    List<Instruction> instructions = translateUnaryExpression(expression);
+
+    //TODO: possibly wrong register
+    Register dest = generalRegisters.get(4);
+
+    //TODO: not might not be a function in the language
+    //NOT dest
+    instructions.add(new Instruction(InstrType.NOT, dest));
+
+    return instructions;
+  }
+
+  @Override
   public List<Instruction> visitNegExp(Expression expression) {
     List<Instruction> instructions = translateUnaryExpression(expression);
 
+    //TODO: possibly wrong register
     Register dest = generalRegisters.get(4);
 
     //NEG dest
@@ -323,6 +338,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   public List<Instruction> visitLenExp(Expression expression) {
     List<Instruction> instructions = translateUnaryExpression(expression);
 
+    //TODO: possibly wrong register
     Register dest = generalRegisters.get(4);
 
     //LEN dest
@@ -335,6 +351,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   public List<Instruction> visitOrdExp(Expression expression) {
     List<Instruction> instructions = translateUnaryExpression(expression);
 
+    //TODO: possibly wrong register
     Register dest = generalRegisters.get(4);
 
     //ORD dest
@@ -347,6 +364,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   public List<Instruction> visitChrExp(Expression expression) {
     List<Instruction> instructions = translateUnaryExpression(expression);
 
+    //TODO: possibly wrong register
     Register dest = generalRegisters.get(4);
 
     //CHR dest
