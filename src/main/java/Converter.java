@@ -147,7 +147,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
             long arrayMallocSize = 0;
 
             for (Expression element : expr.getArrayElem().getExpression()) {
-              pairMallocSize += calculateMallocSize(element,
+              arrayMallocSize += calculateMallocSize(element,
                   currentST.getType(expr.getArrayElem().getIdent()));
             }
 
