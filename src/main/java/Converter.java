@@ -19,8 +19,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   //TODO: ONLY USE FOLLOWING REGISTERS FOR EVALUATION: 4,5,6,7,8,9,10,11
   List<Register> generalRegisters = initialiseGeneralRegisters();
-  private int sp = 0;
+  private Register sp = new Register(13);
   private Register pc = new Register(15);
+  private int spLocation = 0;
   SymbolTable currentST;
 
   private List<Instruction> getInstructionFromExpression(Expression expr) {
@@ -270,7 +271,13 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitIdentExp(Expression expression) {
-    return getInstructionFromExpression(expression);
+    String expressionIdent = expression.getIdent();
+    int storedSPLocation = currentST.getSPMapping(expressionIdent);
+    List<Instruction> instructions = new ArrayList<>();
+    spLocation = spLocation - (int) calculateMallocSize(expression,
+        currentST.getType(expression.getIdent()));
+
+    return null;
   }
 
   @Override
