@@ -331,6 +331,18 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
+  @Override
+  public List<Instruction> visitOrdExp(Expression expression) {
+    List<Instruction> instructions = translateUnaryExpression(expression);
+
+    Register dest = generalRegisters.get(4);
+
+    //NEG dest
+    instructions.add(new Instruction(InstrType.ORD, dest));
+
+    return instructions;
+  }
+
   private List<Instruction> translateBinaryExpression(Expression expression) {
     List<Instruction> instructions = new ArrayList<>();
 

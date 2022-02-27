@@ -88,7 +88,7 @@ public class Instruction {
     }
 
     //NEG instruction format
-    if (type == InstrType.NEG || type == InstrType.LEN) {
+    if (type == InstrType.NEG || type == InstrType.LEN || type == InstrType.ORD) {
       return type + " " + dest;
     }
 
@@ -130,6 +130,7 @@ public class Instruction {
     PUSH, POP,
     MOV, CMP,
     NEG, LEN,
+    ORD,
     ADD, SUB,
     SMULL,
     LDR, STR,
