@@ -262,6 +262,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitProgram(Program program) {
+    spLocation = totalBytesInScope(program.getStatement());
     List<Instruction> instructions = new ArrayList<>();
 
     //TODO: ADD CONSTRUCTOR FOR DIRECTIVES
@@ -292,6 +293,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   //TODO: ADD FUNCTION PARAMETERS TO SYMBOL TABLE
   @Override
   public List<Instruction> visitFunction(Function function) {
+    spLocation = totalBytesInScope(function.getStatement());
     return visitStatement(function.getStatement());
   }
 
