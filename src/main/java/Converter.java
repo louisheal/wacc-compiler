@@ -164,14 +164,100 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   }
 
-
-
   private List<Register> initialiseGeneralRegisters(){
     List<Register> regs = new ArrayList<>();
     for(int i = 0; i != 13; i++){
       regs.add(new Register(i));
     }
     return regs;
+  }
+
+  private int sizeOfTypeOnStack(Type type) {
+    switch (type.getType()) {
+      case INT:
+      case PAIR:
+      case ARRAY:
+      case STRING:
+        return 4;
+      case CHAR:
+      case BOOL:
+        return 1;
+    }
+    return 0;
+  }
+
+  private int totalBytesInScope(Statement statement) {
+
+    //TODO: MAKE A SWITCH STATEMENT?
+
+    if (statement.getStatType() == Statement.StatType.DECLARATION) {
+      return sizeOfTypeOnStack(statement.getLhsType());
+    }
+
+    if (statement.getStatType() == Statement.StatType.CONCAT) {
+      return totalBytesInScope(statement.getStatement1()) + totalBytesInScope(statement.getStatement2());
+    }
+
+    if (statement.getStatType() == Statement.StatType.WHILE) {
+      return totalBytesInScope(statement) + maxBeginStatement(statement);
+    }
+
+    if (statement.getStatType() == Statement.StatType.IF) {
+      int stat1Size = totalBytesInScope(statement.getStatement1());
+      int stat2Size = totalBytesInScope(statement.getStatement2());
+      if (stat1Size > stat2Size) {
+        return stat1Size;
+      }
+      return stat2Size;
+    }
+
+    return -1;
+
+  }
+
+  private int totalBytesInProgram(Program program) {
+    return totalBytesInScope(program.getStatement()) + maxBeginStatement(program.getStatement());
+  }
+
+  private int totalBytesInFunction(Function function) {
+    return totalBytesInScope(function.getStatement()) + maxBeginStatement(function.getStatement());
+  }
+
+  private int maxBeginStatement(Statement statement) {
+
+    List<Statement> beginStatements = getBeginStatements(statement);
+
+    int size = 0;
+    for (Statement s : beginStatements) {
+      int sSize = totalBytesInScope(s);
+      if (sSize > size) {
+        size = sSize;
+      }
+    }
+
+    return size;
+  }
+
+  private List<Statement> getBeginStatements(Statement statement) {
+
+    List<Statement> beginStatements = new ArrayList<>();
+
+    if (statement.getStatType() == Statement.StatType.BEGIN) {
+      beginStatements.add(statement);
+    }
+
+    while (statement.getStatType() == Statement.StatType.CONCAT) {
+      if (statement.getStatement1().getStatType() == Statement.StatType.BEGIN) {
+        beginStatements.add(statement.getStatement1());
+      }
+      statement = statement.getStatement2();
+    }
+
+    if (statement.getStatType() == Statement.StatType.BEGIN) {
+      beginStatements.add(statement);
+    }
+
+    return beginStatements;
   }
 
   @Override
@@ -263,10 +349,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   public List<Instruction> visitIdentExp(Expression expression) {
     String expressionIdent = expression.getIdent();
     int storedSPLocation = currentST.getSPMapping(expressionIdent);
-    spLocation = spLocation - (int) calculateMallocSize(expression,
-        currentST.getType(expression.getIdent()));
+    spLocation = spLocation - sizeOfTypeOnStack(currentST.getType(expression.getIdent()));
 
-    return new new ArrayList<>(List.of(InstrType.STR, generalRegisters.get(1), new Operand2(sp)));
+    return new ArrayList<>(List.of(new Instruction(InstrType.STR, generalRegisters.get(1), new Operand2(sp))));
   }
 
   @Override
