@@ -438,8 +438,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     //ADDS Rn, Rn, Rn+1
     instructions.add(new Instruction(InstrType.ADD, rn, rn, new Operand2(rm), Flags.S));
 
-    //BLVS p_throw_overflow_error
-    instructions.add(new Instruction(InstrType.BL, "p_throw_overflow_error"));
+    instructions.add(new Instruction(InstrType.BL, "p_throw_overflow_error", Flags.VS));
 
     return instructions;
   }
@@ -455,9 +454,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     //SUBS Rn, Rn, Rn+1
     instructions.add(new Instruction(InstrType.SUB, rn, rn, new Operand2(rm), Flags.S));
 
-    //TODO: Add VS condition code
     //BLVS p_throw_overflow_error
-    instructions.add(new Instruction(InstrType.BL, "p_throw_overflow_error"));
+    instructions.add(new Instruction(InstrType.BL, "p_throw_overflow_error", Flags.VS));
 
     return instructions;
   }

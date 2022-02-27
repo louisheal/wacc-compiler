@@ -79,6 +79,13 @@ public class Instruction {
     this.label = label;
   }
 
+  //BL{VS} label
+  public Instruction(InstrType type, String label, Flags flag) {
+    this.type = type;
+    this.label = label;
+    this.flag = flag.toString();
+  }
+
   //PUSH {dest}
   //POP {dest}
   public Instruction(InstrType type, Register dest) {
