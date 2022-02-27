@@ -9,6 +9,7 @@ public class Instruction {
   long immValue;
   Register operand1;
   Operand2 operand2;
+  //TODO: possibly change flag field into 'extra info' as not always used as a 'Flag'
   String flag = "";
   String label;
 
@@ -80,10 +81,10 @@ public class Instruction {
   }
 
   //BL{VS} label
-  public Instruction(InstrType type, String label, Flags flag) {
+  public Instruction(InstrType type, String label, Conditionals conditionals) {
     this.type = type;
     this.label = label;
-    this.flag = flag.toString();
+    this.flag = conditionals.toString();
   }
 
   //PUSH {dest}
@@ -103,7 +104,7 @@ public class Instruction {
 
     //BL, BLVS instruction format
     if (type == InstrType.BL || type == InstrType.BLVS) {
-      return type + " " + label;
+      return type + flag + " " + label;
     }
 
     //ADD, SUB, EOR, RSBS instruction format

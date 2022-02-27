@@ -1,9 +1,9 @@
 package assembly;
 
 public enum Flags {
+  N,
   Z,
-  C,
-  S,
   V,
-  VS
+  C,
+  S // Optional Suffix
 }

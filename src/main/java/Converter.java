@@ -1,3 +1,4 @@
+import assembly.Conditionals;
 import assembly.Flags;
 import assembly.Instruction;
 import assembly.Instruction.InstrType;
@@ -438,7 +439,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     //ADDS Rn, Rn, Rn+1
     instructions.add(new Instruction(InstrType.ADD, rn, rn, new Operand2(rm), Flags.S));
 
-    instructions.add(new Instruction(InstrType.BL, "p_throw_overflow_error", Flags.VS));
+    //BLVS p_throw_overflow_error
+    instructions.add(new Instruction(InstrType.BL, "p_throw_overflow_error", Conditionals.VS));
 
     return instructions;
   }
@@ -454,8 +456,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     //SUBS Rn, Rn, Rn+1
     instructions.add(new Instruction(InstrType.SUB, rn, rn, new Operand2(rm), Flags.S));
 
+    //TODO: Add VS condition code
     //BLVS p_throw_overflow_error
-    instructions.add(new Instruction(InstrType.BL, "p_throw_overflow_error", Flags.VS));
+    instructions.add(new Instruction(InstrType.BL, "p_throw_overflow_error", Conditionals.VS));
 
     return instructions;
   }
@@ -475,7 +478,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     // BLNE p_throw_overflow_error
     //TODO: Add NE condition code
-    instructions.add(new Instruction(InstrType.BL, "p_throw_overflow_error"));
+    instructions.add(new Instruction(InstrType.BL, "p_throw_overflow_error", Conditionals.NE));
 
     return instructions;
   }

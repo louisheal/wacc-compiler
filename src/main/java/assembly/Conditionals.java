@@ -7,4 +7,5 @@ public enum Conditionals {
   LT, // Less than
   GE, // Greater than or equal to
   GT, // Greater than
+  VS
 }
