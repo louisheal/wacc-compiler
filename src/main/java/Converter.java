@@ -300,24 +300,18 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   }
 
   private List<Instruction> translateUnaryExpression(Expression expression) {
-    List<Instruction> instructions = new ArrayList<>();
-
     /* Generate assembly instructions for the expression. */
-    instructions.addAll(visitExpression(expression.getExpression1())); //Store result in Rn
-
-    return instructions;
+    return new ArrayList<>(visitExpression(expression.getExpression1()));
   }
 
   @Override
   public List<Instruction> visitNotExp(Expression expression) {
     List<Instruction> instructions = translateUnaryExpression(expression);
 
-    //TODO: possibly wrong register
     Register dest = generalRegisters.get(4);
 
-    //TODO: not might not be a function in the language
-    //NOT dest
-    instructions.add(new Instruction(InstrType.NOT, dest));
+    //EOR r4, r4, #1
+    instructions.add(new Instruction(InstrType.EOR, dest, dest, new Operand2(1)));
 
     return instructions;
   }
