@@ -350,28 +350,14 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitOrdExp(Expression expression) {
-    List<Instruction> instructions = translateUnaryExpression(expression);
-
-    //TODO: possibly wrong register
-    Register dest = generalRegisters.get(4);
-
-    //ORD dest
-    instructions.add(new Instruction(InstrType.ORD, dest));
-
-    return instructions;
+    //MOV r4, expr
+    return translateUnaryExpression(expression);
   }
 
   @Override
   public List<Instruction> visitChrExp(Expression expression) {
-    List<Instruction> instructions = translateUnaryExpression(expression);
-
-    //TODO: possibly wrong register
-    Register dest = generalRegisters.get(4);
-
-    //CHR dest
-    instructions.add(new Instruction(InstrType.CHR, dest));
-
-    return instructions;
+    //MOV r4, expr
+    return translateUnaryExpression(expression);
   }
 
   private List<Instruction> translateBinaryExpression(Expression expression) {

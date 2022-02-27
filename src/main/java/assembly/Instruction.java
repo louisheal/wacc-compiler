@@ -88,8 +88,7 @@ public class Instruction {
     }
 
     //NOT, NEG, LEN, ORD, CHR instruction format
-    if (type == InstrType.NOT || type == InstrType.NEG || type == InstrType.LEN
-            || type == InstrType.ORD || type == InstrType.CHR) {
+    if (type == InstrType.NOT || type == InstrType.NEG || type == InstrType.LEN) {
       return type + " " + dest;
     }
 
