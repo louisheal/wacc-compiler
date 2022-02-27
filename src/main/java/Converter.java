@@ -263,13 +263,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   public List<Instruction> visitIdentExp(Expression expression) {
     String expressionIdent = expression.getIdent();
     int storedSPLocation = currentST.getSPMapping(expressionIdent);
-    List<Instruction> instructions = new ArrayList<>();
     spLocation = spLocation - (int) calculateMallocSize(expression,
         currentST.getType(expression.getIdent()));
 
-    instructions.add(new Instruction(InstrType.LDR, generalRegisters.get(1), new Operand2(sp)));
-
-    return instructions;
+    return new new ArrayList<>(List.of(InstrType.STR, generalRegisters.get(1), new Operand2(sp)));
   }
 
   @Override
