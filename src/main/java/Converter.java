@@ -325,7 +325,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     Register dest = generalRegisters.get(4);
 
-    //NEG dest
+    //LEN dest
     instructions.add(new Instruction(InstrType.LEN, dest));
 
     return instructions;
@@ -337,8 +337,20 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     Register dest = generalRegisters.get(4);
 
-    //NEG dest
+    //ORD dest
     instructions.add(new Instruction(InstrType.ORD, dest));
+
+    return instructions;
+  }
+
+  @Override
+  public List<Instruction> visitChrExp(Expression expression) {
+    List<Instruction> instructions = translateUnaryExpression(expression);
+
+    Register dest = generalRegisters.get(4);
+
+    //CHR dest
+    instructions.add(new Instruction(InstrType.CHR, dest));
 
     return instructions;
   }
