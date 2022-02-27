@@ -88,11 +88,6 @@ public class Instruction {
       return type + " " + label;
     }
 
-    //LEN instruction format
-    if (type == InstrType.LEN) {
-      return type + " " + dest;
-    }
-
     //ADD, SUB, EOR, RSBS instruction format
     if (type == InstrType.ADD || type == InstrType.SUB || type == InstrType.EOR || type == InstrType.RSBS) {
       return type + " " + dest + ", " + operand1 + ", " + operand2;
@@ -131,7 +126,6 @@ public class Instruction {
     PUSH, POP,
     MOV, CMP,
     EOR, RSBS,
-    LEN,
     ADD, SUB,
     SMULL,
     LDR, STR,

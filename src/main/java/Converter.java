@@ -397,15 +397,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitLenExp(Expression expression) {
-    List<Instruction> instructions = translateUnaryExpression(expression);
-
-    //TODO: possibly wrong register
-    Register dest = generalRegisters.get(4);
-
-    //LEN dest
-    instructions.add(new Instruction(InstrType.LEN, dest));
-
-    return instructions;
+    //LDR r4, [r4]
+    return translateUnaryExpression(expression);
   }
 
   @Override
