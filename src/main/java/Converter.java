@@ -150,18 +150,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   private long calculateMallocSize(Expression exp, Type type){
     switch(type.getType()){
 
-      case BOOL:
-      case CHAR:
-        return 1;
-
-      case INT:
-      case STRING:
-        return 4;
-
-
       case PAIR:
-        return calculateMallocSize(exp, type.getFstType()) + calculateMallocSize(exp,
-            type.getSndType());
+        return 8;
 
       case ARRAY:
         long size = 0;
@@ -170,7 +160,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
         }
         return size;
     }
-    return 0;
+    return sizeOfTypeOnStack(type);
 
   }
 
@@ -277,7 +267,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     spLocation = spLocation - (int) calculateMallocSize(expression,
         currentST.getType(expression.getIdent()));
 
-    return null;
+    instructions.add(new Instruction(InstrType.LDR, generalRegisters.get(1), new Operand2(sp)));
+
+    return instructions;
   }
 
   @Override
