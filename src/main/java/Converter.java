@@ -380,11 +380,15 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   public List<Instruction> visitNegExp(Expression expression) {
     List<Instruction> instructions = translateUnaryExpression(expression);
 
-    //TODO: possibly wrong register
     Register dest = generalRegisters.get(4);
 
-    //NEG dest
-    instructions.add(new Instruction(InstrType.NEG, dest));
+    //TODO: could rely on S condition code as in visitPlusExp
+    //RSBS r4, r4, #0
+    instructions.add(new Instruction(InstrType.RSBS, dest, dest, new Operand2(0)));
+
+    //TODO: could rely on VS condition code as in visitPlusExp
+    //BLVS p_throw_overflow_error
+    instructions.add(new Instruction(InstrType.BLVS, "p_throw_overflow_error"));
 
     return instructions;
   }

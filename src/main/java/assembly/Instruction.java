@@ -83,17 +83,18 @@ public class Instruction {
       return type + " {" + dest + "}";
     }
 
-    if (type == InstrType.BL) {
+    //BL, BLVS instruction format
+    if (type == InstrType.BL || type == InstrType.BLVS) {
       return type + " " + label;
     }
 
-    //NEG, LEN instruction format
-    if (type == InstrType.NEG || type == InstrType.LEN) {
+    //LEN instruction format
+    if (type == InstrType.LEN) {
       return type + " " + dest;
     }
 
-    //ADD, SUB, EOR instruction format
-    if (type == InstrType.ADD || type == InstrType.SUB || type == InstrType.EOR) {
+    //ADD, SUB, EOR, RSBS instruction format
+    if (type == InstrType.ADD || type == InstrType.SUB || type == InstrType.EOR || type == InstrType.RSBS) {
       return type + " " + dest + ", " + operand1 + ", " + operand2;
     }
 
@@ -129,12 +130,12 @@ public class Instruction {
   public enum InstrType {
     PUSH, POP,
     MOV, CMP,
-    EOR,
-    NEG, LEN,
+    EOR, RSBS,
+    LEN,
     ADD, SUB,
     SMULL,
     LDR, STR,
-    BL,
+    BL, BLVS,
     TEXT{
       public String toString() {
         return ".text";
