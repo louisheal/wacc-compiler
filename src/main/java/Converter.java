@@ -298,7 +298,14 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return getInstructionFromExpression(expression);
   }
 
+  private List<Instruction> translateUnaryExpression(Expression expression) {
+    List<Instruction> instructions = new ArrayList<>();
 
+    /* Generate assembly instructions for the expression. */
+    instructions.addAll(visitExpression(expression.getExpression1())); //Store result in Rn
+
+    return instructions;
+  }
 
   private List<Instruction> translateBinaryExpression(Expression expression) {
     List<Instruction> instructions = new ArrayList<>();

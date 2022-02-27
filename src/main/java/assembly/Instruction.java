@@ -87,6 +87,11 @@ public class Instruction {
       return type + " " + label;
     }
 
+    //NEG instruction format
+    if (type == InstrType.NEG) {
+      return type + " " + dest;
+    }
+
     //ADD, SUB instruction format
     if (type == InstrType.ADD || type == InstrType.SUB) {
       return type + " " + dest + ", " + operand1 + ", " + operand2;
@@ -124,6 +129,7 @@ public class Instruction {
   public enum InstrType {
     PUSH, POP,
     MOV, CMP,
+    NEG,
     ADD, SUB,
     SMULL,
     LDR, STR,
