@@ -7,7 +7,7 @@ public class SymbolTable {
 
   private final SymbolTable parent;
   private final Map<String, Type> variables = new HashMap<>();
-
+  private final Map<String, Integer> variableSPMapping = new HashMap<>();
 
   public SymbolTable(SymbolTable parent) {
     this.parent = parent;
@@ -19,6 +19,14 @@ public class SymbolTable {
 
   public boolean contains(String ident) {
     return variables.containsKey(ident);
+  }
+
+  public Integer getSPMapping (String ident) {
+    return variableSPMapping.get(ident);
+  }
+
+  public void setSPMapping (String ident, Integer absoluteSP) {
+    variableSPMapping.put(ident, absoluteSP);
   }
 
   public Type getType(String ident) {
