@@ -19,7 +19,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   //TODO: ONLY USE FOLLOWING REGISTERS FOR EVALUATION: 4,5,6,7,8,9,10,11
   List<Register> generalRegisters = initialiseGeneralRegisters();
-  private Register sp = new Register(13);
+  private int sp = 0;
   private Register pc = new Register(15);
   SymbolTable currentST;
 
@@ -32,30 +32,12 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     switch (expr.getExprType()) {
 
       case INTLITER:
-      case NEG:
-      case ORD:
-      case LEN:
-      case DIVIDE:
-      case MULTIPLY:
-      case MODULO:
-      case PLUS:
-      case MINUS:
         return visitIntLiterExp(expr);
 
       case BOOLLITER:
-      case NOT:
-      case GT:
-      case GTE:
-      case LT:
-      case LTE:
-      case EQ:
-      case NEQ:
-      case AND:
-      case OR:
         return visitBoolLiterExp(expr);
 
       case CHARLITER:
-      case CHR:
         return visitCharLiterExp(expr);
 
       case STRINGLITER:
@@ -129,6 +111,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
             }
             return arrayInstructions;
           case PAIR:
+            // TODO Ask about how the size of malloc works for pair
             long pairMallocSize = 0;
 
             for (Expression element : expr.getArrayElem().getExpression()) {
@@ -144,7 +127,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
             }
             return arrayInstructions;
           case ARRAY:
-            long arrayMallocSize = 0;
+            long arrayMallocSize = 4;
 
             for (Expression element : expr.getArrayElem().getExpression()) {
               arrayMallocSize += calculateMallocSize(element,
@@ -159,22 +142,18 @@ public class Converter extends ASTVisitor<List<Instruction>> {
             return arrayInstructions;
         }
 
-      case BRACKETS:
-        return getInstructionFromExpression(expr.getExpression1());
-
     }
     return null;
   }
 
   private long calculateMallocSize(Expression exp, Type type){
     switch(type.getType()){
-      case INT:
-        return 8;
 
       case BOOL:
       case CHAR:
         return 1;
 
+      case INT:
       case STRING:
         return 4;
 
