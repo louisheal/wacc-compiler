@@ -19,8 +19,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   //TODO: ONLY USE FOLLOWING REGISTERS FOR EVALUATION: 4,5,6,7,8,9,10,11
   List<Register> generalRegisters = initialiseGeneralRegisters();
-  private int sp = 0;
+  private Register sp = new Register(13);
   private Register pc = new Register(15);
+  private int spLocation = 0;
   SymbolTable currentST;
 
   private List<Instruction> getInstructionFromExpression(Expression expr) {
@@ -149,18 +150,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   private long calculateMallocSize(Expression exp, Type type){
     switch(type.getType()){
 
-      case BOOL:
-      case CHAR:
-        return 1;
-
-      case INT:
-      case STRING:
-        return 4;
-
-
       case PAIR:
-        return calculateMallocSize(exp, type.getFstType()) + calculateMallocSize(exp,
-            type.getSndType());
+        return 8;
 
       case ARRAY:
         long size = 0;
@@ -169,7 +160,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
         }
         return size;
     }
-    return 0;
+    return sizeOfTypeOnStack(type);
 
   }
 
@@ -270,7 +261,12 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitIdentExp(Expression expression) {
-    return getInstructionFromExpression(expression);
+    String expressionIdent = expression.getIdent();
+    int storedSPLocation = currentST.getSPMapping(expressionIdent);
+    spLocation = spLocation - (int) calculateMallocSize(expression,
+        currentST.getType(expression.getIdent()));
+
+    return new new ArrayList<>(List.of(InstrType.STR, generalRegisters.get(1), new Operand2(sp)));
   }
 
   @Override
