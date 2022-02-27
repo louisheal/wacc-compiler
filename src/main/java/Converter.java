@@ -173,10 +173,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
       case BOOL:
       case CHAR:
+      case STRING:
         return 1;
 
-      case STRING:
-        return exp.getStringLiter().length();
 
       case PAIR:
         return calculateMallocSize(exp, type.getFstType()) + calculateMallocSize(exp,
