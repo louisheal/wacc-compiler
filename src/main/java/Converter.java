@@ -504,8 +504,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
     List<Instruction> instructions = translateBinaryExpression(expression);
 
-    Register rn = unusedRegisters.get(4);
-    Register rm = unusedRegisters.get(5);
+    /* Allocate two registers: rn and rm (rn+1) for this function to use. */
+    Register rn = popUnusedRegister();
+    Register rm = popUnusedRegister();
 
     //SUBS Rn, Rn, Rn+1
     instructions.add(new Instruction(InstrType.SUB, rn, rn, new Operand2(rm), Flags.S));
@@ -513,6 +514,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     //TODO: Add VS condition code
     //BLVS p_throw_overflow_error
     instructions.add(new Instruction(InstrType.BL, "p_throw_overflow_error", Conditionals.VS));
+
+    /* Mark the two registers used in the evaluation of this function as no longer in use. */
+    pushUnusedRegister(rm);
+    pushUnusedRegister(rn);
 
     return instructions;
   }
