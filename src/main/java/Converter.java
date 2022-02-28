@@ -10,14 +10,9 @@ import ast.Program;
 import ast.Statement;
 
 import ast.Type;
-import ast.Type.EType;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Converter extends ASTVisitor<List<Instruction>> {
-
-  List<Instruction> instructions = new ArrayList<>();
 
   //TODO: ONLY USE FOLLOWING REGISTERS FOR EVALUATION: 4,5,6,7,8,9,10,11
   List<Register> generalRegisters = initialiseGeneralRegisters();
@@ -207,10 +202,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     if (statement.getStatType() == Statement.StatType.IF) {
       int stat1Size = totalBytesInScope(statement.getStatement1());
       int stat2Size = totalBytesInScope(statement.getStatement2());
-      if (stat1Size > stat2Size) {
-        return stat1Size;
-      }
-      return stat2Size;
+      return Math.max(stat1Size, stat2Size);
     }
 
     return -1;
