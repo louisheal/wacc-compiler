@@ -28,6 +28,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   private int spLocation = 0;
   SymbolTable currentST;
   private boolean isDiv = false;
+  private boolean isCalc = false;
+  private boolean runtimeErr = false;
 
   private List<Instruction> getInstructionFromExpression(Expression expr) {
 
@@ -280,19 +282,32 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return beginStatements;
   }
 
-  public List<Instruction> checkDivideByZero(List<Instruction> instructions) {
-    //TODO: variable message number
-    instructions.add(1, new Instruction(InstrType.DATA, "msg_0"));
-    instructions.add(2, new Instruction(InstrType.WORD, 45));
-    instructions.add(3, new Instruction(InstrType.ASCII, "DivideByZeroError: divide or modulo by zero\n\0"));
+  public List<Instruction> throwOverflowError(List<Instruction> instructions, int msgNumber) {
+    instructions.add(1 + msgNumber * 3, new Instruction(InstrType.MSG, msgNumber));
+    instructions.add(2 + msgNumber * 3, new Instruction(InstrType.WORD, 83));
+    instructions.add(3 + msgNumber * 3, new Instruction(InstrType.ASCII, "OverflowError: the result is too " +
+            "small/large to store in a 4-byte signed-integer.\n\0"));
+    //TODO: Register Allocation
+    instructions.add(new Instruction(InstrType.LABEL, "p_throw_overflow_error:"));
+    instructions.add(new Instruction(InstrType.LDR, r0, "msg_" + msgNumber));
+    instructions.add(new Instruction(InstrType.BL, "p_throw_runtime_error"));
+    runtimeErr = true;
+    return instructions;
+  }
+
+  public List<Instruction> checkDivideByZero(List<Instruction> instructions, int msgNumber) {
+    instructions.add(1 + msgNumber * 3, new Instruction(InstrType.MSG, msgNumber));
+    instructions.add(2 + msgNumber * 3, new Instruction(InstrType.WORD, 45));
+    instructions.add(3 + msgNumber * 3, new Instruction(InstrType.ASCII, "DivideByZeroError: divide or modulo by zero\n\0"));
     //TODO: Register Allocation
     instructions.add(new Instruction(InstrType.LABEL, "p_check_divide_by_zero:"));
     //TODO: ADD LR
     instructions.add(new Instruction(InstrType.LABEL, "PUSH {lr}"));
     instructions.add(new Instruction(InstrType.CMP, r1, 0));
-    instructions.add(new Instruction(InstrType.LDR, r0, "msg_0", Conditionals.EQ));
+    instructions.add(new Instruction(InstrType.LDR, r0, "msg_" + msgNumber, Conditionals.EQ));
     instructions.add(new Instruction(InstrType.BL, "p_throw_runtime_error", Conditionals.EQ));
     instructions.add(new Instruction(InstrType.LABEL, "POP {pc}"));
+    runtimeErr = true;
     return instructions;
   }
 
@@ -344,8 +359,25 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(InstrType.LABEL, "POP {pc}"));
     instructions.add(new Instruction(InstrType.LTORG, ""));
 
+    //number of messages
+    int msgNumber = 0;
+
+    if(isCalc) {
+      instructions = throwOverflowError(instructions, msgNumber);
+      msgNumber++;
+    }
+
     if(isDiv) {
-      instructions = checkDivideByZero(instructions);
+      instructions = checkDivideByZero(instructions, msgNumber);
+      msgNumber++;
+    }
+
+    //TODO: Note: runtimeErr must come last
+    if(runtimeErr) {
+      instructions.add(new Instruction(InstrType.LABEL, "p_throw_runtime_error:"));
+      instructions.add(new Instruction(InstrType.BL, "p_print_string"));
+      instructions.add(new Instruction(InstrType.MOV, r0, -1));
+      instructions.add(new Instruction(InstrType.BL, "exit"));
     }
 
     return instructions;
