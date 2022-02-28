@@ -321,7 +321,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       //TODO: SUB sp, sp, #spLocation
     }
 
-    instructions.add(new Instruction(InstrType.LDR, unusedRegisters.get(0), 0));
+    instructions.add(new Instruction(InstrType.LDR, r0, 0));
     instructions.add(new Instruction(InstrType.LABEL, "POP {pc}"));
     instructions.add(new Instruction(InstrType.LTORG, ""));
 
