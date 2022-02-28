@@ -10,14 +10,9 @@ import ast.Program;
 import ast.Statement;
 
 import ast.Type;
-import ast.Type.EType;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Converter extends ASTVisitor<List<Instruction>> {
-
-  List<Instruction> instructions = new ArrayList<>();
 
   //TODO: ONLY USE FOLLOWING REGISTERS FOR EVALUATION: 4,5,6,7,8,9,10,11
   List<Register> generalRegisters = initialiseGeneralRegisters();
@@ -208,10 +203,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     if (statement.getStatType() == Statement.StatType.IF) {
       int stat1Size = totalBytesInScope(statement.getStatement1());
       int stat2Size = totalBytesInScope(statement.getStatement2());
-      if (stat1Size > stat2Size) {
-        return stat1Size;
-      }
-      return stat2Size;
+      return Math.max(stat1Size, stat2Size);
     }
 
     return -1;
@@ -268,11 +260,14 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     List<Instruction> instructions = new ArrayList<>();
 
     //TODO: ADD CONSTRUCTOR FOR DIRECTIVES
+    //TODO: Only include this instruction if needed
     instructions.add(new Instruction(InstrType.DATA, ""));
+    instructions.add(new Instruction(InstrType.LABEL, "")); // Leave gap in lines
 
     //TODO: ADD VARIABLE INSTRUCTIONS HERE
 
     instructions.add(new Instruction(InstrType.TEXT, ""));
+    instructions.add(new Instruction(InstrType.LABEL, "")); // Leave gap in lines
 
     instructions.add(new Instruction(InstrType.GLOBAL_MAIN, ""));
 
@@ -282,14 +277,28 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     }
 
     //TODO: ADD ENUM FOR LABEL
-    instructions.add(new Instruction(InstrType.DATA, "main"));
+    instructions.add(new Instruction(InstrType.LABEL, "main:"));
+
+    //TODO: ADD LR
+    instructions.add(new Instruction(InstrType.LABEL, "PUSH {lr}"));
 
     spLocation = totalBytesInProgram(program);
-    //TODO: SUB sp, sp, #spLocation
+    if (spLocation > 0) {
+      instructions.add(new Instruction(InstrType.LABEL, "SUB sp, sp, #" + spLocation));
+      //TODO: SUB sp, sp, #spLocation
+    }
 
     /* Generate the assembly instructions for the program body. */
     instructions.addAll(visitStatement(program.getStatement()));
 
+    spLocation = totalBytesInProgram(program);
+    if (spLocation > 0) {
+      instructions.add(new Instruction(InstrType.LABEL, "ADD sp, sp, #" + spLocation));
+      //TODO: SUB sp, sp, #spLocation
+    }
+
+    instructions.add(new Instruction(InstrType.LDR, generalRegisters.get(0), 0));
+    instructions.add(new Instruction(InstrType.LABEL, "POP {pc}"));
     instructions.add(new Instruction(InstrType.LTORG, ""));
 
     if(isDiv) {
@@ -422,18 +431,21 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
+  //TODO: Infinitely loops and never computes the length
   @Override
   public List<Instruction> visitLenExp(Expression expression) {
     //LDR r4, [r4]
     return translateUnaryExpression(expression);
   }
 
+  //TODO: Infinitely loops and never computes ord
   @Override
   public List<Instruction> visitOrdExp(Expression expression) {
     //MOV r4, expr
     return translateUnaryExpression(expression);
   }
 
+  //TODO: Infinitely loops and never computes chr
   @Override
   public List<Instruction> visitChrExp(Expression expression) {
     //MOV r4, expr

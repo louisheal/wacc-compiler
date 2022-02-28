@@ -153,6 +153,10 @@ public class Instruction {
       return type + " " + immValue;
     }
 
+    if (type == InstrType.LABEL) {
+      return label;
+    }
+
     return type.toString();
   }
 
@@ -193,7 +197,7 @@ public class Instruction {
       public String toString() {
         return ".ascii";
       }
-    }
+    },
+    LABEL
   }
-
 }
