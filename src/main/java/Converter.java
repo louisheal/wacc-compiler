@@ -21,8 +21,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   //TODO: ONLY USE FOLLOWING REGISTERS FOR EVALUATION: 4,5,6,7,8,9,10,11
   List<Register> generalRegisters = initialiseGeneralRegisters();
-  private Register sp = new Register(13);
-  private Register pc = new Register(15);
+  private final Register sp = new Register(13);
+  private final Register pc = new Register(15);
   private int spLocation = 0;
   SymbolTable currentST;
 
