@@ -106,7 +106,6 @@ public class Instruction {
     this.dest = dest;
   }
 
-  //msg_number:
   //.word number
   public Instruction(InstrType type, long immValue) {
     this.type = type;
@@ -161,12 +160,6 @@ public class Instruction {
       return type + " " + operand2 + ", [" + dest + "]";
     }
 
-    //TODO: msg is also a label; to be double checked at end
-    //msg label format
-    if(type == InstrType.MSG) {
-      return type + "" + immValue + ":";
-    }
-
     //.word instruction format
     if (type == InstrType.WORD) {
       return type + " " + immValue;
@@ -205,11 +198,6 @@ public class Instruction {
     GLOBAL_MAIN{
       public String toString() {
         return ".global main";
-      }
-    },
-    MSG{
-      public String toString() {
-        return "msg_";
       }
     },
     WORD{

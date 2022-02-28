@@ -284,7 +284,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   public List<Instruction> throwOverflowError(List<Instruction> instructions, int msgNumber) {
     int offset = msgNumber * 3;
-    instructions.add(1 + offset, new Instruction(InstrType.MSG, msgNumber));
+    instructions.add(1 + offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
     instructions.add(2 + offset, new Instruction(InstrType.WORD, 83));
     instructions.add(3 + offset, new Instruction(InstrType.ASCII, "OverflowError: the result is too " +
             "small/large to store in a 4-byte signed-integer.\n\0"));
@@ -298,7 +298,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   public List<Instruction> checkDivideByZero(List<Instruction> instructions, int msgNumber) {
     int offset = msgNumber * 3;
-    instructions.add(1 + offset, new Instruction(InstrType.MSG, msgNumber));
+    instructions.add(1 + offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
     instructions.add(2 + offset, new Instruction(InstrType.WORD, 45));
     instructions.add(3 + offset, new Instruction(InstrType.ASCII, "DivideByZeroError: divide or modulo by zero\n\0"));
     //TODO: Register Allocation
