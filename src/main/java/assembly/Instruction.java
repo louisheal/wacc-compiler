@@ -138,6 +138,11 @@ public class Instruction {
       // STR src dest
       return type + " " + operand2 + ", [" + dest + "]";
     }
+
+    if (type == InstrType.LABEL) {
+      return label;
+    }
+
     return type.toString();
   }
 
@@ -168,7 +173,8 @@ public class Instruction {
       public String toString() {
         return ".global main";
       }
-    }
+    },
+    LABEL
   }
 
 }
