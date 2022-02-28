@@ -360,7 +360,24 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitArrayElemExp(Expression expression) {
-    return getInstructionFromExpression(expression);
+    List<Instruction> instructions = new ArrayList<>();
+    String expressionIdent = expression.getIdent();
+    int storedSPLocation = currentST.getSPMapping(expressionIdent);
+    spLocation = spLocation - sizeOfTypeOnStack(currentST.getType(expression.getIdent()));
+    instructions.add(new Instruction(InstrType.ADD, sp, 0));
+    //The index is assumed to be stored at register 5.
+    visitExpression(expression.getArrayElem().getExpression().get(0));
+    instructions.add(new Instruction(InstrType.LDR, generalRegisters.get(4),
+        new Operand2(generalRegisters.get(4))));
+    instructions.add(new Instruction(InstrType.LDR, generalRegisters.get(4),
+        new Operand2(generalRegisters.get(4))));
+    instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(0),
+        new Operand2(generalRegisters.get(5))));
+    instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(1),
+        new Operand2(generalRegisters.get(4))));
+
+
+    return instructions;
   }
 
   private List<Instruction> translateUnaryExpression(Expression expression) {
