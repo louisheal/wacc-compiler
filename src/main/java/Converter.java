@@ -513,6 +513,34 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   }
 
   @Override
+  public List<Instruction> visitModExp(Expression expression) {
+
+    /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
+    List<Instruction> instructions = translateBinaryExpression(expression);
+
+    // SMULL Rn, Rn+1, Rn, Rn+1
+    Register rn = generalRegisters.get(4);
+    Register rm = generalRegisters.get(5);
+
+    // MOV R0, Rn
+    instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(0), new Operand2(rn)));
+
+    // MOV R1, Rn+1
+    instructions.add(new Instruction(InstrType.MOV, generalRegisters.get(1), new Operand2(rm)));
+
+    // BL p_check_divide_by_zero
+    instructions.add(new Instruction(InstrType.BL, "p_check_divide_by_zero"));
+
+    // BL __aeabi_idiv
+    instructions.add(new Instruction(InstrType.BL, "__aeabi_idivmod"));
+
+    // MOV Rn, R1
+    instructions.add(new Instruction(InstrType.MOV, rn, new Operand2(generalRegisters.get(1))));
+
+    return instructions;
+  }
+
+  @Override
   public List<Instruction> visitGreaterExp(Expression expression) {
 
     /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
