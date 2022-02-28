@@ -512,6 +512,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   @Override
   public List<Instruction> visitDivExp(Expression expression) {
 
+    //Set isDiv to True for visitProgram
+    isDiv = true;
+
     /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
     List<Instruction> instructions = translateBinaryExpression(expression);
 
@@ -539,6 +542,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitModExp(Expression expression) {
+
+    //Set isDiv to True for visitProgram
+    isDiv = true;
 
     /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
     List<Instruction> instructions = translateBinaryExpression(expression);

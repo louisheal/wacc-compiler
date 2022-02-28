@@ -112,7 +112,8 @@ public class Instruction {
     }
 
     //BL instruction format
-    if (type == InstrType.BL) {
+    //.ascii instruction format
+    if (type == InstrType.BL || type == InstrType.ASCII) {
       return type + flag + " " + label;
     }
 
