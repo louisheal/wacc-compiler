@@ -572,15 +572,15 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
     List<Instruction> instructions = translateBinaryExpression(expression);
 
-    // SMULL Rn, Rn+1, Rn, Rn+1
-    Register rn = unusedRegisters.get(4);
-    Register rm = unusedRegisters.get(5);
+    /* Allocate two registers: rn and rm (rn+1) for this function to use. */
+    Register rn = popUnusedRegister();
+    Register rm = popUnusedRegister();
 
     // MOV R0, Rn
-    instructions.add(new Instruction(InstrType.MOV, unusedRegisters.get(0), new Operand2(rn)));
+    instructions.add(new Instruction(InstrType.MOV, r0, new Operand2(rn)));
 
     // MOV R1, Rn+1
-    instructions.add(new Instruction(InstrType.MOV, unusedRegisters.get(1), new Operand2(rm)));
+    instructions.add(new Instruction(InstrType.MOV, r1, new Operand2(rm)));
 
     // BL p_check_divide_by_zero
     instructions.add(new Instruction(InstrType.BL, "p_check_divide_by_zero"));
@@ -589,7 +589,11 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(InstrType.BL, "__aeabi_idivmod"));
 
     // MOV Rn, R1
-    instructions.add(new Instruction(InstrType.MOV, rn, new Operand2(unusedRegisters.get(1))));
+    instructions.add(new Instruction(InstrType.MOV, rn, new Operand2(r1)));
+
+    /* Mark the two registers used in the evaluation of this function as no longer in use. */
+    pushUnusedRegister(rn);
+    pushUnusedRegister(rm);
 
     return instructions;
   }
