@@ -77,6 +77,7 @@ public class Instruction {
   }
 
   //BL label
+  //.ascii label
   public Instruction(InstrType type, String label) {
     this.type = type;
     this.label = label;
@@ -94,6 +95,12 @@ public class Instruction {
   public Instruction(InstrType type, Register dest) {
     this.type = type;
     this.dest = dest;
+  }
+
+  //.word number
+  public Instruction(InstrType type, long immValue) {
+    this.type = type;
+    this.immValue = immValue;
   }
 
   @Override
@@ -140,6 +147,11 @@ public class Instruction {
       // STR src dest
       return type + " " + operand2 + ", [" + dest + "]";
     }
+
+    if (type == InstrType.WORD) {
+      return type + " " + immValue;
+    }
+
     return type.toString();
   }
 
@@ -169,6 +181,16 @@ public class Instruction {
     GLOBAL_MAIN{
       public String toString() {
         return ".global main";
+      }
+    },
+    WORD{
+      public String toString() {
+        return ".word";
+      }
+    },
+    ASCII{
+      public String toString() {
+        return ".ascii";
       }
     }
   }

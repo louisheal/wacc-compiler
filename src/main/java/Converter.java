@@ -25,6 +25,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   private final Register pc = new Register(15);
   private int spLocation = 0;
   SymbolTable currentST;
+  private boolean isDiv = false;
 
   private List<Instruction> getInstructionFromExpression(Expression expr) {
 
@@ -290,6 +291,13 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.addAll(visitStatement(program.getStatement()));
 
     instructions.add(new Instruction(InstrType.LTORG, ""));
+
+    if(isDiv) {
+      //TODO: variable message number
+      instructions.add(1, new Instruction(InstrType.DATA, "msg_0"));
+      instructions.add(2, new Instruction(InstrType.WORD, 45));
+      instructions.add(3, new Instruction(InstrType.ASCII, "DivideByZeroError: divide or modulo by zero\n\0"));
+    }
 
     return instructions;
   }
