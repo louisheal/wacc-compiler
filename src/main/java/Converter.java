@@ -425,10 +425,14 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   public List<Instruction> visitNotExp(Expression expression) {
     List<Instruction> instructions = translateUnaryExpression(expression);
 
-    Register dest = unusedRegisters.get(4);
+    /* Allocate a register: rn for this function to use. */
+    Register rn = popUnusedRegister();
 
-    //EOR r4, r4, #1
-    instructions.add(new Instruction(InstrType.EOR, dest, dest, new Operand2(1)));
+    // EOR rn, rn, #1
+    instructions.add(new Instruction(InstrType.EOR, rn, rn, new Operand2(1)));
+
+    /* Mark the register used in the evaluation of this function as no longer in use. */
+    pushUnusedRegister(rn);
 
     return instructions;
   }
@@ -440,10 +444,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Allocate a register: rn for this function to use. */
     Register rn = popUnusedRegister();
     
-    //RSBS rn, rn, #0
+    // RSBS rn, rn, #0
     instructions.add(new Instruction(InstrType.RSB, rn, rn, new Operand2(0), Flags.S));
 
-    //BLVS p_throw_overflow_error
+    // BLVS p_throw_overflow_error
     instructions.add(new Instruction(InstrType.BL, "p_throw_overflow_error", Conditionals.VS));
 
     /* Mark the register used in the evaluation of this function as no longer in use. */
@@ -455,21 +459,21 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   //TODO: Infinitely loops and never computes the length
   @Override
   public List<Instruction> visitLenExp(Expression expression) {
-    //LDR r4, [r4]
+    // LDR r4, [r4]
     return translateUnaryExpression(expression);
   }
 
   //TODO: Infinitely loops and never computes ord
   @Override
   public List<Instruction> visitOrdExp(Expression expression) {
-    //MOV r4, expr
+    // MOV r4, expr
     return translateUnaryExpression(expression);
   }
 
   //TODO: Infinitely loops and never computes chr
   @Override
   public List<Instruction> visitChrExp(Expression expression) {
-    //MOV r4, expr
+    // MOV r4, expr
     return translateUnaryExpression(expression);
   }
 
@@ -495,10 +499,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     Register rn = popUnusedRegister();
     Register rm = popUnusedRegister();
 
-    //ADDS Rn, Rn, Rn+1
+    // ADDS Rn, Rn, Rn+1
     instructions.add(new Instruction(InstrType.ADD, rn, rn, new Operand2(rm), Flags.S));
 
-    //BLVS p_throw_overflow_error
+    // BLVS p_throw_overflow_error
     instructions.add(new Instruction(InstrType.BL, "p_throw_overflow_error", Conditionals.VS));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
@@ -517,11 +521,11 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     Register rn = popUnusedRegister();
     Register rm = popUnusedRegister();
 
-    //SUBS Rn, Rn, Rn+1
+    // SUBS Rn, Rn, Rn+1
     instructions.add(new Instruction(InstrType.SUB, rn, rn, new Operand2(rm), Flags.S));
 
     //TODO: Add VS condition code
-    //BLVS p_throw_overflow_error
+    // BLVS p_throw_overflow_error
     instructions.add(new Instruction(InstrType.BL, "p_throw_overflow_error", Conditionals.VS));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
