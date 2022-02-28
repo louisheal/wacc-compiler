@@ -437,13 +437,17 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   public List<Instruction> visitNegExp(Expression expression) {
     List<Instruction> instructions = translateUnaryExpression(expression);
 
-    Register dest = unusedRegisters.get(4);
+    /* Allocate a register: rn for this function to use. */
+    Register rn = popUnusedRegister();
     
-    //RSBS r4, r4, #0
-    instructions.add(new Instruction(InstrType.RSB, dest, dest, new Operand2(0), Flags.S));
+    //RSBS rn, rn, #0
+    instructions.add(new Instruction(InstrType.RSB, rn, rn, new Operand2(0), Flags.S));
 
     //BLVS p_throw_overflow_error
     instructions.add(new Instruction(InstrType.BL, "p_throw_overflow_error", Conditionals.VS));
+
+    /* Mark the register used in the evaluation of this function as no longer in use. */
+    pushUnusedRegister(rn);
 
     return instructions;
   }
