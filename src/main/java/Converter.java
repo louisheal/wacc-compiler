@@ -920,7 +920,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
-  //TODO: Implement Condition Codes
   @Override
   public List<Instruction> visitNeqExp(Expression expression) {
 
@@ -935,10 +934,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(InstrType.CMP, rn, new Operand2(rm)));
 
     // MOVNE Rn, #1
-    instructions.add(new Instruction(InstrType.MOV, rn, 1));
+    instructions.add(new Instruction(InstrType.MOV, rn, 1, Conditionals.NE));
 
     // MOVEQ Rn, #0
-    instructions.add(new Instruction(InstrType.MOV, rn, 0));
+    instructions.add(new Instruction(InstrType.MOV, rn, 0, Conditionals.EQ));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rm);
