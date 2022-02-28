@@ -909,6 +909,18 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return super.visitNeqExp(expression);
   }
 
+  //TODO
+  @Override
+  public List<Instruction> visitAndExp(Expression expression) {
+    return super.visitAndExp(expression);
+  }
+
+  //TODO
+  @Override
+  public List<Instruction> visitOrExp(Expression expression) {
+    return super.visitOrExp(expression);
+  }
+
   @Override
   public List<Instruction> visitExprRHS(AssignRHS rhs) {
     return super.visitExprRHS(rhs);
