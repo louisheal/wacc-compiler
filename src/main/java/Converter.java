@@ -29,6 +29,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   SymbolTable currentST;
   private boolean isDiv = false;
   private boolean isCalc = false;
+  private boolean isArrayLookup = false;
   private boolean runtimeErr = false;
 
   private List<Instruction> getInstructionFromExpression(Expression expr) {
@@ -282,6 +283,31 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return beginStatements;
   }
 
+  public List<Instruction> arrayIndexOutOfBoundsError(List<Instruction> instructions, int msgNumber) {
+    int offset = msgNumber * 3;
+    instructions.add(1 + offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
+    instructions.add(2 + offset, new Instruction(InstrType.WORD, 44));
+    instructions.add(3 + offset, new Instruction(InstrType.ASCII, "ArrayIndexOutOfBoundsError: negative index\n\0"));
+    msgNumber++;
+    offset = msgNumber * 3;
+    instructions.add(1 + offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
+    instructions.add(2 + offset, new Instruction(InstrType.WORD, 45));
+    instructions.add(3 + offset, new Instruction(InstrType.ASCII, "ArrayIndexOutOfBoundsError: index too large\n\0"));
+    instructions.add(new Instruction(InstrType.LABEL, "p_check_array_bounds:"));
+    //TODO: ADD LR
+    instructions.add(new Instruction(InstrType.LABEL, "PUSH {lr}"));
+    instructions.add(new Instruction(InstrType.CMP, r0, 0));
+    instructions.add(new Instruction(InstrType.LDR, r0, "msg_" + (msgNumber - 1), Conditionals.LT));
+    instructions.add(new Instruction(InstrType.BL, "p_throw_runtime_error", Conditionals.LT));
+    instructions.add(new Instruction(InstrType.LDR, r1, new Operand2(r1)));
+    instructions.add(new Instruction(InstrType.CMP, r0, new Operand2(r1)));
+    instructions.add(new Instruction(InstrType.LDR, r0, "msg_" + msgNumber, Conditionals.CS));
+    instructions.add(new Instruction(InstrType.BL, "p_throw_runtime_error", Conditionals.CS));
+    instructions.add(new Instruction(InstrType.LABEL, "POP {pc}"));
+    runtimeErr = true;
+    return instructions;
+  }
+
   public List<Instruction> throwOverflowError(List<Instruction> instructions, int msgNumber) {
     int offset = msgNumber * 3;
     instructions.add(1 + offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
@@ -363,6 +389,11 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     //number of messages
     int msgNumber = 0;
+
+    if(isArrayLookup) {
+      instructions = arrayIndexOutOfBoundsError(instructions, msgNumber);
+      msgNumber+=2;
+    }
 
     if(isCalc) {
       instructions = throwOverflowError(instructions, msgNumber);
@@ -502,11 +533,15 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitArrayElemExp(Expression expression) {
+
+    isArrayLookup = true;
+
     List<Instruction> instructions = new ArrayList<>();
     String expressionIdent = expression.getIdent();
     int storedSPLocation = currentST.getSPMapping(expressionIdent);
     spLocation = spLocation - sizeOfTypeOnStack(currentST.getType(expression.getIdent()));
     instructions.add(new Instruction(InstrType.ADD, sp, 0));
+
     //The index is assumed to be stored at register 5.
     visitExpression(expression.getArrayElem().getExpression().get(0));
     instructions.add(new Instruction(InstrType.LDR, unusedRegisters.get(4),
@@ -521,6 +556,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(InstrType.LABEL, "ADD rn, rn, LSL #2"));
     instructions.add(new Instruction(InstrType.LDR, unusedRegisters.get(4),
         new Operand2(unusedRegisters.get(4))));
+
     return instructions;
   }
 
