@@ -402,14 +402,12 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     List<Instruction> instructions = translateUnaryExpression(expression);
 
     Register dest = generalRegisters.get(4);
-
-    //TODO: could rely on S condition code as in visitPlusExp
+    
     //RSBS r4, r4, #0
-    instructions.add(new Instruction(InstrType.RSBS, dest, dest, new Operand2(0)));
+    instructions.add(new Instruction(InstrType.RSB, dest, dest, new Operand2(0), Flags.S));
 
-    //TODO: could rely on VS condition code as in visitPlusExp
     //BLVS p_throw_overflow_error
-    instructions.add(new Instruction(InstrType.BLVS, "p_throw_overflow_error"));
+    instructions.add(new Instruction(InstrType.BL, "p_throw_overflow_error", Conditionals.VS));
 
     return instructions;
   }

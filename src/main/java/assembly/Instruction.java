@@ -22,6 +22,7 @@ public class Instruction {
 
   //ADD{cond} dest, operand1, operand2
   //SUB{cond} dest, operand1, operand2
+  //RSB{cond} dest, operand1, operand2
   public Instruction(InstrType type, Register dest, Register operand1, Operand2 operand2) {
     this.type = type;
     this.dest = dest;
@@ -31,6 +32,7 @@ public class Instruction {
 
   //ADD{S}{cond} dest, operand1, operand2
   //SUB{S}{cond} dest, operand1, operand2
+  //RSB{S}{cond} dest, operand1, operand2
   public Instruction(InstrType type, Register dest, Register operand1, Operand2 operand2, Flags flag) {
     this.type = type;
     this.dest = dest;
@@ -102,13 +104,13 @@ public class Instruction {
       return type + " {" + dest + "}";
     }
 
-    //BL, BLVS instruction format
-    if (type == InstrType.BL || type == InstrType.BLVS) {
+    //BL instruction format
+    if (type == InstrType.BL) {
       return type + flag + " " + label;
     }
 
-    //ADD, SUB, EOR, RSBS instruction format
-    if (type == InstrType.ADD || type == InstrType.SUB || type == InstrType.EOR || type == InstrType.RSBS) {
+    //ADD, SUB, EOR, RSB instruction format
+    if (type == InstrType.ADD || type == InstrType.SUB || type == InstrType.EOR || type == InstrType.RSB) {
       return type + flag + " " + dest + ", " + operand1 + ", " + operand2;
     }
 
@@ -144,11 +146,11 @@ public class Instruction {
   public enum InstrType {
     PUSH, POP,
     MOV, CMP,
-    EOR, RSBS,
+    EOR, RSB,
     ADD, SUB,
     SMULL,
     LDR, STR,
-    BL, BLVS,
+    BL,
     TEXT{
       public String toString() {
         return ".text";
