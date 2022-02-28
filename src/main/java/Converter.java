@@ -283,12 +283,20 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     //TODO: ADD ENUM FOR LABEL
     instructions.add(new Instruction(InstrType.DATA, "main"));
 
+    //TODO
+    instructions.add(new Instruction(InstrType.PUSH, "lr"));
+
     spLocation = totalBytesInProgram(program);
-    //TODO: SUB sp, sp, #spLocation
+    if (spLocation > 0) {
+      instructions.add(new Instruction(InstrType.SUB, sp, spLocation));
+      //TODO: SUB sp, sp, #spLocation
+    }
 
     /* Generate the assembly instructions for the program body. */
     instructions.addAll(visitStatement(program.getStatement()));
 
+    instructions.add(new Instruction(InstrType.LDR, generalRegisters.get(0), 0));
+    instructions.add(new Instruction(InstrType.POP, pc));
     instructions.add(new Instruction(InstrType.LTORG, ""));
 
     return instructions;
