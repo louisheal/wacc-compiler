@@ -312,6 +312,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       //TODO: SUB sp, sp, #spLocation
     }
 
+    currentST = new SymbolTable(null);
+
     /* Generate the assembly instructions for the program body. */
     instructions.addAll(visitStatement(program.getStatement()));
 
@@ -376,15 +378,27 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return new ArrayList<>(List.of(new Instruction(InstrType.MOV, unusedRegisters.get(2), charVal)));
   }
 
+  //TODO: How do we know that it will be msg_0, what happens if there are 2 strings
   @Override
   public List<Instruction> visitStringLiterExp(Expression expression) {
+
     //TODO Generate initial message label
     List<Instruction> instructions = new ArrayList<>();
-      instructions.add(new Instruction(InstrType.LDR, unusedRegisters.get(1), "msg_0" ));
-      instructions.add(new Instruction(InstrType.PUSH, unusedRegisters.get(1)));
+
+    /* Allocate a register: rn for this function to use. */
+    Register rn = popUnusedRegister();
+
+    // LDR rn, =msg_0
+    //TODO: Verify this matches the instruction above
+    instructions.add(new Instruction(InstrType.LDR, rn, "msg_0"));
+
+    /* Mark the register used in the evaluation of this function as no longer in use. */
+    pushUnusedRegister(rn);
+
     return instructions;
   }
 
+  //TODO: VERIFY THAT THIS MANIPULATES THE STACK POINTER PROPERLY
   @Override
   public List<Instruction> visitIdentExp(Expression expression) {
     String expressionIdent = expression.getIdent();
