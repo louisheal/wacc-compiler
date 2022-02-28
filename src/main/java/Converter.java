@@ -592,8 +592,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(InstrType.MOV, rn, new Operand2(r1)));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
-    pushUnusedRegister(rn);
     pushUnusedRegister(rm);
+    pushUnusedRegister(rn);
 
     return instructions;
   }
@@ -619,8 +619,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(InstrType.MOV, rn, 1));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
-    pushUnusedRegister(rn);
     pushUnusedRegister(rm);
+    pushUnusedRegister(rn);
 
     return instructions;
   }
@@ -646,8 +646,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(InstrType.MOV, rn, 1));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
-    pushUnusedRegister(rn);
     pushUnusedRegister(rm);
+    pushUnusedRegister(rn);
 
     return instructions;
   }
@@ -673,8 +673,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(InstrType.MOV, rn, 1));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
-    pushUnusedRegister(rn);
     pushUnusedRegister(rm);
+    pushUnusedRegister(rn);
 
     return instructions;
   }
@@ -700,8 +700,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(InstrType.MOV, rn, 1));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
-    pushUnusedRegister(rn);
     pushUnusedRegister(rm);
+    pushUnusedRegister(rn);
 
     return instructions;
   }
