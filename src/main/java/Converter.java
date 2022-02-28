@@ -14,7 +14,7 @@ import java.util.*;
 
 public class Converter extends ASTVisitor<List<Instruction>> {
 
-  //TODO: ONLY USE FOLLOWING REGISTERS FOR EVALUATION: 4,5,6,7,8,9,10,11
+  /* A list of general purpose registers: r4, r5, r6, r7, r8, r9, r10 and r11. */
   List<Register> unusedRegisters = initialiseGeneralRegisters();
 
   /* Function return registers. */
