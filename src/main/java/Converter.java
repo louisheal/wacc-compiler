@@ -4,17 +4,13 @@ import assembly.Instruction;
 import assembly.Instruction.InstrType;
 import assembly.Operand2;
 import assembly.Register;
-import ast.Expression;
-import ast.Function;
-import ast.Program;
-import ast.Statement;
+import ast.*;
 
-import ast.Type;
 import java.util.*;
 
 public class Converter extends ASTVisitor<List<Instruction>> {
 
-  //TODO: ONLY USE FOLLOWING REGISTERS FOR EVALUATION: 4,5,6,7,8,9,10,11
+  /* A list of general purpose registers: r4, r5, r6, r7, r8, r9, r10 and r11. */
   List<Register> unusedRegisters = initialiseGeneralRegisters();
 
   /* Function return registers. */
@@ -29,6 +25,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   SymbolTable currentST;
   private boolean isDiv = false;
   private boolean isCalc = false;
+  private boolean isArrayLookup = false;
   private boolean runtimeErr = false;
 
   private List<Instruction> getInstructionFromExpression(Expression expr) {
@@ -282,6 +279,31 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return beginStatements;
   }
 
+  public List<Instruction> arrayIndexOutOfBoundsError(List<Instruction> instructions, int msgNumber) {
+    int offset = msgNumber * 3;
+    instructions.add(1 + offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
+    instructions.add(2 + offset, new Instruction(InstrType.WORD, 44));
+    instructions.add(3 + offset, new Instruction(InstrType.ASCII, "ArrayIndexOutOfBoundsError: negative index\n\0"));
+    msgNumber++;
+    offset = msgNumber * 3;
+    instructions.add(1 + offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
+    instructions.add(2 + offset, new Instruction(InstrType.WORD, 45));
+    instructions.add(3 + offset, new Instruction(InstrType.ASCII, "ArrayIndexOutOfBoundsError: index too large\n\0"));
+    instructions.add(new Instruction(InstrType.LABEL, "p_check_array_bounds:"));
+    //TODO: ADD LR
+    instructions.add(new Instruction(InstrType.LABEL, "PUSH {lr}"));
+    instructions.add(new Instruction(InstrType.CMP, r0, 0));
+    instructions.add(new Instruction(InstrType.LDR, r0, "msg_" + (msgNumber - 1), Conditionals.LT));
+    instructions.add(new Instruction(InstrType.BL, "p_throw_runtime_error", Conditionals.LT));
+    instructions.add(new Instruction(InstrType.LDR, r1, new Operand2(r1)));
+    instructions.add(new Instruction(InstrType.CMP, r0, new Operand2(r1)));
+    instructions.add(new Instruction(InstrType.LDR, r0, "msg_" + msgNumber, Conditionals.CS));
+    instructions.add(new Instruction(InstrType.BL, "p_throw_runtime_error", Conditionals.CS));
+    instructions.add(new Instruction(InstrType.LABEL, "POP {pc}"));
+    runtimeErr = true;
+    return instructions;
+  }
+
   public List<Instruction> throwOverflowError(List<Instruction> instructions, int msgNumber) {
     int offset = msgNumber * 3;
     instructions.add(1 + offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
@@ -363,6 +385,11 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     //number of messages
     int msgNumber = 0;
+
+    if(isArrayLookup) {
+      instructions = arrayIndexOutOfBoundsError(instructions, msgNumber);
+      msgNumber+=2;
+    }
 
     if(isCalc) {
       instructions = throwOverflowError(instructions, msgNumber);
@@ -502,11 +529,15 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitArrayElemExp(Expression expression) {
+
+    isArrayLookup = true;
+
     List<Instruction> instructions = new ArrayList<>();
     String expressionIdent = expression.getIdent();
     int storedSPLocation = currentST.getSPMapping(expressionIdent);
     spLocation = spLocation - sizeOfTypeOnStack(currentST.getType(expression.getIdent()));
     instructions.add(new Instruction(InstrType.ADD, sp, 0));
+
     //The index is assumed to be stored at register 5.
     visitExpression(expression.getArrayElem().getExpression().get(0));
     instructions.add(new Instruction(InstrType.LDR, unusedRegisters.get(4),
@@ -521,6 +552,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(InstrType.LABEL, "ADD rn, rn, LSL #2"));
     instructions.add(new Instruction(InstrType.LDR, unusedRegisters.get(4),
         new Operand2(unusedRegisters.get(4))));
+
     return instructions;
   }
 
@@ -859,5 +891,91 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     pushUnusedRegister(rn);
 
     return instructions;
+  }
+
+  //TODO: Implement Condition Codes
+  @Override
+  public List<Instruction> visitEqExp(Expression expression) {
+
+    /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
+    List<Instruction> instructions = translateBinaryExpression(expression);
+
+    /* Allocate two registers: rn and rm (rn+1) for this function to use. */
+    Register rn = popUnusedRegister();
+    Register rm = popUnusedRegister();
+
+    // CMP Rn, Rn+1
+    instructions.add(new Instruction(InstrType.CMP, rn, new Operand2(rm)));
+
+    // MOVEQ Rn, #1
+    instructions.add(new Instruction(InstrType.MOV, rn, 1));
+
+    // MOVNE Rn, #0
+    instructions.add(new Instruction(InstrType.MOV, rn, 0));
+
+    /* Mark the two registers used in the evaluation of this function as no longer in use. */
+    pushUnusedRegister(rm);
+    pushUnusedRegister(rn);
+
+    return instructions;
+  }
+
+  //TODO: Implement Condition Codes
+  @Override
+  public List<Instruction> visitNeqExp(Expression expression) {
+
+    /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
+    List<Instruction> instructions = translateBinaryExpression(expression);
+
+    /* Allocate two registers: rn and rm (rn+1) for this function to use. */
+    Register rn = popUnusedRegister();
+    Register rm = popUnusedRegister();
+
+    // CMP Rn, Rn+1
+    instructions.add(new Instruction(InstrType.CMP, rn, new Operand2(rm)));
+
+    // MOVNE Rn, #1
+    instructions.add(new Instruction(InstrType.MOV, rn, 1));
+
+    // MOVEQ Rn, #0
+    instructions.add(new Instruction(InstrType.MOV, rn, 0));
+
+    /* Mark the two registers used in the evaluation of this function as no longer in use. */
+    pushUnusedRegister(rm);
+    pushUnusedRegister(rn);
+
+    return instructions;
+  }
+
+  //TODO
+  @Override
+  public List<Instruction> visitAndExp(Expression expression) {
+    return super.visitAndExp(expression);
+  }
+
+  //TODO
+  @Override
+  public List<Instruction> visitOrExp(Expression expression) {
+    return super.visitOrExp(expression);
+  }
+
+  @Override
+  public List<Instruction> visitExprRHS(AssignRHS rhs) {
+    return super.visitExprRHS(rhs);
+  }
+
+  @Override
+  public List<Instruction> visitArrayRHS(AssignRHS rhs) {
+    return super.visitArrayRHS(rhs);
+  }
+
+  @Override
+  public List<Instruction> visitNewPairRHS(AssignRHS rhs) {
+    return super.visitNewPairRHS(rhs);
+  }
+
+  @Override
+  public List<Instruction> visitCallRHS(AssignRHS rhs) {
+    return super.visitCallRHS(rhs);
   }
 }
