@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 import org.junit.Test;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 public class EmulatorValidTests {
   //TODO: Add assert fail in correct spaces
@@ -52,6 +54,19 @@ public class EmulatorValidTests {
       }
     }
     return output.toString();
+  }
+
+  public String extractFromAssembly(File file) throws IOException {
+    String[] commands = {"sh", "-c", "echo ' ' | ./wacc_examples/refEmulate " + file.getName()};
+
+    String s;
+    StringBuilder sb = new StringBuilder();
+    Process p = Runtime.getRuntime().exec(commands);
+    BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+    while (((s = br.readLine()) != null)) {
+      sb.append(s);
+    }
+    return sb.toString();
   }
 
   @Test
@@ -103,8 +118,9 @@ public class EmulatorValidTests {
     File directory = new File("wacc_examples/valid/expressions/");
     File[] examples = directory.listFiles();
 
-    assert examples != null;
-    runTests(examples);
+    System.out.println("Hello");
+
+
   }
 
   @Test
