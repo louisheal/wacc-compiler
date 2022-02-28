@@ -1,6 +1,7 @@
 package assembly;
 
 import javax.lang.model.element.ModuleElement.Directive;
+import java.util.Objects;
 
 public class Instruction {
 
@@ -76,6 +77,14 @@ public class Instruction {
     this.label = label;
   }
 
+  //LDR{S}{cond} dest, operand
+  public Instruction(InstrType type, Register dest, String label, Conditionals conditionals) {
+    this.type = type;
+    this.dest = dest;
+    this.label = label;
+    this.flag = conditionals.toString();
+  }
+
   //BL label
   //.ascii label
   public Instruction(InstrType type, String label) {
@@ -139,7 +148,9 @@ public class Instruction {
     }
 
     if (type == InstrType.LDR) { //LDR instruction format
-      if (operand2 == null) {
+      if(!Objects.equals(flag, "")) {
+        return type + flag + " " + dest + ", =" + label;
+      } else if (operand2 == null) {
         return type + " " + dest + ", =" + immValue;
       } else {
         return  type + " " + dest + ", [" + operand2 + "]";
