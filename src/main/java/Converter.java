@@ -255,6 +255,22 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return beginStatements;
   }
 
+  public List<Instruction> checkDivideByZero(List<Instruction> instructions) {
+    //TODO: variable message number
+    instructions.add(1, new Instruction(InstrType.DATA, "msg_0"));
+    instructions.add(2, new Instruction(InstrType.WORD, 45));
+    instructions.add(3, new Instruction(InstrType.ASCII, "DivideByZeroError: divide or modulo by zero\n\0"));
+    //TODO: Register Allocation
+    instructions.add(new Instruction(InstrType.LABEL, "p_check_divide_by_zero:"));
+    //TODO: ADD LR
+    instructions.add(new Instruction(InstrType.LABEL, "PUSH {lr}"));
+    instructions.add(new Instruction(InstrType.CMP, generalRegisters.get(1), 0));
+    instructions.add(new Instruction(InstrType.LDR, generalRegisters.get(0), "msg_0", Conditionals.EQ));
+    instructions.add(new Instruction(InstrType.BL, "p_throw_runtime_error", Conditionals.EQ));
+    instructions.add(new Instruction(InstrType.LABEL, "POP {pc}"));
+    return instructions;
+  }
+
   @Override
   public List<Instruction> visitProgram(Program program) {
     List<Instruction> instructions = new ArrayList<>();
@@ -302,18 +318,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(InstrType.LTORG, ""));
 
     if(isDiv) {
-      //TODO: variable message number
-      instructions.add(1, new Instruction(InstrType.DATA, "msg_0"));
-      instructions.add(2, new Instruction(InstrType.WORD, 45));
-      instructions.add(3, new Instruction(InstrType.ASCII, "DivideByZeroError: divide or modulo by zero\n\0"));
-      //TODO: Register Allocation
-      instructions.add(new Instruction(InstrType.LABEL, "p_check_divide_by_zero:"));
-      //TODO: ADD LR
-      instructions.add(new Instruction(InstrType.LABEL, "PUSH {lr}"));
-      instructions.add(new Instruction(InstrType.CMP, generalRegisters.get(1), 0));
-      instructions.add(new Instruction(InstrType.LDR, generalRegisters.get(0), "msg_0", Conditionals.EQ));
-      instructions.add(new Instruction(InstrType.BL, "p_throw_runtime_error", Conditionals.EQ));
-      instructions.add(new Instruction(InstrType.LABEL, "POP {pc}"));
+      instructions = checkDivideByZero(instructions);
     }
 
     return instructions;
