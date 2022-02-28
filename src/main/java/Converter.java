@@ -374,8 +374,20 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitCharLiterExp(Expression expression) {
+
+    /* Allocate a register: rn for this function to use. */
+    Register rn = popUnusedRegister();
+
     long charVal = Character.getNumericValue(expression.getCharLiter());
-    return new ArrayList<>(List.of(new Instruction(InstrType.MOV, unusedRegisters.get(2), charVal)));
+
+    List<Instruction> instructions = new ArrayList<>();
+
+    // MOV rn, #charVal
+    //TODO: Make instruction look like: MOV r4, #'x' - as an example
+    instructions.add(new Instruction(InstrType.MOV, rn, expression.getCharLiter()));
+    //TODO: Ensure that following instruction is "STRB rn, [sp]"
+
+    return instructions;
   }
 
   //TODO: How do we know that it will be msg_0, what happens if there are 2 strings
