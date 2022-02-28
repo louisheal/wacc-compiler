@@ -654,7 +654,7 @@ public class ASTVisitor<T> {
      * @param rhs expression node
      * @return returns the assembly instructions for a rhs expression
      */
-    private T visitExprRHS(AssignRHS rhs) {
+    public T visitExprRHS(AssignRHS rhs) {
         return null;
     }
 
@@ -667,7 +667,7 @@ public class ASTVisitor<T> {
      * @param rhs array node
      * @return returns the assembly instructions for a rhs array
      */
-    private T visitArrayRHS(AssignRHS rhs) {
+    public T visitArrayRHS(AssignRHS rhs) {
         return null;
     }
 
@@ -681,7 +681,7 @@ public class ASTVisitor<T> {
      * @param rhs new pair node
      * @return returns the assembly instructions for a rhs new pair
      */
-    private T visitNewPairRHS(AssignRHS rhs) {
+    public T visitNewPairRHS(AssignRHS rhs) {
         return null;
     }
 
@@ -694,7 +694,7 @@ public class ASTVisitor<T> {
      * @param rhs pair elem node
      * @return returns the assembly instructions for a rhs pair elem
      */
-    private T visitPairElemRHS(AssignRHS rhs) {
+    public T visitPairElemRHS(AssignRHS rhs) {
         return null;
     }
 
@@ -708,7 +708,63 @@ public class ASTVisitor<T> {
      * @param rhs function call node
      * @return returns the assembly instructions for a rhs function call
      */
-    private T visitCallRHS(AssignRHS rhs) {
+    public T visitCallRHS(AssignRHS rhs) {
+        return null;
+    }
+
+    /** Calls the corresponding visit lhs function based on the lhs type.
+     *
+     * @param lhs an AssignLHS node from the abstract syntax tree
+     * @return a list of assembly instructions that represent the given lhs
+     */
+    public T visitLHS(AssignLHS lhs) {
+        switch (lhs.getAssignType()) {
+            case IDENT:
+                return visitIdentLHS(lhs);
+            case ARRAYELEM:
+                return visitArrayElemLHS(lhs);
+            case PAIRELEM:
+                return visitPairElemLHS(lhs);
+        }
+        return null;
+    }
+
+    /** <p>Visits a lhs identity node.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getAssignType()</b> - Returns a LHSType enum.</p>
+     * <p><b>getIdent()</b> - Returns the name of the function as a string.</p>
+     *
+     * @param lhs identity node
+     * @return returns the assembly instructions for a lhs identity node
+     */
+    public T visitIdentLHS(AssignLHS lhs) {
+        return null;
+    }
+
+    /** <p>Visits a lhs array elem node.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getAssignType()</b> - Returns a LHSType enum.</p>
+     * <p><b>getArrayElem()</b> - Returns an ArrayElem class of the AssignLHS node.</p>
+     *
+     * @param lhs array elem node
+     * @return returns the assembly instructions for a lhs array elem node
+     */
+    public T visitArrayElemLHS(AssignLHS lhs) {
+        return null;
+    }
+
+    /** <p>Visits a lhs pair elem node.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getAssignType()</b> - Returns a LHSType enum.</p>
+     * <p><b>getPairElem()</b> - Returns an PairElem class of the AssignLHS node.</p>
+     *
+     * @param lhs pair elem node
+     * @return returns the assembly instructions for a lhs pair elem node
+     */
+    public T visitPairElemLHS(AssignLHS lhs) {
         return null;
     }
 
