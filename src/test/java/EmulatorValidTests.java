@@ -6,6 +6,8 @@ import java.util.Scanner;
 import org.junit.Test;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.util.Arrays;
 
 public class EmulatorValidTests {
   //TODO: Add assert fail in correct spaces
@@ -57,16 +59,44 @@ public class EmulatorValidTests {
   }
 
   public String extractFromAssembly(File file) throws IOException {
-    String[] commands = {"sh", "-c", "echo ' ' | ./wacc_examples/refEmulate " + file.getName()};
 
+    //Executes the commands neccessary to receieve the full output of assembly emulator of a .s file
+    String[] commands = {"sh", "-c", "echo ' ' | ./wacc_examples/refEmulate " + file.getName()};
     String s;
     StringBuilder sb = new StringBuilder();
     Process p = Runtime.getRuntime().exec(commands);
     BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
     while (((s = br.readLine()) != null)) {
-      sb.append(s);
+      sb.append(s).append("\n");
     }
-    return sb.toString();
+
+    //Extracts all lines after 'Emulation Output'
+    BufferedReader bufferedReader = new BufferedReader(new StringReader(sb.toString()));
+    String line = null;
+    StringBuilder outputExtracted = new StringBuilder();
+
+    while ((line = bufferedReader.readLine()) != null) {
+      if (line.contains("Emulation Output")) {
+        while ((line = bufferedReader.readLine()) != null) {
+          outputExtracted.append(line).append("\n");
+      }
+      break;
+    }
+  }
+
+  //Removes the last 2 lines which are "------" and exit code
+  String[] lines = outputExtracted.toString().split("\n");
+  String[] linesWithoutExit = Arrays.copyOf(lines, lines.length - 2);
+
+  StringBuilder arrayToString = new StringBuilder();
+  for (int i = 0; i < linesWithoutExit.length; i++) {
+    arrayToString.append(linesWithoutExit[i]);
+    if (i != linesWithoutExit.length - 1) {
+      arrayToString.append("\n");
+    }
+  }
+
+  return arrayToString.toString();
   }
 
   @Test
