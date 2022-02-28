@@ -6,6 +6,7 @@ import java.util.Scanner;
 import org.junit.Test;
 
 public class EmulatorValidTests {
+  //TODO: Add assert fail in correct spaces
 
   MySecurityManager securityManager = new MySecurityManager();
 
@@ -14,6 +15,27 @@ public class EmulatorValidTests {
 
   // Will ensure that the files listed are not folders
   FileFilter folderFilter = pathname -> !pathname.isDirectory();
+
+  public void runTests(File[] files) throws FileNotFoundException {
+    for (File file : files) {
+      totalTests++;
+      String expectedOutput = scan(file);
+      //TODO: extract actual output from executing assembly file
+      String actualOutput = "";
+
+      System.out.print("RUNNING " + file.getName() + ": ");
+      if (actualOutput.equals(expectedOutput)) {
+        System.out.println("PASS");
+      } else {
+        failedTests++;
+        System.out.println("FAIL");
+      }
+      System.out.println("EXPECTED OUTPUT:");
+      System.out.print(expectedOutput);
+      System.out.println("ACTUAL OUTPUT:\n");
+      System.out.print(actualOutput);
+    }
+  }
 
   public String scan(File file) throws FileNotFoundException {
     final Scanner scanner = new Scanner(file);
@@ -49,7 +71,7 @@ public class EmulatorValidTests {
     File[] examples = directory.listFiles();
 
     assert examples != null;
-
+    runTests(examples);
   }
 
   @Test
@@ -60,7 +82,7 @@ public class EmulatorValidTests {
     File[] examples = directory.listFiles();
 
     assert examples != null;
-
+    runTests(examples);
   }
 
   @Test
@@ -71,7 +93,7 @@ public class EmulatorValidTests {
     File[] examples = directory.listFiles();
 
     assert examples != null;
-
+    runTests(examples);
   }
 
   @Test
@@ -82,6 +104,7 @@ public class EmulatorValidTests {
     File[] examples = directory.listFiles();
 
     assert examples != null;
+    runTests(examples);
   }
 
   @Test
@@ -92,7 +115,7 @@ public class EmulatorValidTests {
     File[] examples = directory.listFiles();
 
     assert examples != null;
-
+    runTests(examples);
   }
 
   @Test
@@ -103,7 +126,7 @@ public class EmulatorValidTests {
     File[] examples = directory.listFiles();
 
     assert examples != null;
-
+    runTests(examples);
   }
 
   @Test
@@ -114,19 +137,18 @@ public class EmulatorValidTests {
     File[] examples = directory.listFiles();
 
     assert examples != null;
-
+    runTests(examples);
   }
 
   @Test
   public void IOTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-
     File directory = new File("wacc_examples/valid/IO/");
     File[] examples = directory.listFiles(folderFilter);
 
     assert examples != null;
-
+    runTests(examples);
   }
 
   @Test
@@ -138,7 +160,7 @@ public class EmulatorValidTests {
     File[] examples = directory.listFiles();
 
     assert examples != null;
-
+    runTests(examples);
   }
 
   @Test
@@ -150,7 +172,7 @@ public class EmulatorValidTests {
     File[] examples = directory.listFiles();
 
     assert examples != null;
-
+    runTests(examples);
   }
 
   @Test
@@ -161,7 +183,7 @@ public class EmulatorValidTests {
     File[] examples = directory.listFiles();
 
     assert examples != null;
-
+    runTests(examples);
   }
 
 
@@ -174,7 +196,7 @@ public class EmulatorValidTests {
     File[] examples = directory.listFiles();
 
     assert examples != null;
-
+    runTests(examples);
   }
 
 
@@ -186,7 +208,7 @@ public class EmulatorValidTests {
     File[] examples = directory.listFiles();
 
     assert examples != null;
-
+    runTests(examples);
   }
 
 
@@ -198,7 +220,7 @@ public class EmulatorValidTests {
     File[] examples = directory.listFiles();
 
     assert examples != null;
-
+    runTests(examples);
   }
 
 
@@ -210,7 +232,7 @@ public class EmulatorValidTests {
     File[] examples = directory.listFiles();
 
     assert examples != null;
-
+    runTests(examples);
   }
 
   @Test
@@ -221,7 +243,7 @@ public class EmulatorValidTests {
     File[] examples = directory.listFiles();
 
     assert examples != null;
-
+    runTests(examples);
   }
 
   @Test
@@ -232,7 +254,7 @@ public class EmulatorValidTests {
     File[] examples = directory.listFiles();
 
     assert examples != null;
-
+    runTests(examples);
   }
 
   @Test
@@ -243,7 +265,7 @@ public class EmulatorValidTests {
     File[] examples = directory.listFiles();
 
     assert examples != null;
-
+    runTests(examples);
   }
 
   @Test
@@ -254,5 +276,6 @@ public class EmulatorValidTests {
     File[] examples = directory.listFiles();
 
     assert examples != null;
+    runTests(examples);
   }
 }
