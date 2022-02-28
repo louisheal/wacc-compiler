@@ -660,6 +660,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
     List<Instruction> instructions = translateBinaryExpression(expression);
 
+    /* Allocate two registers: rn and rm for this function to use. */
     Register rn = popUnusedRegister();
     Register rm = popUnusedRegister();
 
@@ -673,6 +674,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     //TODO: CREATE CONDITION CODE ENUMS
     instructions.add(new Instruction(InstrType.MOV, rn, 1));
 
+    /* Mark the two registers used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rn);
     pushUnusedRegister(rm);
 
