@@ -523,16 +523,23 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
     List<Instruction> instructions = translateBinaryExpression(expression);
 
-    // SMULL Rn, Rn+1, Rn, Rn+1
-    Register rn = unusedRegisters.get(1);
-    Register rm = unusedRegisters.get(2);
+    /* Allocate two registers: rn and rm (rn+1) for this function to use. */
+    Register rn = popUnusedRegister();
+    Register rm = popUnusedRegister();
+
+    // SMULL rn, rm, rn, rm
     instructions.add(new Instruction(InstrType.SMULL, rn, rm, rn, rm));
 
     // CMP Rn+1, Rn, ASR #31
+    instructions.add(new Instruction(InstrType.LABEL, "CMP " + rm + " " + rn + " ASR #31"));
 
     // BLNE p_throw_overflow_error
     //TODO: Add NE condition code
     instructions.add(new Instruction(InstrType.BL, "p_throw_overflow_error", Conditionals.NE));
+
+    /* Mark the two registers used in the evaluation of this function as no longer in use. */
+    pushUnusedRegister(rm);
+    pushUnusedRegister(rn);
 
     return instructions;
   }
