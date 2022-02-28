@@ -4,12 +4,8 @@ import assembly.Instruction;
 import assembly.Instruction.InstrType;
 import assembly.Operand2;
 import assembly.Register;
-import ast.Expression;
-import ast.Function;
-import ast.Program;
-import ast.Statement;
+import ast.*;
 
-import ast.Type;
 import java.util.*;
 
 public class Converter extends ASTVisitor<List<Instruction>> {
@@ -895,5 +891,25 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     pushUnusedRegister(rn);
 
     return instructions;
+  }
+
+  @Override
+  public List<Instruction> visitExprRHS(AssignRHS rhs) {
+    return super.visitExprRHS(rhs);
+  }
+
+  @Override
+  public List<Instruction> visitArrayRHS(AssignRHS rhs) {
+    return super.visitArrayRHS(rhs);
+  }
+
+  @Override
+  public List<Instruction> visitNewPairRHS(AssignRHS rhs) {
+    return super.visitNewPairRHS(rhs);
+  }
+
+  @Override
+  public List<Instruction> visitCallRHS(AssignRHS rhs) {
+    return super.visitCallRHS(rhs);
   }
 }
