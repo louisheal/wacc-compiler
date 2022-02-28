@@ -362,8 +362,19 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitIntLiterExp(Expression expression) {
-    return new ArrayList<>(List.of(new Instruction(InstrType.MOV, unusedRegisters.get(2),
-        expression.getIntLiter())));
+
+    /* Allocate a register: rn for this function to use. */
+    Register rn = popUnusedRegister();
+
+    List<Instruction> instructions = new ArrayList<>();
+
+    // LDR rn, =i
+    instructions.add(new Instruction(InstrType.LDR, rn, expression.getIntLiter()));
+
+    /* Mark the register used in the evaluation of this function as no longer in use. */
+    pushUnusedRegister(rn);
+
+    return instructions;
   }
 
   @Override
@@ -523,8 +534,14 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Generate assembly instructions for the first expression. */
     instructions.addAll(visitExpression(expression.getExpression1())); //Store result in Rn
 
+    /* Declare that rn is in use. */
+    Register rn = popUnusedRegister();
+
     /* Generate assembly instructions for the second expression. */
     instructions.addAll(visitExpression(expression.getExpression2())); //Store result in Rn+1
+
+    /* Declare that rn is no longer in use. */
+    pushUnusedRegister(rn);
 
     return instructions;
   }
@@ -589,7 +606,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(InstrType.SMULL, rn, rm, rn, rm));
 
     // CMP Rn+1, Rn, ASR #31
-    instructions.add(new Instruction(InstrType.LABEL, "CMP " + rm + " " + rn + " ASR #31"));
+    instructions.add(new Instruction(InstrType.LABEL, "CMP " + rm + ", " + rn + ", ASR #31"));
 
     // BLNE p_throw_overflow_error
     //TODO: Add NE condition code
