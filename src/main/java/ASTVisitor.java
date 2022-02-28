@@ -1,7 +1,4 @@
-import ast.Expression;
-import ast.Program;
-import ast.Function;
-import ast.Statement;
+import ast.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -624,6 +621,94 @@ public class ASTVisitor<T> {
      * @return returns the assembly instructions for an or expression
      */
     public T visitOrExp(Expression expression) {
+        return null;
+    }
+
+    /** Calls the corresponding visit rhs function based on the rhs type.
+     *
+     * @param rhs an AssignRHS node from the abstract syntax tree
+     * @return a list of assembly instructions that represent the given rhs
+     */
+    public T visitRHS(AssignRHS rhs) {
+        switch (rhs.getAssignType()) {
+            case EXPR:
+                return visitExprRHS(rhs);
+            case ARRAY:
+                return visitArrayRHS(rhs);
+            case NEWPAIR:
+                return visitNewPairRHS(rhs);
+            case PAIRELEM:
+                return visitPairElemRHS(rhs);
+            case CALL:
+                return visitCallRHS(rhs);
+        }
+        return null;
+    }
+
+    /** <p>Visits a rhs expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getAssignType()</b> - Returns a RHSType enum.</p>
+     * <p><b>getExpression1()</b> - Returns the expression.</p>
+     *
+     * @param rhs expression node
+     * @return returns the assembly instructions for a rhs expression
+     */
+    private T visitExprRHS(AssignRHS rhs) {
+        return null;
+    }
+
+    /** <p>Visits a rhs array.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getAssignType()</b> - Returns a RHSType enum.</p>
+     * <p><b>getArray()</b> - Returns the array.</p>
+     *
+     * @param rhs array node
+     * @return returns the assembly instructions for a rhs array
+     */
+    private T visitArrayRHS(AssignRHS rhs) {
+        return null;
+    }
+
+    /** <p>Visits a rhs new pair.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getAssignType()</b> - Returns a RHSType enum.</p>
+     * <p><b>getExpression1()</b> - Returns the first expression of the new pair.</p>
+     * <p><b>getExpression2()</b> - Returns the second expression of the new pair.</p>
+     *
+     * @param rhs new pair node
+     * @return returns the assembly instructions for a rhs new pair
+     */
+    private T visitNewPairRHS(AssignRHS rhs) {
+        return null;
+    }
+
+    /** <p>Visits a rhs pair elem.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getAssignType()</b> - Returns a RHSType enum.</p>
+     * <p><b>getPairElem()</b> - Returns the pair elem.</p>
+     *
+     * @param rhs pair elem node
+     * @return returns the assembly instructions for a rhs pair elem
+     */
+    private T visitPairElemRHS(AssignRHS rhs) {
+        return null;
+    }
+
+    /** <p>Visits a rhs function call.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getAssignType()</b> - Returns a RHSType enum.</p>
+     * <p><b>getFunctionIdent()</b> - Returns the name of the function as a string.</p>
+     * <p><b>getArgList()</b> - Returns the arguments as a list of expressions.</p>
+     *
+     * @param rhs function call node
+     * @return returns the assembly instructions for a rhs function call
+     */
+    private T visitCallRHS(AssignRHS rhs) {
         return null;
     }
 
