@@ -21,8 +21,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   //TODO: ONLY USE FOLLOWING REGISTERS FOR EVALUATION: 4,5,6,7,8,9,10,11
   List<Register> generalRegisters = initialiseGeneralRegisters();
-  private Register sp = new Register(13);
-  private Register pc = new Register(15);
+  private final Register sp = new Register(13);
+  private final Register pc = new Register(15);
   private int spLocation = 0;
   SymbolTable currentST;
 
@@ -264,7 +264,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitProgram(Program program) {
-    spLocation = totalBytesInScope(program.getStatement());
     List<Instruction> instructions = new ArrayList<>();
 
     //TODO: ADD CONSTRUCTOR FOR DIRECTIVES
@@ -284,6 +283,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     //TODO: ADD ENUM FOR LABEL
     instructions.add(new Instruction(InstrType.DATA, "main"));
 
+    spLocation = totalBytesInProgram(program);
+    //TODO: SUB sp, sp, #spLocation
+
     /* Generate the assembly instructions for the program body. */
     instructions.addAll(visitStatement(program.getStatement()));
 
@@ -295,7 +297,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   //TODO: ADD FUNCTION PARAMETERS TO SYMBOL TABLE
   @Override
   public List<Instruction> visitFunction(Function function) {
-    spLocation = totalBytesInScope(function.getStatement());
+    spLocation = totalBytesInFunction(function);
     return visitStatement(function.getStatement());
   }
 
