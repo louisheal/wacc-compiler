@@ -293,6 +293,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(1 + offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
     instructions.add(2 + offset, new Instruction(InstrType.WORD, 45));
     instructions.add(3 + offset, new Instruction(InstrType.ASCII, "ArrayIndexOutOfBoundsError: index too large\n\0"));
+    //TODO: Register Allocation
     instructions.add(new Instruction(InstrType.LABEL, "p_check_array_bounds:"));
     //TODO: ADD LR
     instructions.add(new Instruction(InstrType.LABEL, "PUSH {lr}"));
@@ -583,6 +584,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitNegExp(Expression expression) {
+
+    isCalc = true;
+
     List<Instruction> instructions = translateUnaryExpression(expression);
 
     /* Allocate a register: rn for this function to use. */
