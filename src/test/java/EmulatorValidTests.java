@@ -3,6 +3,7 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
+import org.junit.Assert;
 import org.junit.Test;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -23,9 +24,21 @@ public class EmulatorValidTests {
   public void runTests(File[] files) throws FileNotFoundException {
     for (File file : files) {
       totalTests++;
+      // Extracts the # Output part of the .wacc example file
       String expectedOutput = scan(file);
-      //TODO: extract actual output from executing assembly file
       String actualOutput = "";
+
+      // Runs the given assembly file and writes the output onto actualOutput
+      try {
+        String[] arg = {file.toString()};
+        Compiler.main(arg);
+        String newFileName = file.getName().substring(0, file.getName().lastIndexOf('.')) + ".s";
+        File generatedAssemblyFile = new File(newFileName);
+        actualOutput = extractFromAssembly(generatedAssemblyFile);
+        generatedAssemblyFile.delete();
+      } catch (Exception ignored) {
+        System.out.println("Compile error");
+      }
 
       System.out.print("RUNNING " + file.getName() + ": ");
       if (actualOutput.equals(expectedOutput)) {
@@ -39,9 +52,13 @@ public class EmulatorValidTests {
       System.out.println("ACTUAL OUTPUT:\n");
       System.out.print(actualOutput);
     }
+      System.out.println("--------- Tests passed: " + (totalTests - failedTests) + "/" + totalTests + " ---------\n");
+      if (failedTests > 0) {
+        Assert.fail();
+      }
   }
 
-  public String scan(File file) throws FileNotFoundException {
+  public static String scan(File file) throws FileNotFoundException {
     final Scanner scanner = new Scanner(file);
     StringBuilder output = new StringBuilder();
     while (scanner.hasNextLine()) {
@@ -59,7 +76,7 @@ public class EmulatorValidTests {
     return output.toString();
   }
 
-  public String extractFromAssembly(File file) throws IOException {
+  public static String extractFromAssembly(File file) throws IOException {
     //Executes the commands neccessary to receieve the full output of assembly emulator of a .s file
     String[] commands = {"sh", "-c", "echo ' ' | ./wacc_examples/refEmulate " + file.getName()};
     String s;
@@ -106,6 +123,8 @@ public class EmulatorValidTests {
     File directory = new File("wacc_examples/valid/advanced/");
     File[] examples = directory.listFiles();
 
+    assert examples != null;
+    runTests(examples);
   }
 
   @Test
@@ -148,9 +167,8 @@ public class EmulatorValidTests {
     File directory = new File("wacc_examples/valid/expressions/");
     File[] examples = directory.listFiles();
 
-    System.out.println("Hello");
-
-
+    assert examples != null;
+    runTests(examples);
   }
 
   @Test
