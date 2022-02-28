@@ -55,6 +55,7 @@ public class EmulatorValidTests {
         }
       }
     }
+    scanner.close();
     return output.toString();
   }
 
