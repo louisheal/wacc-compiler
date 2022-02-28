@@ -423,18 +423,21 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
+  //TODO: Infinitely loops and never computes the length
   @Override
   public List<Instruction> visitLenExp(Expression expression) {
     //LDR r4, [r4]
     return translateUnaryExpression(expression);
   }
 
+  //TODO: Infinitely loops and never computes ord
   @Override
   public List<Instruction> visitOrdExp(Expression expression) {
     //MOV r4, expr
     return translateUnaryExpression(expression);
   }
 
+  //TODO: Infinitely loops and never computes chr
   @Override
   public List<Instruction> visitChrExp(Expression expression) {
     //MOV r4, expr
