@@ -477,14 +477,16 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     visitExpression(expression.getArrayElem().getExpression().get(0));
     instructions.add(new Instruction(InstrType.LDR, unusedRegisters.get(4),
         new Operand2(unusedRegisters.get(4))));
-    instructions.add(new Instruction(InstrType.LDR, unusedRegisters.get(4),
-        new Operand2(unusedRegisters.get(4))));
     instructions.add(new Instruction(InstrType.MOV, unusedRegisters.get(0),
         new Operand2(unusedRegisters.get(5))));
     instructions.add(new Instruction(InstrType.MOV, unusedRegisters.get(1),
         new Operand2(unusedRegisters.get(4))));
-
-
+    instructions.add(new Instruction(InstrType.BL, "p_check_array_bounds"));
+    instructions.add(new Instruction(InstrType.ADD, unusedRegisters.get(4),
+        unusedRegisters.get(4), new Operand2(4)));
+    instructions.add(new Instruction(InstrType.LABEL, "ADD rn, rn, LSL #2"));
+    instructions.add(new Instruction(InstrType.LDR, unusedRegisters.get(4),
+        new Operand2(unusedRegisters.get(4))));
     return instructions;
   }
 
