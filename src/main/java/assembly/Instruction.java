@@ -1,8 +1,5 @@
 package assembly;
 
-import javax.lang.model.element.ModuleElement.Directive;
-import java.util.Objects;
-
 public class Instruction {
 
   InstrType type;
@@ -10,8 +7,7 @@ public class Instruction {
   long immValue;
   Register operand1;
   Operand2 operand2;
-  //TODO: possibly change flag field into 'extra info' as not always used as a 'Flag'
-  String flag = "";
+  String extraInformation = "";
   String label;
 
   //TODO: OPTIMIZE USE OF FIELDS
@@ -39,7 +35,7 @@ public class Instruction {
     this.dest = dest;
     this.operand1 = operand1;
     this.operand2 = operand2;
-    this.flag = flag.toString();
+    this.extraInformation += flag.toString();
   }
 
   //SMULL{S}{cond} RdLo, RdHi, Rn, Rm
@@ -51,8 +47,8 @@ public class Instruction {
     this.rm = rm;
   }
 
-  //CMP{cond} dest, immValue
-  //MOV{cond} dest, immValue
+  //CMP dest, immValue
+  //MOV dest, immValue
   //LDR dest, immValue
   public Instruction(InstrType type, Register dest, long immValue) {
     this.type = type;
@@ -60,14 +56,35 @@ public class Instruction {
     this.immValue = immValue;
   }
 
-  //CMP{cond} dest, operand
-  //MOV{cond} dest, operand
-  //STR{cond} src, dest
-  //LDR{cond} dest, operand
+  //CMP{cond} dest, immValue
+  //MOV{cond} dest, immValue
+  //LDR{cond} dest, immValue
+  public Instruction(InstrType type, Register dest, long immValue, Conditionals conditionals) {
+    this.type = type;
+    this.dest = dest;
+    this.immValue = immValue;
+    this.extraInformation += conditionals.name();
+  }
+
+  //CMP dest, operand
+  //MOV dest, operand
+  //STR src, dest
+  //LDR dest, operand
   public Instruction(InstrType type, Register dest, Operand2 operand2) {
     this.type = type;
     this.dest = dest;
     this.operand2 = operand2;
+  }
+
+  //CMP{cond} dest, operand
+  //MOV{cond} dest, operand
+  //STR{cond} src, dest
+  //LDR{cond} dest, operand
+  public Instruction(InstrType type, Register dest, Operand2 operand2, Conditionals conditionals) {
+    this.type = type;
+    this.dest = dest;
+    this.operand2 = operand2;
+    this.extraInformation += conditionals;
   }
 
   //LDR{cond} dest, operand
@@ -82,7 +99,7 @@ public class Instruction {
     this.type = type;
     this.dest = dest;
     this.label = label;
-    this.flag = conditionals.toString();
+    this.extraInformation = conditionals.toString();
   }
 
   //BL label
@@ -96,7 +113,7 @@ public class Instruction {
   public Instruction(InstrType type, String label, Conditionals conditionals) {
     this.type = type;
     this.label = label;
-    this.flag = conditionals.toString();
+    this.extraInformation = conditionals.toString();
   }
 
   //PUSH {dest}
@@ -123,12 +140,12 @@ public class Instruction {
     //BL instruction format
     //.ascii instruction format
     if (type == InstrType.BL || type == InstrType.ASCII) {
-      return type + flag + " " + label;
+      return type + extraInformation + " " + label;
     }
 
     //ADD, SUB, EOR, RSB instruction format
     if (type == InstrType.ADD || type == InstrType.SUB || type == InstrType.EOR || type == InstrType.RSB) {
-      return type + flag + " " + dest + ", " + operand1 + ", " + operand2;
+      return type + extraInformation + " " + dest + ", " + operand1 + ", " + operand2;
     }
 
     if (type == InstrType.SMULL) {
@@ -140,17 +157,17 @@ public class Instruction {
 
       //With immValue format
       if (operand2 == null) {
-        return type + " " + dest + ", #" + immValue;
+        return type + extraInformation + " " + dest + ", #" + immValue;
       }
 
       //With operand format
-      return type + " " + dest + ", " + operand2;
+      return type + extraInformation + " " + dest + ", " + operand2;
     }
 
     if (type == InstrType.LDR) { //LDR instruction format
       //TODO: double check if if statements follow correctly
       if(label != null) {
-        return type + flag + " " + dest + ", =" + label;
+        return type + extraInformation + " " + dest + ", =" + label;
       } else if (operand2 == null) {
         return type + " " + dest + ", =" + immValue;
       } else {
