@@ -21,16 +21,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   private final Register r0 = new Register(0);
   private final Register r1 = new Register(1);
 
-  /* General purpose registers. */
-  private final Register r4 = new Register(4);
-  private final Register r5 = new Register(5);
-  private final Register r6 = new Register(6);
-  private final Register r7 = new Register(7);
-  private final Register r8 = new Register(8);
-  private final Register r9 = new Register(9);
-  private final Register r10 = new Register(10);
-  private final Register r11 = new Register(11);
-
   /* Special registers. */
   private final Register sp = new Register(13);
   private final Register pc = new Register(15);
@@ -182,14 +172,14 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     List<Register> registers = new ArrayList<>();
 
-    registers.add(r4);
-    registers.add(r5);
-    registers.add(r6);
-    registers.add(r7);
-    registers.add(r8);
-    registers.add(r9);
-    registers.add(r10);
-    registers.add(r11);
+    registers.add(new Register(4));
+    registers.add(new Register(5));
+    registers.add(new Register(6));
+    registers.add(new Register(7));
+    registers.add(new Register(8));
+    registers.add(new Register(9));
+    registers.add(new Register(10));
+    registers.add(new Register(11));
 
     return registers;
   }
@@ -670,16 +660,21 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
     List<Instruction> instructions = translateBinaryExpression(expression);
 
+    Register rn = popUnusedRegister();
+    Register rm = popUnusedRegister();
+
     // CMP Rn, Rn+1
-    instructions.add(new Instruction(InstrType.CMP, unusedRegisters.get(1),
-        new Operand2(unusedRegisters.get(2))));
+    instructions.add(new Instruction(InstrType.CMP, rn, new Operand2(rm)));
 
     // MOVGT Rn, #0
-    instructions.add(new Instruction(InstrType.MOV, unusedRegisters.get(1), 0));
+    instructions.add(new Instruction(InstrType.MOV, rn, 0));
 
     // MOVLE Rn, #1
     //TODO: CREATE CONDITION CODE ENUMS
-    instructions.add(new Instruction(InstrType.MOV, unusedRegisters.get(1), 1));
+    instructions.add(new Instruction(InstrType.MOV, rn, 1));
+
+    pushUnusedRegister(rn);
+    pushUnusedRegister(rm);
 
     return instructions;
   }
