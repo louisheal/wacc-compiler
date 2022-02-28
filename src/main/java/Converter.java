@@ -289,8 +289,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(InstrType.LABEL, "p_check_divide_by_zero:"));
     //TODO: ADD LR
     instructions.add(new Instruction(InstrType.LABEL, "PUSH {lr}"));
-    instructions.add(new Instruction(InstrType.CMP, generalRegisters.get(1), 0));
-    instructions.add(new Instruction(InstrType.LDR, generalRegisters.get(0), "msg_0", Conditionals.EQ));
+    instructions.add(new Instruction(InstrType.CMP, r1, 0));
+    instructions.add(new Instruction(InstrType.LDR, r0, "msg_0", Conditionals.EQ));
     instructions.add(new Instruction(InstrType.BL, "p_throw_runtime_error", Conditionals.EQ));
     instructions.add(new Instruction(InstrType.LABEL, "POP {pc}"));
     return instructions;

@@ -6,8 +6,5 @@
 # Program:
 
 begin
-  int x = 42 ;
-  int y = 30 ;
-  int z = x + y ;
-  println z
+	int x = 1+(2+(3+4))
 end
