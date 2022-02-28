@@ -60,7 +60,6 @@ public class EmulatorValidTests {
   }
 
   public String extractFromAssembly(File file) throws IOException {
-
     //Executes the commands neccessary to receieve the full output of assembly emulator of a .s file
     String[] commands = {"sh", "-c", "echo ' ' | ./wacc_examples/refEmulate " + file.getName()};
     String s;
