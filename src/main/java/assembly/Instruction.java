@@ -148,6 +148,7 @@ public class Instruction {
     }
 
     if (type == InstrType.LDR) { //LDR instruction format
+      //TODO: double check if if statements follow correctly
       if(label != null) {
         return type + flag + " " + dest + ", =" + label;
       } else if (operand2 == null) {
