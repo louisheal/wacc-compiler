@@ -306,6 +306,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       instructions.add(1, new Instruction(InstrType.DATA, "msg_0"));
       instructions.add(2, new Instruction(InstrType.WORD, 45));
       instructions.add(3, new Instruction(InstrType.ASCII, "DivideByZeroError: divide or modulo by zero\n\0"));
+      //TODO: Register Allocation
       instructions.add(new Instruction(InstrType.LABEL, "p_check_divide_by_zero:"));
       //TODO: ADD LR
       instructions.add(new Instruction(InstrType.LABEL, "PUSH {lr}"));
