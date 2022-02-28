@@ -675,7 +675,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     // SUBS Rn, Rn, Rn+1
     instructions.add(new Instruction(InstrType.SUB, rn, rn, new Operand2(rm), Flags.S));
 
-    //TODO: Add VS condition code
     // BLVS p_throw_overflow_error
     instructions.add(new Instruction(InstrType.BL, "p_throw_overflow_error", Conditionals.VS));
 
@@ -705,7 +704,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(InstrType.LABEL, "CMP " + rm + ", " + rn + ", ASR #31"));
 
     // BLNE p_throw_overflow_error
-    //TODO: Add NE condition code
     instructions.add(new Instruction(InstrType.BL, "p_throw_overflow_error", Conditionals.NE));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
@@ -799,11 +797,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(InstrType.CMP, rn, new Operand2(rm)));
 
     // MOVLE Rn, #0
-    instructions.add(new Instruction(InstrType.MOV, rn, 0));
+    instructions.add(new Instruction(InstrType.MOV, rn, 0, Conditionals.LE));
 
     // MOVGT Rn, #1
-    //TODO: CREATE CONDITION CODE ENUMS
-    instructions.add(new Instruction(InstrType.MOV, rn, 1));
+    instructions.add(new Instruction(InstrType.MOV, rn, 1, Conditionals.GT));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rm);
@@ -826,11 +823,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(InstrType.CMP, rn, new Operand2(rm)));
 
     // MOVLT Rn, #0
-    instructions.add(new Instruction(InstrType.MOV, rn, 0));
+    instructions.add(new Instruction(InstrType.MOV, rn, 0, Conditionals.LT));
 
     // MOVGE Rn, #1
-    //TODO: CREATE CONDITION CODE ENUMS
-    instructions.add(new Instruction(InstrType.MOV, rn, 1));
+    instructions.add(new Instruction(InstrType.MOV, rn, 1, Conditionals.GE));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rm);
@@ -853,11 +849,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(InstrType.CMP, rn, new Operand2(rm)));
 
     // MOVGE Rn, #0
-    instructions.add(new Instruction(InstrType.MOV, rn, 0));
+    instructions.add(new Instruction(InstrType.MOV, rn, 0, Conditionals.GE));
 
     // MOVLT Rn, #1
-    //TODO: CREATE CONDITION CODE ENUMS
-    instructions.add(new Instruction(InstrType.MOV, rn, 1));
+    instructions.add(new Instruction(InstrType.MOV, rn, 1, Conditionals.LT));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rm);
@@ -880,11 +875,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(InstrType.CMP, rn, new Operand2(rm)));
 
     // MOVGT Rn, #0
-    instructions.add(new Instruction(InstrType.MOV, rn, 0));
+    instructions.add(new Instruction(InstrType.MOV, rn, 0, Conditionals.GT));
 
     // MOVLE Rn, #1
-    //TODO: CREATE CONDITION CODE ENUMS
-    instructions.add(new Instruction(InstrType.MOV, rn, 1));
+    instructions.add(new Instruction(InstrType.MOV, rn, 1, Conditionals.LE));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rm);
@@ -893,7 +887,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
-  //TODO: Implement Condition Codes
   @Override
   public List<Instruction> visitEqExp(Expression expression) {
 
@@ -908,10 +901,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(InstrType.CMP, rn, new Operand2(rm)));
 
     // MOVEQ Rn, #1
-    instructions.add(new Instruction(InstrType.MOV, rn, 1));
+    instructions.add(new Instruction(InstrType.MOV, rn, 1, Conditionals.EQ));
 
     // MOVNE Rn, #0
-    instructions.add(new Instruction(InstrType.MOV, rn, 0));
+    instructions.add(new Instruction(InstrType.MOV, rn, 0, Conditionals.NE));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rm);
@@ -920,7 +913,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
-  //TODO: Implement Condition Codes
   @Override
   public List<Instruction> visitNeqExp(Expression expression) {
 
@@ -935,10 +927,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(InstrType.CMP, rn, new Operand2(rm)));
 
     // MOVNE Rn, #1
-    instructions.add(new Instruction(InstrType.MOV, rn, 1));
+    instructions.add(new Instruction(InstrType.MOV, rn, 1, Conditionals.NE));
 
     // MOVEQ Rn, #0
-    instructions.add(new Instruction(InstrType.MOV, rn, 0));
+    instructions.add(new Instruction(InstrType.MOV, rn, 0, Conditionals.EQ));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rm);
