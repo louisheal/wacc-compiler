@@ -368,8 +368,21 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitBoolLiterExp(Expression expression) {
+
+    /* Allocate a register: rn for this function to use. */
+    Register rn = popUnusedRegister();
+
     long boolVal = expression.getBoolLiter() ? 1 : 0;
-    return new ArrayList<>(List.of(new Instruction(InstrType.MOV, unusedRegisters.get(2), boolVal)));
+
+    List<Instruction> instructions = new ArrayList<>();
+
+    // MOV rn, #(1 | 0)
+    instructions.add(new Instruction(InstrType.MOV, rn, boolVal));
+
+    /* Mark the register used in the evaluation of this function as no longer in use. */
+    pushUnusedRegister(rn);
+
+    return instructions;
   }
 
   @Override
@@ -378,14 +391,15 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Allocate a register: rn for this function to use. */
     Register rn = popUnusedRegister();
 
-    long charVal = Character.getNumericValue(expression.getCharLiter());
-
     List<Instruction> instructions = new ArrayList<>();
 
     // MOV rn, #charVal
     //TODO: Make instruction look like: MOV r4, #'x' - as an example
     instructions.add(new Instruction(InstrType.MOV, rn, expression.getCharLiter()));
     //TODO: Ensure that following instruction is "STRB rn, [sp]"
+
+    /* Mark the register used in the evaluation of this function as no longer in use. */
+    pushUnusedRegister(rn);
 
     return instructions;
   }
