@@ -264,7 +264,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitProgram(Program program) {
-    spLocation = totalBytesInScope(program.getStatement());
     List<Instruction> instructions = new ArrayList<>();
 
     //TODO: ADD CONSTRUCTOR FOR DIRECTIVES
@@ -284,6 +283,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     //TODO: ADD ENUM FOR LABEL
     instructions.add(new Instruction(InstrType.DATA, "main"));
 
+    spLocation = totalBytesInProgram(program);
+    //TODO: SUB sp, sp, #spLocation
+
     /* Generate the assembly instructions for the program body. */
     instructions.addAll(visitStatement(program.getStatement()));
 
@@ -295,7 +297,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   //TODO: ADD FUNCTION PARAMETERS TO SYMBOL TABLE
   @Override
   public List<Instruction> visitFunction(Function function) {
-    spLocation = totalBytesInScope(function.getStatement());
+    spLocation = totalBytesInFunction(function);
     return visitStatement(function.getStatement());
   }
 
