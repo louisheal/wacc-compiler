@@ -419,10 +419,25 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return visitStatement(function.getStatement());
   }
 
-  //TODO: ADD RHS VISIT FUNCTION
   @Override
   public List<Instruction> visitDeclarationStatement(Statement statement) {
-    return visitExpression(statement.getRHS().getExpression1());
+
+    List<Instruction> instructions = new ArrayList<>();
+
+    statement.getLhsIdent();
+
+    /* Generate instructions to evaluate the RHS and put the result into the first unused register. */
+    instructions.addAll(visitRHS(statement.getRHS()));
+
+    /* Retrieve the first register which is where the value of the RHS is stored. */
+    Register rn = popUnusedRegister();
+
+    // STR rn, [sp]
+    instructions.add(new Instruction(InstrType.STR, rn, spLocation));
+
+    spLocation -= sizeOfTypeOnStack(statement.getLhsType());
+
+    return instructions;
   }
 
   @Override
