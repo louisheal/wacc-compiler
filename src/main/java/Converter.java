@@ -880,11 +880,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(InstrType.CMP, rn, new Operand2(rm)));
 
     // MOVGT Rn, #0
-    instructions.add(new Instruction(InstrType.MOV, rn, 0));
+    instructions.add(new Instruction(InstrType.MOV, rn, 0, Conditionals.GT));
 
     // MOVLE Rn, #1
-    //TODO: CREATE CONDITION CODE ENUMS
-    instructions.add(new Instruction(InstrType.MOV, rn, 1));
+    instructions.add(new Instruction(InstrType.MOV, rn, 1, Conditionals.LE));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rm);
