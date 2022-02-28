@@ -654,7 +654,7 @@ public class ASTVisitor<T> {
      * @param rhs expression node
      * @return returns the assembly instructions for a rhs expression
      */
-    private T visitExprRHS(AssignRHS rhs) {
+    public T visitExprRHS(AssignRHS rhs) {
         return null;
     }
 
@@ -667,7 +667,7 @@ public class ASTVisitor<T> {
      * @param rhs array node
      * @return returns the assembly instructions for a rhs array
      */
-    private T visitArrayRHS(AssignRHS rhs) {
+    public T visitArrayRHS(AssignRHS rhs) {
         return null;
     }
 
@@ -681,7 +681,7 @@ public class ASTVisitor<T> {
      * @param rhs new pair node
      * @return returns the assembly instructions for a rhs new pair
      */
-    private T visitNewPairRHS(AssignRHS rhs) {
+    public T visitNewPairRHS(AssignRHS rhs) {
         return null;
     }
 
@@ -694,7 +694,7 @@ public class ASTVisitor<T> {
      * @param rhs pair elem node
      * @return returns the assembly instructions for a rhs pair elem
      */
-    private T visitPairElemRHS(AssignRHS rhs) {
+    public T visitPairElemRHS(AssignRHS rhs) {
         return null;
     }
 
@@ -708,7 +708,7 @@ public class ASTVisitor<T> {
      * @param rhs function call node
      * @return returns the assembly instructions for a rhs function call
      */
-    private T visitCallRHS(AssignRHS rhs) {
+    public T visitCallRHS(AssignRHS rhs) {
         return null;
     }
 
@@ -738,7 +738,7 @@ public class ASTVisitor<T> {
      * @param lhs identity node
      * @return returns the assembly instructions for a lhs identity node
      */
-    private T visitIdentLHS(AssignLHS lhs) {
+    public T visitIdentLHS(AssignLHS lhs) {
         return null;
     }
 
@@ -751,7 +751,7 @@ public class ASTVisitor<T> {
      * @param lhs array elem node
      * @return returns the assembly instructions for a lhs array elem node
      */
-    private T visitArrayElemLHS(AssignLHS lhs) {
+    public T visitArrayElemLHS(AssignLHS lhs) {
         return null;
     }
 
@@ -764,7 +764,7 @@ public class ASTVisitor<T> {
      * @param lhs pair elem node
      * @return returns the assembly instructions for a lhs pair elem node
      */
-    private T visitPairElemLHS(AssignLHS lhs) {
+    public T visitPairElemLHS(AssignLHS lhs) {
         return null;
     }
 
