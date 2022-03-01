@@ -90,9 +90,14 @@ public class Compiler {
 
   public static void main(String[] args) throws IOException {
 
-    Path filename = Path.of(args[0]);
+    Path filename = Path.of("test.wacc");
 
-    Program ast = compile(new String(args[0]));
+    String program = "begin\n" +
+        "int x = 10;\n" +
+        "x = 20\n" +
+        "end";
+
+    Program ast = compileProgram(program);
 
     Converter converter = new Converter();
     List<Instruction> instructions = converter.visitProgram(ast);
