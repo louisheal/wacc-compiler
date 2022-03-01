@@ -27,27 +27,31 @@ public class EmulatorValidTests {
       // Extracts the # Output part of the .wacc example file
       String expectedOutput = extractExpectedOutputFromAssembly(file);
       String actualOutput = "";
-
+      System.out.print("RUNNING " + file.getName() + ": ");
       // Runs the given assembly file and writes the output onto actualOutput
 
-      String[] arg = {file.toString()};
-      Compiler.main(arg);
-      String newFileName = file.getName().substring(0, file.getName().lastIndexOf('.')) + ".s";
-      File generatedAssemblyFile = new File(newFileName);
-      actualOutput = extractActualOutputFromAssembly(generatedAssemblyFile);
-      generatedAssemblyFile.delete();
-
-      System.out.print("RUNNING " + file.getName() + ": ");
-      if (actualOutput.equals(expectedOutput)) {
-        System.out.println("PASS");
-      } else {
+      try {
+        String[] arg = {file.toString()};
+        Compiler.main(arg);
+        String newFileName = file.getName().substring(0, file.getName().lastIndexOf('.')) + ".s";
+        File generatedAssemblyFile = new File(newFileName);
+        actualOutput = extractActualOutputFromAssembly(generatedAssemblyFile);
+        generatedAssemblyFile.delete();
+        if (actualOutput.equals(expectedOutput)) {
+          System.out.println("PASS");
+        } else {
+          failedTests++;
+          System.out.println("FAIL");
+        }
+        System.out.println("EXPECTED OUTPUT:");
+        System.out.println(expectedOutput);
+        System.out.println("ACTUAL OUTPUT:\n");
+        System.out.print(actualOutput);
+      } catch (Exception e) {
+        System.out.println("Compile Error");
         failedTests++;
-        System.out.println("FAIL");
       }
-      System.out.println("EXPECTED OUTPUT:");
-      System.out.print(expectedOutput);
-      System.out.println("ACTUAL OUTPUT:\n");
-      System.out.print(actualOutput);
+      System.out.println("--------------------------------------");
     }
       System.out.println("--------- Tests passed: " + (totalTests - failedTests) + "/" + totalTests + " ---------\n");
       if (failedTests > 0) {
@@ -81,7 +85,7 @@ public class EmulatorValidTests {
 
   public static String extractActualOutputFromAssembly(File file) throws IOException {
     //Executes the commands neccessary to receieve the full output of assembly emulator of a .s file
-    String[] commands = {"sh", "-c", "echo ' ' | ./wacc_examples/refEmulate " + file.getPath()};
+    String[] commands = {"bash", "-c", "echo ' ' | ./wacc_examples/refEmulate " + file.getPath()};
     String s;
     StringBuilder sb = new StringBuilder();
     Process p = Runtime.getRuntime().exec(commands);
@@ -121,7 +125,7 @@ public class EmulatorValidTests {
 
   public static String extractExpectedOutputFromAssembly(File file) throws IOException {
     //Executes the commands neccessary to receieve the full output of assembly emulator of a .s file
-    String[] commands = {"sh", "-c", "echo ' ' | ./wacc_examples/refCompile -x " + file.getPath()};
+    String[] commands = {"bash", "-c", "echo ' ' | ./wacc_examples/refCompile -x " + file.getPath().replace("\\", "/")};
     String s;
     StringBuilder sb = new StringBuilder();
     Process p = Runtime.getRuntime().exec(commands);
