@@ -527,31 +527,55 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return new ArrayList<>(List.of(new Instruction(InstrType.STR, unusedRegisters.get(1), new Operand2(sp))));
   }
 
+  // TODO: Multi-dimensional array lookup
   @Override
   public List<Instruction> visitArrayElemExp(Expression expression) {
 
+    /* Set ArrayLookup flag to true. */
     isArrayLookup = true;
 
+    ArrayElem arrayElem = expression.getArrayElem();
     List<Instruction> instructions = new ArrayList<>();
-    String expressionIdent = expression.getIdent();
-    int storedSPLocation = currentST.getSPMapping(expressionIdent);
-    spLocation = spLocation - sizeOfTypeOnStack(currentST.getType(expression.getIdent()));
-    instructions.add(new Instruction(InstrType.ADD, sp, 0));
+    String instruction;
 
-    //The index is assumed to be stored at register 5.
-    visitExpression(expression.getArrayElem().getExpression().get(0));
-    instructions.add(new Instruction(InstrType.LDR, unusedRegisters.get(4),
-        new Operand2(unusedRegisters.get(4))));
-    instructions.add(new Instruction(InstrType.MOV, unusedRegisters.get(0),
-        new Operand2(unusedRegisters.get(5))));
-    instructions.add(new Instruction(InstrType.MOV, unusedRegisters.get(1),
-        new Operand2(unusedRegisters.get(4))));
+    /* Find where the array address is stored on the stack. */
+    int stackOffset = currentST.getSPMapping(expression.getIdent());
+
+    /* Allocate one register: rn for this function to use. */
+    Register rn = popUnusedRegister();
+
+    // ADD rn, sp, #offset
+    instruction = String.format("ADD %s, sp, #%d", rn, stackOffset);
+    instructions.add(new Instruction(InstrType.LABEL, instruction));
+
+    /* Evaluate the index of the ArrayElem and store it in rm. */
+    instructions.addAll(visitExpression(arrayElem.getExpression().get(0)));
+
+    /* Retrieve the register rm which contains the value of the index. */
+    Register rm = popUnusedRegister();
+
+    // LDR rn, [rn]
+    instructions.add(new Instruction(InstrType.LDR, rn, new Operand2(rn)));
+
+    // MOV r1, rn
+    instructions.add(new Instruction(InstrType.MOV, r1, new Operand2(rn)));
+
+    // BL p_check_array_bounds
     instructions.add(new Instruction(InstrType.BL, "p_check_array_bounds"));
-    instructions.add(new Instruction(InstrType.ADD, unusedRegisters.get(4),
-        unusedRegisters.get(4), new Operand2(4)));
-    instructions.add(new Instruction(InstrType.LABEL, "ADD rn, rn, LSL #2"));
-    instructions.add(new Instruction(InstrType.LDR, unusedRegisters.get(4),
-        new Operand2(unusedRegisters.get(4))));
+
+    // ADD rn, rn, #4
+    instructions.add(new Instruction(InstrType.ADD, rn, rn, new Operand2(4)));
+
+    // ADD rn, rn, rm, LSL #2
+    instruction = String.format("ADD %s, %s, LSL #2", rn, rn);
+    instructions.add(new Instruction(InstrType.LABEL, instruction));
+
+    // LDR rn, [rn]
+    instructions.add(new Instruction(InstrType.LDR, rn, new Operand2(rn)));
+
+    /* Mark the two registers used in the evaluation of this function as no longer in use. */
+    pushUnusedRegister(rm);
+    pushUnusedRegister(rn);
 
     return instructions;
   }
