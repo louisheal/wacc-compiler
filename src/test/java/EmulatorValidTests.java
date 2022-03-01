@@ -29,16 +29,13 @@ public class EmulatorValidTests {
       String actualOutput = "";
 
       // Runs the given assembly file and writes the output onto actualOutput
-      try {
-        String[] arg = {file.toString()};
-        Compiler.main(arg);
-        String newFileName = file.getName().substring(0, file.getName().lastIndexOf('.')) + ".s";
-        File generatedAssemblyFile = new File(newFileName);
-        actualOutput = extractActualOutputFromAssembly(generatedAssemblyFile);
-        generatedAssemblyFile.delete();
-      } catch (Exception ignored) {
-        System.out.println("Compile error");
-      }
+
+      String[] arg = {file.toString()};
+      Compiler.main(arg);
+      String newFileName = file.getName().substring(0, file.getName().lastIndexOf('.')) + ".s";
+      File generatedAssemblyFile = new File(newFileName);
+      actualOutput = extractActualOutputFromAssembly(generatedAssemblyFile);
+      generatedAssemblyFile.delete();
 
       System.out.print("RUNNING " + file.getName() + ": ");
       if (actualOutput.equals(expectedOutput)) {
