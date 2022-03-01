@@ -85,7 +85,7 @@ public class EmulatorValidTests {
 
   public static String extractActualOutputFromAssembly(File file) throws IOException {
     //Executes the commands neccessary to receieve the full output of assembly emulator of a .s file
-    String[] commands = {"bash", "-c", "echo ' ' | ./wacc_examples/refEmulate " + file.getPath()};
+    String[] commands = {"bash", "-c", "echo ' ' | ./wacc_examples/refEmulate " + file.getPath().replace("\\", "/")};
     String s;
     StringBuilder sb = new StringBuilder();
     Process p = Runtime.getRuntime().exec(commands);
