@@ -34,7 +34,7 @@ public class EmulatorValidTests {
         Compiler.main(arg);
         String newFileName = file.getName().substring(0, file.getName().lastIndexOf('.')) + ".s";
         File generatedAssemblyFile = new File(newFileName);
-        actualOutput = extractFromAssembly(generatedAssemblyFile);
+        actualOutput = extractActualOutputFromAssembly(generatedAssemblyFile);
         generatedAssemblyFile.delete();
       } catch (Exception ignored) {
         System.out.println("Compile error");
@@ -82,7 +82,7 @@ public class EmulatorValidTests {
     return output.toString();
   }
 
-  public static String extractFromAssembly(File file) throws IOException {
+  public static String extractActualOutputFromAssembly(File file) throws IOException {
     //Executes the commands neccessary to receieve the full output of assembly emulator of a .s file
     String[] commands = {"sh", "-c", "echo ' ' | ./wacc_examples/refEmulate " + file.getName()};
     String s;
@@ -120,6 +120,46 @@ public class EmulatorValidTests {
   }
 
   return arrayToString.toString();
+  }
+
+  public static String extractExpectedOutputFromAssembly(File file) throws IOException {
+    //Executes the commands neccessary to receieve the full output of assembly emulator of a .s file
+    String[] commands = {"sh", "-c", "echo ' ' | ./wacc_examples/refCompile -x " + file.getName()};
+    String s;
+    StringBuilder sb = new StringBuilder();
+    Process p = Runtime.getRuntime().exec(commands);
+    BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+    while (((s = br.readLine()) != null)) {
+      sb.append(s).append("\n");
+    }
+
+    //Extracts all lines after 'Emulation Output'
+    BufferedReader bufferedReader = new BufferedReader(new StringReader(sb.toString()));
+    String line = null;
+    StringBuilder outputExtracted = new StringBuilder();
+
+    while ((line = bufferedReader.readLine()) != null) {
+      if (line.contains("===========================================================")) {
+        while ((line = bufferedReader.readLine()) != null) {
+          outputExtracted.append(line).append("\n");
+        }
+        break;
+      }
+    }
+
+    //Removes the last 3 lines which are "====" and exit code and finished
+    String[] lines = outputExtracted.toString().split("\n");
+    String[] linesWithoutExit = Arrays.copyOf(lines, lines.length - 3);
+
+    StringBuilder arrayToString = new StringBuilder();
+    for (int i = 0; i < linesWithoutExit.length; i++) {
+      arrayToString.append(linesWithoutExit[i]);
+      if (i != linesWithoutExit.length - 1) {
+        arrayToString.append("\n");
+      }
+    }
+
+    return arrayToString.toString();
   }
 
   @Test
