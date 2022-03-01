@@ -28,6 +28,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   private boolean isArrayLookup = false;
   private boolean runtimeErr = false;
 
+  //TODO: DELETE?
   private List<Instruction> getInstructionFromExpression(Expression expr) {
 
     if (expr == null) {
@@ -151,6 +152,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return null;
   }
 
+  //TODO: DELETE?
   private long calculateMallocSize(Expression exp, Type type){
     switch(type.getType()){
 
@@ -1022,7 +1024,49 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitArrayRHS(AssignRHS rhs) {
-    return super.visitArrayRHS(rhs);
+
+    List<Expression> array = rhs.getArray();
+    List<Instruction> instructions = new ArrayList<>();
+    Type arrayType = new Type(Type.EType.INT);
+
+    int mallocSize = 4;
+    for (Expression expression : array) {
+      //TODO: private Type expressionToType(Expression expression){}
+      mallocSize += sizeOfTypeOnStack(arrayType);
+    }
+
+    // LDR r0, =mallocSize
+    instructions.add(new Instruction(InstrType.LDR, r0, mallocSize));
+
+    // BL malloc
+    instructions.add(new Instruction(InstrType.BL, "malloc"));
+
+    /* Allocate one register: rn for this function to use. */
+    Register rn = popUnusedRegister();
+
+    // MOV rn, r0
+    instructions.add(new Instruction(InstrType.MOV, rn, new Operand2(r0)));
+
+    int offset = mallocSize;
+    for (Expression expression : array) {
+
+      /* Generate instructions to evaluate each expression. */
+      instructions.addAll(visitExpression(expression));
+
+      /* Retrieve the register containing the evaluated expression. */
+      Register rm = popUnusedRegister();
+
+      /* Store the evaluated expression into the malloc location at an offset. */
+      instructions.add(new Instruction(InstrType.LABEL, String.format("STR %s, [%s, #%d]", rm, rn, offset)));
+    }
+
+    /* Allocate a register: rm for this function to use. */
+    Register rm = popUnusedRegister();
+
+    // LDR rm, =array.size()
+    instructions.add(new Instruction(InstrType.LDR, rm, array.size()));
+
+    return instructions;
   }
 
   @Override
