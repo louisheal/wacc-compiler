@@ -525,7 +525,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
-  //TODO: ADD FUNCTION PARAMETERS TO SYMBOL TABLE
   @Override
   public List<Instruction> visitFunction(Function function) {
 
@@ -610,6 +609,24 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Mark the register used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rn);
 
+    return instructions;
+  }
+
+  @Override
+  public List<Instruction> visitReassignmentStatement(Statement statement) {
+    String lhsIdent = getIdentFromLHS(statement.getLHS());
+    int lhsStackLocation = currentST.getSPMapping(lhsIdent);
+    List<Instruction> instructions = new ArrayList<>(visitRHS(statement.getRHS()));
+    Register rn = popUnusedRegister();
+    if (spLocation - currentST.getSPMapping(lhsIdent) > 0 ){
+      instructions.add(new Instruction(InstrType.LABEL, String.format("STR %s [sp, #%d]", rn,
+              lhsStackLocation)));
+    }
+    else{
+      instructions.add(new Instruction(InstrType.STR, rn, new Operand2(sp)));
+    }
+
+    pushUnusedRegister(rn);
     return instructions;
   }
 
@@ -804,23 +821,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       default:
         return lhs.getIdent();
     }
-  }
-
-  public List<Instruction> visitReassignmentStatement(Statement statement) {
-    String lhsIdent = getIdentFromLHS(statement.getLHS());
-    int lhsStackLocation = currentST.getSPMapping(lhsIdent);
-    List<Instruction> instructions = new ArrayList<>(visitRHS(statement.getRHS()));
-    Register rn = popUnusedRegister();
-    if (spLocation - currentST.getSPMapping(lhsIdent) > 0 ){
-      instructions.add(new Instruction(InstrType.LABEL, String.format("STR %s [sp, #%d]", rn,
-          lhsStackLocation)));
-    }
-    else{
-      instructions.add(new Instruction(InstrType.STR, rn, new Operand2(sp)));
-    }
-
-    pushUnusedRegister(rn);
-    return instructions;
   }
 
   private List<Instruction> translateUnaryExpression(Expression expression) {
