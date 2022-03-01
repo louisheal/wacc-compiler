@@ -331,9 +331,8 @@ public class EmulatorValidTests {
   public void variablesTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-//    File directory = new File("wacc_examples/valid/variables/");
-//    File[] examples = directory.listFiles();
-    File[] examples = {new File("wacc_examples/valid/variables/intDeclaration.wacc")};
+    File directory = new File("wacc_examples/valid/variables/");
+    File[] examples = directory.listFiles();
 
     assert examples != null;
     runTests(examples);
