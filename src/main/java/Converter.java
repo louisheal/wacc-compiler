@@ -533,6 +533,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     List<Instruction> instructions = new ArrayList<>();
 
+    currentST = new SymbolTable(null);
+
     spLocation = totalBytesInFunction(function);
 
     if (spLocation > 0) {
@@ -599,6 +601,11 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.addAll(visitStatement(statement.getStatement2()));
 
     return instructions;
+  }
+
+  @Override
+  public List<Instruction> visitReturnStatement(Statement statement) {
+    return Collections.emptyList();
   }
 
   @Override
