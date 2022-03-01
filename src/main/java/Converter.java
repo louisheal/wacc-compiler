@@ -372,6 +372,22 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
+  public List<Instruction> checkNullPointer(List<Instruction> instructions, int msgNumber) {
+    int offset = msgNumber * 3;
+    instructions.add(1 + offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
+    instructions.add(2 + offset, new Instruction(InstrType.WORD, 50));
+    instructions.add(3 + offset, new Instruction(InstrType.ASCII, "NullReferenceError: dereference a null reference\n\0"));
+    //TODO: Register Allocation
+    instructions.add(new Instruction(InstrType.LABEL, "p_check_null_pointer:"));
+    instructions.add(new Instruction(InstrType.LABEL, "PUSH {lr}"));
+    instructions.add(new Instruction(InstrType.CMP, r0, 0));
+    instructions.add(new Instruction(InstrType.LDR, r0, "msg_" + msgNumber, Conditionals.EQ));
+    instructions.add(new Instruction(InstrType.BL, "p_throw_runtime_error", Conditionals.EQ));
+    instructions.add(new Instruction(InstrType.LABEL, "POP {pc}"));
+    runtimeErr = true;
+    return instructions;
+  }
+
   public List<Instruction> checkDivideByZero(List<Instruction> instructions, int msgNumber) {
     int offset = msgNumber * 3;
     instructions.add(1 + offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
