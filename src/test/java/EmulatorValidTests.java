@@ -21,11 +21,11 @@ public class EmulatorValidTests {
   // Will ensure that the files listed are not folders
   FileFilter folderFilter = pathname -> !pathname.isDirectory();
 
-  public void runTests(File[] files) throws FileNotFoundException {
+  public void runTests(File[] files) throws IOException {
     for (File file : files) {
       totalTests++;
       // Extracts the # Output part of the .wacc example file
-      String expectedOutput = scan(file);
+      String expectedOutput = extractExpectedOutputFromAssembly(file);
       String actualOutput = "";
 
       // Runs the given assembly file and writes the output onto actualOutput
@@ -84,7 +84,7 @@ public class EmulatorValidTests {
 
   public static String extractActualOutputFromAssembly(File file) throws IOException {
     //Executes the commands neccessary to receieve the full output of assembly emulator of a .s file
-    String[] commands = {"sh", "-c", "echo ' ' | ./wacc_examples/refEmulate " + file.getName()};
+    String[] commands = {"sh", "-c", "echo ' ' | ./wacc_examples/refEmulate " + file.getPath()};
     String s;
     StringBuilder sb = new StringBuilder();
     Process p = Runtime.getRuntime().exec(commands);
@@ -124,7 +124,7 @@ public class EmulatorValidTests {
 
   public static String extractExpectedOutputFromAssembly(File file) throws IOException {
     //Executes the commands neccessary to receieve the full output of assembly emulator of a .s file
-    String[] commands = {"sh", "-c", "echo ' ' | ./wacc_examples/refCompile -x " + file.getName()};
+    String[] commands = {"sh", "-c", "echo ' ' | ./wacc_examples/refCompile -x " + file.getPath()};
     String s;
     StringBuilder sb = new StringBuilder();
     Process p = Runtime.getRuntime().exec(commands);
@@ -133,7 +133,7 @@ public class EmulatorValidTests {
       sb.append(s).append("\n");
     }
 
-    //Extracts all lines after 'Emulation Output'
+    //Extracts all lines after '============='
     BufferedReader bufferedReader = new BufferedReader(new StringReader(sb.toString()));
     String line = null;
     StringBuilder outputExtracted = new StringBuilder();
