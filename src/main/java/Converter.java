@@ -1123,6 +1123,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     // LDR rm, =array.size()
     instructions.add(new Instruction(InstrType.LDR, rm, array.size()));
 
+    // STR r5, [r4]
+    instructions.add(new Instruction(InstrType.STR, rn, new Operand2(rm)));
+
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rm);
     pushUnusedRegister(rn);
