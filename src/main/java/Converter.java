@@ -595,8 +595,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     List<Instruction> instructions = new ArrayList<>();
 
     // MOV rn, #charVal
-    //TODO: Make instruction look like: MOV r4, #'x' - as an example
-    instructions.add(new Instruction(InstrType.MOV, rn, expression.getCharLiter()));
+    String instruction = String.format("MOV %s, #'%s'", rn, expression.getCharLiter());
+    instructions.add(new Instruction(InstrType.LABEL, instruction));
     //TODO: Ensure that following instruction is "STRB rn, [sp]"
 
     /* Mark the register used in the evaluation of this function as no longer in use. */
@@ -746,21 +746,18 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
-  //TODO: Infinitely loops and never computes the length
   @Override
   public List<Instruction> visitLenExp(Expression expression) {
     // LDR r4, [r4]
     return translateUnaryExpression(expression);
   }
 
-  //TODO: Infinitely loops and never computes ord
   @Override
   public List<Instruction> visitOrdExp(Expression expression) {
     // MOV r4, expr
     return translateUnaryExpression(expression);
   }
 
-  //TODO: Infinitely loops and never computes chr
   @Override
   public List<Instruction> visitChrExp(Expression expression) {
     // MOV r4, expr
