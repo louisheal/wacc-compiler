@@ -500,8 +500,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     }
     instructions.add(new Instruction(InstrType.LABEL, instruction));
 
-    /* Add the variable and its offset to the symbol table. */
+    /* Add the variable to the symbol table. */
     currentST.setSPMapping(statement.getLhsIdent(), stackOffset);
+    currentST.newVariable(statement.getLhsIdent(), statement.getLhsType());
 
     /* Update the spLocation variable to point to the next available space on the stack. */
     spLocation = stackOffset;
@@ -616,6 +617,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       instruction = String.format("LDR %s, [sp]", rn);
     }
     instructions.add(new Instruction(InstrType.LABEL, instruction));
+
+    /* Mark the register used in the evaluation of this function as no longer in use. */
+    pushUnusedRegister(rn);
 
     return instructions;
   }
@@ -1078,12 +1082,11 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     List<Expression> array = rhs.getArray();
     List<Instruction> instructions = new ArrayList<>();
-    Type arrayType = new Type(Type.EType.INT);
 
     int mallocSize = 4;
     for (Expression expression : array) {
       //TODO: private Type expressionToType(Expression expression){}
-      mallocSize += sizeOfTypeOnStack(arrayType);
+      mallocSize += sizeOfTypeOnStack(getExpressionType(expression));
     }
 
     // LDR r0, =mallocSize
