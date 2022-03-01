@@ -530,9 +530,19 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   //TODO: ADD FUNCTION PARAMETERS TO SYMBOL TABLE
   @Override
   public List<Instruction> visitFunction(Function function) {
-    return Collections.emptyList();
-    //spLocation = totalBytesInFunction(function);
-    //return visitStatement(function.getStatement());
+
+    List<Instruction> instructions = new ArrayList<>();
+
+    spLocation = totalBytesInFunction(function);
+
+    if (spLocation > 0) {
+      instructions.add(new Instruction(InstrType.LABEL, String.format("SUB sp, sp, #%d", spLocation)));
+    }
+
+    /* Evaluate function body. */
+    instructions.addAll(visitStatement(function.getStatement()));
+
+    return instructions;
   }
 
   @Override
