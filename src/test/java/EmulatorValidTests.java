@@ -74,6 +74,11 @@ public class EmulatorValidTests {
       }
     }
     scanner.close();
+
+    if (output.toString().equals("#empty#\n")) {
+      return "";
+    }
+
     return output.toString();
   }
 
@@ -326,8 +331,9 @@ public class EmulatorValidTests {
   public void variablesTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-    File directory = new File("wacc_examples/valid/variables/");
-    File[] examples = directory.listFiles();
+//    File directory = new File("wacc_examples/valid/variables/");
+//    File[] examples = directory.listFiles();
+    File[] examples = {new File("wacc_examples/valid/variables/intDeclaration.wacc")};
 
     assert examples != null;
     runTests(examples);
