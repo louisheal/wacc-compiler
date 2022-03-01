@@ -541,7 +541,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return Collections.emptyList();
   }
 
-  //TODO: Add variable to symbol table
   @Override
   public List<Instruction> visitDeclarationStatement(Statement statement) {
 
@@ -553,13 +552,18 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     int stackOffset = spLocation - sizeOfTypeOnStack(statement.getLhsType());
 
-    String instruction;
+    String instruction = "STR";
+
+    if (sizeOfTypeOnStack(statement.getLhsType()) == 1) {
+      instruction += "B";
+    }
+
     if (stackOffset > 0) {
       // STR rn, [sp]
-      instruction = String.format("STR %s, [sp, #%d]", rn, stackOffset);
+      instruction += String.format(" %s, [sp, #%d]", rn, stackOffset);
     } else {
       // STR rn, [sp, #i]
-      instruction = String.format("STR %s, [sp]", rn);
+      instruction += String.format(" %s, [sp]", rn);
     }
     instructions.add(new Instruction(InstrType.LABEL, instruction));
 
@@ -653,7 +657,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     Register rn = popUnusedRegister();
 
     // LDR rn, =msg_0
-    //TODO: Verify this matches the instruction above
     instructions.add(new Instruction(InstrType.LDR, rn, "msg_0"));
 
     /* Mark the register used in the evaluation of this function as no longer in use. */
@@ -831,16 +834,15 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   }
 
   private List<Instruction> translateBinaryExpression(Expression expression) {
-    List<Instruction> instructions = new ArrayList<>();
 
     /* Generate assembly instructions for the first expression. */
-    instructions.addAll(visitExpression(expression.getExpression1())); //Store result in Rn
+    List<Instruction> instructions = new ArrayList<>(visitExpression(expression.getExpression1()));
 
     /* Declare that rn is in use. */
     Register rn = popUnusedRegister();
 
     /* Generate assembly instructions for the second expression. */
-    instructions.addAll(visitExpression(expression.getExpression2())); //Store result in Rn+1
+    instructions.addAll(visitExpression(expression.getExpression2()));
 
     /* Declare that rn is no longer in use. */
     pushUnusedRegister(rn);
@@ -1206,13 +1208,12 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     int mallocSize = 4;
     int typeSize = 0;
 
-    /* if array is not empty get size of type */
+    /* If array is not empty get stack size of type. */
     if(!array.isEmpty()) {
       typeSize = sizeOfTypeOnStack(getExpressionType(array.get(0)));
     }
 
-    for (Expression expression : array) {
-      //TODO: private Type expressionToType(Expression expression){}
+    for (int i = 0; i < array.size(); i++) {
       mallocSize += typeSize;
     }
 
