@@ -27,6 +27,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   private boolean isCalc = false;
   private boolean isArrayLookup = false;
   private boolean runtimeErr = false;
+  private boolean checkNullPointer = false;
 
   //TODO: DELETE?
   private List<Instruction> getInstructionFromExpression(Expression expr) {
@@ -334,14 +335,15 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   public List<Instruction> arrayIndexOutOfBoundsError(List<Instruction> instructions, int msgNumber) {
     int offset = msgNumber * 3;
-    instructions.add(1 + offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
-    instructions.add(2 + offset, new Instruction(InstrType.WORD, 44));
-    instructions.add(3 + offset, new Instruction(InstrType.ASCII, "ArrayIndexOutOfBoundsError: negative index\n\0"));
+    instructions.add(offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
+    instructions.add(1 + offset, new Instruction(InstrType.WORD, 44));
+    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "ArrayIndexOutOfBoundsError: negative index\n\0"));
     msgNumber++;
     offset = msgNumber * 3;
-    instructions.add(1 + offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
-    instructions.add(2 + offset, new Instruction(InstrType.WORD, 45));
-    instructions.add(3 + offset, new Instruction(InstrType.ASCII, "ArrayIndexOutOfBoundsError: index too large\n\0"));
+    instructions.add(offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
+    instructions.add(1 + offset, new Instruction(InstrType.WORD, 45));
+    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "ArrayIndexOutOfBoundsError: index too large\n\0"));
+    //TODO: Register Allocation
     instructions.add(new Instruction(InstrType.LABEL, "p_check_array_bounds:"));
     //TODO: ADD LR
     instructions.add(new Instruction(InstrType.LABEL, "PUSH {lr}"));
@@ -359,9 +361,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   public List<Instruction> throwOverflowError(List<Instruction> instructions, int msgNumber) {
     int offset = msgNumber * 3;
-    instructions.add(1 + offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
-    instructions.add(2 + offset, new Instruction(InstrType.WORD, 83));
-    instructions.add(3 + offset, new Instruction(InstrType.ASCII, "OverflowError: the result is too " +
+    instructions.add(offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
+    instructions.add(1 + offset, new Instruction(InstrType.WORD, 83));
+    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "OverflowError: the result is too " +
             "small/large to store in a 4-byte signed-integer.\n\0"));
     //TODO: Register Allocation
     instructions.add(new Instruction(InstrType.LABEL, "p_throw_overflow_error:"));
@@ -371,11 +373,27 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
+  public List<Instruction> checkNullPointer(List<Instruction> instructions, int msgNumber) {
+    int offset = msgNumber * 3;
+    instructions.add(offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
+    instructions.add(1 + offset, new Instruction(InstrType.WORD, 50));
+    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "NullReferenceError: dereference a null reference\n\0"));
+    //TODO: Register Allocation
+    instructions.add(new Instruction(InstrType.LABEL, "p_check_null_pointer:"));
+    instructions.add(new Instruction(InstrType.LABEL, "PUSH {lr}"));
+    instructions.add(new Instruction(InstrType.CMP, r0, 0));
+    instructions.add(new Instruction(InstrType.LDR, r0, "msg_" + msgNumber, Conditionals.EQ));
+    instructions.add(new Instruction(InstrType.BL, "p_throw_runtime_error", Conditionals.EQ));
+    instructions.add(new Instruction(InstrType.LABEL, "POP {pc}"));
+    runtimeErr = true;
+    return instructions;
+  }
+
   public List<Instruction> checkDivideByZero(List<Instruction> instructions, int msgNumber) {
     int offset = msgNumber * 3;
-    instructions.add(1 + offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
-    instructions.add(2 + offset, new Instruction(InstrType.WORD, 45));
-    instructions.add(3 + offset, new Instruction(InstrType.ASCII, "DivideByZeroError: divide or modulo by zero\n\0"));
+    instructions.add(offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
+    instructions.add(1 + offset, new Instruction(InstrType.WORD, 45));
+    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "DivideByZeroError: divide or modulo by zero\n\0"));
     //TODO: Register Allocation
     instructions.add(new Instruction(InstrType.LABEL, "p_check_divide_by_zero:"));
     //TODO: ADD LR
@@ -393,9 +411,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     List<Instruction> instructions = new ArrayList<>();
 
     //TODO: ADD CONSTRUCTOR FOR DIRECTIVES
-    //TODO: Only include this instruction if needed
-    instructions.add(new Instruction(InstrType.DATA, ""));
-    instructions.add(new Instruction(InstrType.LABEL, "")); // Leave gap in lines
 
     //TODO: ADD VARIABLE INSTRUCTIONS HERE
 
@@ -449,17 +464,27 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       msgNumber++;
     }
 
+    if(checkNullPointer) {
+      instructions = checkNullPointer(instructions, msgNumber);
+      msgNumber++;
+    }
+
     if(isDiv) {
       instructions = checkDivideByZero(instructions, msgNumber);
       msgNumber++;
     }
 
-    //TODO: Note: runtimeErr must come last
     if(runtimeErr) {
       instructions.add(new Instruction(InstrType.LABEL, "p_throw_runtime_error:"));
+      //TODO: might need p_print_string?
       instructions.add(new Instruction(InstrType.BL, "p_print_string"));
       instructions.add(new Instruction(InstrType.MOV, r0, -1));
       instructions.add(new Instruction(InstrType.BL, "exit"));
+    }
+
+    if(msgNumber > 0) {
+      instructions.add(0, new Instruction(InstrType.DATA, ""));
+      instructions.add(1, new Instruction(InstrType.LABEL, "")); // Leave gap in lines
     }
 
     return instructions;
@@ -700,6 +725,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitNegExp(Expression expression) {
+
+    isCalc = true;
+
     List<Instruction> instructions = translateUnaryExpression(expression);
 
     /* Allocate a register: rn for this function to use. */
@@ -1132,6 +1160,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitNewPairRHS(AssignRHS rhs) {
+
+    checkNullPointer = true;
 
     List<Instruction> instructions = new ArrayList<>();
     Register rn, rm;
