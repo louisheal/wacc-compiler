@@ -36,7 +36,6 @@ public class EmulatorValidTests {
         String newFileName = file.getName().substring(0, file.getName().lastIndexOf('.')) + ".s";
         File generatedAssemblyFile = new File(newFileName);
         actualOutput = extractActualOutputFromAssembly(generatedAssemblyFile);
-        generatedAssemblyFile.delete();
         if (actualOutput.equals(expectedOutput)) {
           System.out.println("PASS");
         } else {
@@ -51,6 +50,11 @@ public class EmulatorValidTests {
         System.out.println("Compile Error");
         failedTests++;
       }
+
+      System.out.println("DIFFERENCE BETWEEN EXPECTED AND ACTUAL ASSEMBLY CODE:");
+
+
+
       System.out.println("--------------------------------------");
     }
       System.out.println("--------- Tests passed: " + (totalTests - failedTests) + "/" + totalTests + " ---------\n");
@@ -83,7 +87,7 @@ public class EmulatorValidTests {
     return output.toString();
   }
 
-  public static String extractActualOutputFromAssembly(File file) throws IOException {
+  public static String runEmulatorOnFile(File file) throws IOException {
     //Executes the commands neccessary to receieve the full output of assembly emulator of a .s file
     String[] commands = {"bash", "-c", "echo ' ' | ./wacc_examples/refEmulate " + file.getPath().replace("\\", "/")};
     String s;
@@ -94,8 +98,65 @@ public class EmulatorValidTests {
       sb.append(s).append("\n");
     }
 
-    //Extracts all lines after 'Emulation Output'
+    return sb.toString();
+  }
+
+  public static String runRefCompilerOnFile(File file) throws IOException {
+    //Executes the commands neccessary to receieve the full output of assembly emulator of a .s file
+    String[] commands = {"bash", "-c", "echo ' ' | ./wacc_examples/refCompile -x " + file.getPath().replace("\\", "/")};
+    String s;
+    StringBuilder sb = new StringBuilder();
+    Process p = Runtime.getRuntime().exec(commands);
+    BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+    while (((s = br.readLine()) != null)) {
+      sb.append(s).append("\n");
+    }
+    return sb.toString();
+  }
+
+  public static String getAssemblyCodeFromRefCompiler(File file) throws IOException {
+    //Executes the commands neccessary to receieve the assembly code for .wacc file
+    String[] commands = {"bash", "-c", "echo ' ' | ./wacc_examples/refCompile -a " + file.getPath().replace("\\", "/")};
+    String s;
+    StringBuilder sb = new StringBuilder();
+    Process p = Runtime.getRuntime().exec(commands);
+    BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+    while (((s = br.readLine()) != null)) {
+      sb.append(s).append("\n");
+    }
+
+    // Retrieves just the code after ======
     BufferedReader bufferedReader = new BufferedReader(new StringReader(sb.toString()));
+    String line = null;
+    StringBuilder assemblyCode = new StringBuilder();
+
+    while ((line = bufferedReader.readLine()) != null) {
+      if (line.contains("=========")) {
+        while ((line = bufferedReader.readLine()) != null) {
+          assemblyCode.append(line).append("\n");
+        }
+        break;
+      }
+    }
+
+    //Removes the last 2 lines which are "======" and finished
+    String[] lines = assemblyCode.toString().split("\n");
+    String[] linesWithoutExit = Arrays.copyOf(lines, lines.length - 2);
+    StringBuilder result = new StringBuilder();
+    for (int i = 0; i < linesWithoutExit.length; i++) {
+      result.append(linesWithoutExit[i].substring(2));
+      if (i != linesWithoutExit.length - 1) {
+        result.append("\n");
+      }
+    }
+    return result.toString();
+  }
+
+  public static String extractActualOutputFromAssembly(File file) throws IOException {
+    String emulatorOutput = runEmulatorOnFile(file);
+
+    //Extracts all lines after 'Emulation Output'
+    BufferedReader bufferedReader = new BufferedReader(new StringReader(emulatorOutput));
     String line = null;
     StringBuilder outputExtracted = new StringBuilder();
 
@@ -124,18 +185,10 @@ public class EmulatorValidTests {
   }
 
   public static String extractExpectedOutputFromAssembly(File file) throws IOException {
-    //Executes the commands neccessary to receieve the full output of assembly emulator of a .s file
-    String[] commands = {"bash", "-c", "echo ' ' | ./wacc_examples/refCompile -x " + file.getPath().replace("\\", "/")};
-    String s;
-    StringBuilder sb = new StringBuilder();
-    Process p = Runtime.getRuntime().exec(commands);
-    BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-    while (((s = br.readLine()) != null)) {
-      sb.append(s).append("\n");
-    }
+    String compilerOutput = runRefCompilerOnFile(file);
 
     //Extracts all lines after '============='
-    BufferedReader bufferedReader = new BufferedReader(new StringReader(sb.toString()));
+    BufferedReader bufferedReader = new BufferedReader(new StringReader(compilerOutput));
     String line = null;
     StringBuilder outputExtracted = new StringBuilder();
 
