@@ -92,7 +92,7 @@ public class Compiler {
 
     Path filename = Path.of(args[0]);
 
-    Program ast = compile(filename.getFileName().toString());
+    Program ast = compile(new String(args[0]));
 
     Converter converter = new Converter();
     List<Instruction> instructions = converter.visitProgram(ast);

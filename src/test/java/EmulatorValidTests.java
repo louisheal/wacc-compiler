@@ -3,7 +3,12 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
+import org.junit.Assert;
 import org.junit.Test;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.util.Arrays;
 
 public class EmulatorValidTests {
   //TODO: Add assert fail in correct spaces
@@ -16,28 +21,46 @@ public class EmulatorValidTests {
   // Will ensure that the files listed are not folders
   FileFilter folderFilter = pathname -> !pathname.isDirectory();
 
-  public void runTests(File[] files) throws FileNotFoundException {
+  public void runTests(File[] files) throws IOException {
     for (File file : files) {
       totalTests++;
-      String expectedOutput = scan(file);
-      //TODO: extract actual output from executing assembly file
+      // Extracts the # Output part of the .wacc example file
+      String expectedOutput = extractExpectedOutputFromAssembly(file);
       String actualOutput = "";
-
       System.out.print("RUNNING " + file.getName() + ": ");
-      if (actualOutput.equals(expectedOutput)) {
-        System.out.println("PASS");
-      } else {
+      // Runs the given assembly file and writes the output onto actualOutput
+
+      try {
+        String[] arg = {file.toString()};
+        Compiler.main(arg);
+        String newFileName = file.getName().substring(0, file.getName().lastIndexOf('.')) + ".s";
+        File generatedAssemblyFile = new File(newFileName);
+        actualOutput = extractActualOutputFromAssembly(generatedAssemblyFile);
+        generatedAssemblyFile.delete();
+        if (actualOutput.equals(expectedOutput)) {
+          System.out.println("PASS");
+        } else {
+          failedTests++;
+          System.out.println("FAIL");
+        }
+        System.out.println("EXPECTED OUTPUT:");
+        System.out.println(expectedOutput);
+        System.out.println("ACTUAL OUTPUT:\n");
+        System.out.print(actualOutput);
+      } catch (Exception e) {
+        System.out.println("Compile Error");
         failedTests++;
-        System.out.println("FAIL");
       }
-      System.out.println("EXPECTED OUTPUT:");
-      System.out.print(expectedOutput);
-      System.out.println("ACTUAL OUTPUT:\n");
-      System.out.print(actualOutput);
+      System.out.println("--------------------------------------");
     }
+      System.out.println("--------- Tests passed: " + (totalTests - failedTests) + "/" + totalTests + " ---------\n");
+      if (failedTests > 0) {
+        Assert.fail();
+      }
   }
 
-  public String scan(File file) throws FileNotFoundException {
+  // Extracts the output part from the .wacc example files
+  public static String scan(File file) throws FileNotFoundException {
     final Scanner scanner = new Scanner(file);
     StringBuilder output = new StringBuilder();
     while (scanner.hasNextLine()) {
@@ -51,7 +74,93 @@ public class EmulatorValidTests {
         }
       }
     }
+    scanner.close();
+
+    if (output.toString().equals("#empty#\n")) {
+      return "";
+    }
+
     return output.toString();
+  }
+
+  public static String extractActualOutputFromAssembly(File file) throws IOException {
+    //Executes the commands neccessary to receieve the full output of assembly emulator of a .s file
+    String[] commands = {"bash", "-c", "echo ' ' | ./wacc_examples/refEmulate " + file.getPath().replace("\\", "/")};
+    String s;
+    StringBuilder sb = new StringBuilder();
+    Process p = Runtime.getRuntime().exec(commands);
+    BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+    while (((s = br.readLine()) != null)) {
+      sb.append(s).append("\n");
+    }
+
+    //Extracts all lines after 'Emulation Output'
+    BufferedReader bufferedReader = new BufferedReader(new StringReader(sb.toString()));
+    String line = null;
+    StringBuilder outputExtracted = new StringBuilder();
+
+    while ((line = bufferedReader.readLine()) != null) {
+      if (line.contains("Emulation Output")) {
+        while ((line = bufferedReader.readLine()) != null) {
+          outputExtracted.append(line).append("\n");
+      }
+      break;
+    }
+  }
+
+  //Removes the last 2 lines which are "------" and exit code
+  String[] lines = outputExtracted.toString().split("\n");
+  String[] linesWithoutExit = Arrays.copyOf(lines, lines.length - 2);
+
+  StringBuilder arrayToString = new StringBuilder();
+  for (int i = 0; i < linesWithoutExit.length; i++) {
+    arrayToString.append(linesWithoutExit[i]);
+    if (i != linesWithoutExit.length - 1) {
+      arrayToString.append("\n");
+    }
+  }
+
+  return arrayToString.toString();
+  }
+
+  public static String extractExpectedOutputFromAssembly(File file) throws IOException {
+    //Executes the commands neccessary to receieve the full output of assembly emulator of a .s file
+    String[] commands = {"bash", "-c", "echo ' ' | ./wacc_examples/refCompile -x " + file.getPath().replace("\\", "/")};
+    String s;
+    StringBuilder sb = new StringBuilder();
+    Process p = Runtime.getRuntime().exec(commands);
+    BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+    while (((s = br.readLine()) != null)) {
+      sb.append(s).append("\n");
+    }
+
+    //Extracts all lines after '============='
+    BufferedReader bufferedReader = new BufferedReader(new StringReader(sb.toString()));
+    String line = null;
+    StringBuilder outputExtracted = new StringBuilder();
+
+    while ((line = bufferedReader.readLine()) != null) {
+      if (line.contains("===========================================================")) {
+        while ((line = bufferedReader.readLine()) != null) {
+          outputExtracted.append(line).append("\n");
+        }
+        break;
+      }
+    }
+
+    //Removes the last 3 lines which are "====" and exit code and finished
+    String[] lines = outputExtracted.toString().split("\n");
+    String[] linesWithoutExit = Arrays.copyOf(lines, lines.length - 3);
+
+    StringBuilder arrayToString = new StringBuilder();
+    for (int i = 0; i < linesWithoutExit.length; i++) {
+      arrayToString.append(linesWithoutExit[i]);
+      if (i != linesWithoutExit.length - 1) {
+        arrayToString.append("\n");
+      }
+    }
+
+    return arrayToString.toString();
   }
 
   @Test
@@ -61,6 +170,8 @@ public class EmulatorValidTests {
     File directory = new File("wacc_examples/valid/advanced/");
     File[] examples = directory.listFiles();
 
+    assert examples != null;
+    runTests(examples);
   }
 
   @Test
