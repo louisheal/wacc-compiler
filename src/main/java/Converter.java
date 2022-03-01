@@ -1161,6 +1161,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   @Override
   public List<Instruction> visitNewPairRHS(AssignRHS rhs) {
 
+    checkNullPointer = true;
+
     List<Instruction> instructions = new ArrayList<>();
     Register rn, rm;
 
