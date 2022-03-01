@@ -528,8 +528,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   //TODO: ADD FUNCTION PARAMETERS TO SYMBOL TABLE
   @Override
   public List<Instruction> visitFunction(Function function) {
-    spLocation = totalBytesInFunction(function);
-    return visitStatement(function.getStatement());
+    return Collections.emptyList();
+    //spLocation = totalBytesInFunction(function);
+    //return visitStatement(function.getStatement());
   }
 
   @Override
@@ -1186,6 +1187,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     // LDR rm, =array.size()
     instructions.add(new Instruction(InstrType.LDR, rm, array.size()));
 
+    // STR r5, [r4]
+    instructions.add(new Instruction(InstrType.STR, rn, new Operand2(rm)));
+
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rm);
     pushUnusedRegister(rn);
@@ -1264,6 +1268,46 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitCallRHS(AssignRHS rhs) {
-    return super.visitCallRHS(rhs);
+
+    List<Instruction> instructions = new ArrayList<>();
+    int totalSize = 0;
+
+    for (Expression expression : rhs.getArgList()) {
+
+      /* Evaluate argument and store in first unused register. */
+      instructions.addAll(visitExpression(expression));
+
+      /* Retrieve the first unused register. */
+      Register rn = popUnusedRegister();
+
+      int expSize = sizeOfTypeOnStack(getExpressionType(expression));
+      if (expSize > 1) {
+        instructions.add(new Instruction(InstrType.LABEL, String.format("STR %s [sp, #-%d]!", rn, expSize)));
+      } else {
+        instructions.add(new Instruction(InstrType.LABEL, String.format("STRB %s [sp, #-%d]!", rn, expSize)));
+      }
+
+      totalSize += expSize;
+
+      /* Mark register rn as no longer in use. */
+      pushUnusedRegister(rn);
+    }
+
+    // BL f_functionIdentity
+    instructions.add(new Instruction(InstrType.BL, "f_" + rhs.getFunctionIdent()));
+
+    // ADD sp, sp, #totalSize
+    instructions.add(new Instruction(InstrType.LABEL, "ADD sp, sp, #" + totalSize));
+
+    /* Retrieve the first unused register. */
+    Register rn = popUnusedRegister();
+
+    // MOV rn, r0
+    instructions.add(new Instruction(InstrType.MOV, rn, new Operand2(r0)));
+
+    /* Mark register rn as no longer in use. */
+    pushUnusedRegister(rn);
+
+    return instructions;
   }
 }
