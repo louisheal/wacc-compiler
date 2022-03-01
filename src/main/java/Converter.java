@@ -1152,7 +1152,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
-  //TODO
   @Override
   public List<Instruction> visitAndExp(Expression expression) {
 
@@ -1173,7 +1172,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
-  //TODO
   @Override
   public List<Instruction> visitOrExp(Expression expression) {
 
