@@ -7,8 +7,6 @@ import assembly.Register;
 import ast.*;
 
 import java.util.*;
-import javax.imageio.spi.RegisterableService;
-import javax.swing.plaf.nimbus.State;
 
 public class Converter extends ASTVisitor<List<Instruction>> {
 
@@ -467,10 +465,11 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     //TODO: ADD LR
     instructions.add(new Instruction(InstrType.LABEL, "PUSH {lr}"));
 
-    spLocation = totalBytesInProgram(program);
-    if (spLocation > 0) {
-      instructions.add(new Instruction(InstrType.LABEL, "SUB sp, sp, #" + spLocation));
-      //TODO: SUB sp, sp, #spLocation
+    int totalBytes = totalBytesInProgram(program);
+    spLocation = totalBytes;
+    if (totalBytes > 0) {
+      instructions.add(new Instruction(InstrType.LABEL, "SUB sp, sp, #" + totalBytes));
+      //TODO: SUB sp, sp, #totalBytes
     }
 
     currentST = new SymbolTable(null);
@@ -478,10 +477,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Generate the assembly instructions for the program body. */
     instructions.addAll(visitStatement(program.getStatement()));
 
-    spLocation = totalBytesInProgram(program);
-    if (spLocation > 0) {
-      instructions.add(new Instruction(InstrType.LABEL, "ADD sp, sp, #" + spLocation));
-      //TODO: SUB sp, sp, #spLocation
+    if (totalBytes > 0) {
+      instructions.add(new Instruction(InstrType.LABEL, "ADD sp, sp, #" + totalBytes));
+      //TODO: SUB sp, sp, #totalBytes
     }
 
     instructions.add(new Instruction(InstrType.LDR, r0, 0));
@@ -530,9 +528,44 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   //TODO: ADD FUNCTION PARAMETERS TO SYMBOL TABLE
   @Override
   public List<Instruction> visitFunction(Function function) {
-    return Collections.emptyList();
-    //spLocation = totalBytesInFunction(function);
-    //return visitStatement(function.getStatement());
+
+    List<Instruction> instructions = new ArrayList<>();
+
+    /* Initialise symbol table. */
+    currentST = new SymbolTable(null);
+
+    /* Function wrapper instructions. */
+    instructions.add(new Instruction(InstrType.LABEL, "f_" + function.getIdent() + ":"));
+    instructions.add(new Instruction(InstrType.LABEL, "PUSH {lr}"));
+
+    /* Move stack pointer to allocate space on the stack for the function to use. */
+    int totalBytes = totalBytesInFunction(function);
+    spLocation = totalBytes;
+    if (totalBytes > 0) {
+      instructions.add(new Instruction(InstrType.LABEL, String.format("SUB sp, sp, #%d", totalBytes)));
+    }
+
+    /* Add parameters to symbol table. */
+    int stackOffset = totalBytes + 4;
+    for (Param param : function.getParams()) {
+      currentST.newVariable(param.getIdent(), param.getType());
+      currentST.setSPMapping(param.getIdent(), stackOffset);
+      stackOffset += sizeOfTypeOnStack(param.getType());
+    }
+
+    /* Evaluate function body. */
+    instructions.addAll(visitStatement(function.getStatement()));
+
+    if (totalBytes > 0) {
+      instructions.add(new Instruction(InstrType.LABEL, String.format("ADD sp, sp, #%d", totalBytes)));
+    }
+
+    /* Function wrapper instructions. */
+    instructions.add(new Instruction(InstrType.LABEL, "POP {pc}"));
+    instructions.add(new Instruction(InstrType.LABEL, "POP {pc}"));
+    instructions.add(new Instruction(InstrType.LTORG, ""));
+
+    return instructions;
   }
 
   @Override
@@ -587,6 +620,24 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Generate the assembly code for each statement in the concatenated statement. */
     instructions.addAll(visitStatement(statement.getStatement1()));
     instructions.addAll(visitStatement(statement.getStatement2()));
+
+    return instructions;
+  }
+
+  @Override
+  public List<Instruction> visitReturnStatement(Statement statement) {
+
+    /* Evaluate the expression on the rhs of the return statement. */
+    List<Instruction> instructions = new ArrayList<>(visitExpression(statement.getExpression()));
+
+    /* Allocate a register to use for the duration of this function. */
+    Register rn = popUnusedRegister();
+
+    // MOV r0, rn
+    instructions.add(new Instruction(InstrType.MOV, r0, new Operand2(rn)));
+
+    /* Mark the allocated register as no longer in use. */
+    pushUnusedRegister(rn);
 
     return instructions;
   }
