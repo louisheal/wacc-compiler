@@ -286,7 +286,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       return Math.max(stat1Size, stat2Size);
     }
 
-    return -1;
+    return 0;
 
   }
 
@@ -753,16 +753,17 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   }
 
   public List<Instruction> visitReassignmentStatement(Statement statement) {
-    int lhsStackLocation = currentST.getSPMapping(statement.getLHS().getIdent());
+    String lhsIdent = getIdentFromLHS(statement.getLHS());
+    int lhsStackLocation = currentST.getSPMapping(lhsIdent);
     List<Instruction> instructions = new ArrayList<>(visitRHS(statement.getRHS()));
     Register rn = popUnusedRegister();
-    instructions.add(new Instruction(InstrType.LABEL, String.format("STR %s [sp, #%d]", rn,
-        lhsStackLocation)));
-    instructions.add(new Instruction(InstrType.LABEL, String.format("LDR %s [sp, #%d]", rn,
-        lhsStackLocation)));
-    instructions.add(new Instruction(InstrType.STR, rn, new Operand2 (sp)));
-    instructions.add(new Instruction(InstrType.LDR, rn, new Operand2 (sp)));
-    instructions.add(new Instruction(InstrType.MOV, r0, new Operand2(rn)));
+    if (spLocation - currentST.getSPMapping(lhsIdent) > 0 ){
+      instructions.add(new Instruction(InstrType.LABEL, String.format("STR %s [sp, #%d]", rn,
+          lhsStackLocation)));
+    }
+    else{
+      instructions.add(new Instruction(InstrType.STR, rn, new Operand2(sp)));
+    }
 
     pushUnusedRegister(rn);
     return instructions;
