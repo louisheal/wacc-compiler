@@ -7,6 +7,8 @@ import assembly.Register;
 import ast.*;
 
 import java.util.*;
+import javax.imageio.spi.RegisterableService;
+import javax.swing.plaf.nimbus.State;
 
 public class Converter extends ASTVisitor<List<Instruction>> {
 
@@ -735,6 +737,34 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     pushUnusedRegister(rm);
     pushUnusedRegister(rn);
 
+    return instructions;
+  }
+
+  private String getIdentFromLHS(AssignLHS lhs){
+    switch (lhs.getAssignType()) {
+      case ARRAYELEM:
+        return lhs.getArrayElem().getIdent();
+        //TODO Check PAIRELEM ident is correct
+      case PAIRELEM:
+        return lhs.getPairElem().getExpression().getIdent();
+      default:
+        return lhs.getIdent();
+    }
+  }
+
+  public List<Instruction> visitReassignmentStatement(Statement statement) {
+    int lhsStackLocation = currentST.getSPMapping(statement.getLHS().getIdent());
+    List<Instruction> instructions = new ArrayList<>(visitRHS(statement.getRHS()));
+    Register rn = popUnusedRegister();
+    instructions.add(new Instruction(InstrType.LABEL, String.format("STR %s [sp, #%d]", rn,
+        lhsStackLocation)));
+    instructions.add(new Instruction(InstrType.LABEL, String.format("LDR %s [sp, #%d]", rn,
+        lhsStackLocation)));
+    instructions.add(new Instruction(InstrType.STR, rn, new Operand2 (sp)));
+    instructions.add(new Instruction(InstrType.LDR, rn, new Operand2 (sp)));
+    instructions.add(new Instruction(InstrType.MOV, r0, new Operand2(rn)));
+
+    pushUnusedRegister(rn);
     return instructions;
   }
 
