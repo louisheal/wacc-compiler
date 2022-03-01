@@ -632,8 +632,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     List<Instruction> instructions = new ArrayList<>();
 
     // MOV rn, #charVal
-    //TODO: Make instruction look like: MOV r4, #'x' - as an example
-    instructions.add(new Instruction(InstrType.MOV, rn, expression.getCharLiter()));
+    String instruction = String.format("MOV %s, #'%s'", rn, expression.getCharLiter());
+    instructions.add(new Instruction(InstrType.LABEL, instruction));
     //TODO: Ensure that following instruction is "STRB rn, [sp]"
 
     /* Mark the register used in the evaluation of this function as no longer in use. */
@@ -812,21 +812,18 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
-  //TODO: Infinitely loops and never computes the length
   @Override
   public List<Instruction> visitLenExp(Expression expression) {
     // LDR r4, [r4]
     return translateUnaryExpression(expression);
   }
 
-  //TODO: Infinitely loops and never computes ord
   @Override
   public List<Instruction> visitOrdExp(Expression expression) {
     // MOV r4, expr
     return translateUnaryExpression(expression);
   }
 
-  //TODO: Infinitely loops and never computes chr
   @Override
   public List<Instruction> visitChrExp(Expression expression) {
     // MOV r4, expr
@@ -1158,13 +1155,43 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   //TODO
   @Override
   public List<Instruction> visitAndExp(Expression expression) {
-    return super.visitAndExp(expression);
+
+    /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
+    List<Instruction> instructions = translateBinaryExpression(expression);
+
+    /* Allocate two registers: rn and rm (rn+1) for this function to use. */
+    Register rn = popUnusedRegister();
+    Register rm = popUnusedRegister();
+
+    // AND r4, r4, r5
+    instructions.add(new Instruction(InstrType.LABEL, String.format("AND %s, %s, %s", rn, rn, rm)));
+
+    /* Mark the two registers used in the evaluation of this function as no longer in use. */
+    pushUnusedRegister(rm);
+    pushUnusedRegister(rn);
+
+    return instructions;
   }
 
   //TODO
   @Override
   public List<Instruction> visitOrExp(Expression expression) {
-    return super.visitOrExp(expression);
+
+    /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
+    List<Instruction> instructions = translateBinaryExpression(expression);
+
+    /* Allocate two registers: rn and rm (rn+1) for this function to use. */
+    Register rn = popUnusedRegister();
+    Register rm = popUnusedRegister();
+
+    // AND r4, r4, r5
+    instructions.add(new Instruction(InstrType.LABEL, String.format("ORR %s, %s, %s", rn, rn, rm)));
+
+    /* Mark the two registers used in the evaluation of this function as no longer in use. */
+    pushUnusedRegister(rm);
+    pushUnusedRegister(rn);
+
+    return instructions;
   }
 
   @Override
