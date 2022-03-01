@@ -419,6 +419,12 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return visitStatement(function.getStatement());
   }
 
+  @Override
+  public List<Instruction> visitSkipStatement(Statement statement) {
+    /* Generate instructions when a skip statement is found, that is, no instructions. */
+    return Collections.emptyList();
+  }
+
   //TODO: Add variable to symbol table
   @Override
   public List<Instruction> visitDeclarationStatement(Statement statement) {
@@ -429,20 +435,26 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Retrieve the first register which is where the value of the RHS is stored. */
     Register rn = popUnusedRegister();
 
-    int offset = spLocation - sizeOfTypeOnStack(statement.getLhsType());
+    int stackOffset = spLocation - sizeOfTypeOnStack(statement.getLhsType());
 
-    // STR rn, [sp]
-    // STR rn, [sp, #i]
     String instruction;
-    if (offset > 0) {
-      instruction = String.format("STR %s, [sp, #%d]", rn.toString(), offset);
+    if (stackOffset > 0) {
+      // STR rn, [sp]
+      instruction = String.format("STR %s, [sp, #%d]", rn, stackOffset);
     } else {
-      instruction = String.format("STR %s, [sp]", rn.toString());
+      // STR rn, [sp, #i]
+      instruction = String.format("STR %s, [sp]", rn);
     }
     instructions.add(new Instruction(InstrType.LABEL, instruction));
 
+    /* Add the variable and its offset to the symbol table. */
+    currentST.setSPMapping(statement.getLhsIdent(), stackOffset);
+
     /* Update the spLocation variable to point to the next available space on the stack. */
-    spLocation = offset;
+    spLocation = stackOffset;
+
+    /* Mark the register used in the evaluation of this function as no longer in use. */
+    pushUnusedRegister(rn);
 
     return instructions;
   }
@@ -456,12 +468,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.addAll(visitStatement(statement.getStatement2()));
 
     return instructions;
-  }
-
-  @Override
-  public List<Instruction> visitSkipStatement(Statement statement) {
-    /* Generate instructions when a skip statement is found, that is, no instructions. */
-    return Collections.emptyList();
   }
 
   @Override
@@ -539,14 +545,26 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
-  //TODO: VERIFY THAT THIS MANIPULATES THE STACK POINTER PROPERLY
   @Override
   public List<Instruction> visitIdentExp(Expression expression) {
-    String expressionIdent = expression.getIdent();
-    int storedSPLocation = currentST.getSPMapping(expressionIdent);
-    spLocation = spLocation - sizeOfTypeOnStack(currentST.getType(expression.getIdent()));
 
-    return new ArrayList<>(List.of(new Instruction(InstrType.STR, unusedRegisters.get(1), new Operand2(sp))));
+    List<Instruction> instructions = new ArrayList<>();
+
+    /* Retrieve the position of the variable on the stack from the symbol table. */
+    int stackOffset = currentST.getSPMapping(expression.getIdent());
+
+    /* Allocate a register: rn for this function to use. */
+    Register rn = popUnusedRegister();
+
+    String instruction;
+    if (stackOffset != 0) {
+      instruction = String.format("LDR %s, [sp, #%d]", rn, stackOffset);
+    } else {
+      instruction = String.format("LDR %s, [sp]", rn);
+    }
+    instructions.add(new Instruction(InstrType.LABEL, instruction));
+
+    return instructions;
   }
 
   @Override
