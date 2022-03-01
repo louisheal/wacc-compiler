@@ -1148,9 +1148,16 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     List<Instruction> instructions = new ArrayList<>();
 
     int mallocSize = 4;
+    int typeSize = 0;
+
+    /* if array is not empty get size of type */
+    if(!array.isEmpty()) {
+      typeSize = sizeOfTypeOnStack(getExpressionType(array.get(0)));
+    }
+
     for (Expression expression : array) {
       //TODO: private Type expressionToType(Expression expression){}
-      mallocSize += sizeOfTypeOnStack(getExpressionType(expression));
+      mallocSize += typeSize;
     }
 
     // LDR r0, =mallocSize
@@ -1165,7 +1172,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     // MOV rn, r0
     instructions.add(new Instruction(InstrType.MOV, rn, new Operand2(r0)));
 
-    int offset = mallocSize;
+    int offset = 4;
     for (Expression expression : array) {
 
       /* Generate instructions to evaluate each expression. */
@@ -1179,6 +1186,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
       /* Mark register rm as no longer in use. */
       pushUnusedRegister(rm);
+
+      offset += typeSize;
     }
 
     /* Allocate a register: rm for this function to use. */
