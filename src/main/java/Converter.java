@@ -7,8 +7,6 @@ import assembly.Register;
 import ast.*;
 
 import java.util.*;
-import javax.imageio.spi.RegisterableService;
-import javax.swing.plaf.nimbus.State;
 
 public class Converter extends ASTVisitor<List<Instruction>> {
 
@@ -536,13 +534,23 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Initialise symbol table. */
     currentST = new SymbolTable(null);
 
+    /* Function wrapper instructions. */
     instructions.add(new Instruction(InstrType.LABEL, "f_" + function.getIdent() + ":"));
     instructions.add(new Instruction(InstrType.LABEL, "PUSH {lr}"));
 
+    /* Move stack pointer to allocate space on the stack for the function to use. */
     int totalBytes = totalBytesInFunction(function);
     spLocation = totalBytes;
     if (totalBytes > 0) {
       instructions.add(new Instruction(InstrType.LABEL, String.format("SUB sp, sp, #%d", totalBytes)));
+    }
+
+    /* Add parameters to symbol table. */
+    int stackOffset = totalBytes + 4;
+    for (Param param : function.getParams()) {
+      currentST.newVariable(param.getIdent(), param.getType());
+      currentST.setSPMapping(param.getIdent(), stackOffset);
+      stackOffset += sizeOfTypeOnStack(param.getType());
     }
 
     /* Evaluate function body. */
@@ -552,6 +560,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       instructions.add(new Instruction(InstrType.LABEL, String.format("ADD sp, sp, #%d", totalBytes)));
     }
 
+    /* Function wrapper instructions. */
     instructions.add(new Instruction(InstrType.LABEL, "POP {pc}"));
     instructions.add(new Instruction(InstrType.LABEL, "POP {pc}"));
     instructions.add(new Instruction(InstrType.LTORG, ""));
