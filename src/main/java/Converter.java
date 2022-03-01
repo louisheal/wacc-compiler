@@ -419,23 +419,30 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return visitStatement(function.getStatement());
   }
 
+  //TODO: Add variable to symbol table
   @Override
   public List<Instruction> visitDeclarationStatement(Statement statement) {
 
-    List<Instruction> instructions = new ArrayList<>();
-
-    statement.getLhsIdent();
-
     /* Generate instructions to evaluate the RHS and put the result into the first unused register. */
-    instructions.addAll(visitRHS(statement.getRHS()));
+    List<Instruction> instructions = new ArrayList<>(visitRHS(statement.getRHS()));
 
     /* Retrieve the first register which is where the value of the RHS is stored. */
     Register rn = popUnusedRegister();
 
-    // STR rn, [sp]
-    instructions.add(new Instruction(InstrType.STR, rn, spLocation));
+    int offset = spLocation - sizeOfTypeOnStack(statement.getLhsType());
 
-    spLocation -= sizeOfTypeOnStack(statement.getLhsType());
+    // STR rn, [sp]
+    // STR rn, [sp, #i]
+    String instruction;
+    if (offset > 0) {
+      instruction = String.format("STR %s, [sp, #%d]", rn.toString(), offset);
+    } else {
+      instruction = String.format("STR %s, [sp]", rn.toString());
+    }
+    instructions.add(new Instruction(InstrType.LABEL, instruction));
+
+    /* Update the spLocation variable to point to the next available space on the stack. */
+    spLocation = offset;
 
     return instructions;
   }
@@ -968,7 +975,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitExprRHS(AssignRHS rhs) {
-    return super.visitExprRHS(rhs);
+    return visitExpression(rhs.getExpression1());
   }
 
   @Override
