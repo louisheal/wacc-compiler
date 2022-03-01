@@ -58,6 +58,7 @@ public class EmulatorValidTests {
       }
   }
 
+  // Extracts the output part from the .wacc example files
   public static String scan(File file) throws FileNotFoundException {
     final Scanner scanner = new Scanner(file);
     StringBuilder output = new StringBuilder();
