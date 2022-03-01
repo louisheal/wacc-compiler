@@ -617,7 +617,20 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitReturnStatement(Statement statement) {
-    return Collections.emptyList();
+
+    /* Evaluate the expression on the rhs of the return statement. */
+    List<Instruction> instructions = new ArrayList<>(visitExpression(statement.getExpression()));
+
+    /* Allocate a register to use for the duration of this function. */
+    Register rn = popUnusedRegister();
+
+    // MOV r0, rn
+    instructions.add(new Instruction(InstrType.MOV, r0, new Operand2(rn)));
+
+    /* Mark the allocated register as no longer in use. */
+    pushUnusedRegister(rn);
+
+    return instructions;
   }
 
   @Override
