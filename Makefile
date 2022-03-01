@@ -48,6 +48,9 @@ testSyntax: antlr
 testSemantics: antlr
 	mvn test -Dtest="InvalidSemanticTest"
 
+testCodeGen: antlr
+	mvn test -Dtest="EmulatorValidTests"
+
 antlr:
 	cd $(ANTLR_DIR) && ./$(ANTLR) 
 	$(MKDIR) $(OUTPUT_DIR)

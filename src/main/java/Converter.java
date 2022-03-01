@@ -221,7 +221,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     }
 
     if (statement.getStatType() == Statement.StatType.WHILE) {
-      return totalBytesInScope(statement) + maxBeginStatement(statement);
+      return totalBytesInScope(statement.getStatement1()) + maxBeginStatement(statement);
     }
 
     if (statement.getStatType() == Statement.StatType.IF) {
