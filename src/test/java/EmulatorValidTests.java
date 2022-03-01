@@ -26,10 +26,10 @@ public class EmulatorValidTests {
       totalTests++;
       // Extracts the # Output part of the .wacc example file
       String expectedOutput = extractExpectedOutputFromAssembly(file);
-      String actualOutput = "";
+      String actualOutput;
       System.out.print("RUNNING " + file.getName() + ": ");
-      // Runs the given assembly file and writes the output onto actualOutput
 
+      // Runs the given assembly file and writes the output onto actualOutput
       try {
         String[] arg = {file.toString()};
         Compiler.main(arg);
@@ -42,25 +42,37 @@ public class EmulatorValidTests {
           failedTests++;
           System.out.println("FAIL");
         }
+
         System.out.println("EXPECTED OUTPUT:");
         System.out.println(expectedOutput);
         System.out.println("ACTUAL OUTPUT:\n");
         System.out.print(actualOutput);
+
+        System.out.println("ACTUAL ASSEMBLY CODE:");
+        System.out.println(assemblyFileToString(generatedAssemblyFile));
+        System.out.println("REFERENCE ASSEMBLY CODE:");
+        System.out.println(getAssemblyCodeFromRefCompiler(file));
+        generatedAssemblyFile.delete();
       } catch (Exception e) {
         System.out.println("Compile Error");
         failedTests++;
       }
-
-      System.out.println("DIFFERENCE BETWEEN EXPECTED AND ACTUAL ASSEMBLY CODE:");
-
-
-
       System.out.println("--------------------------------------");
     }
       System.out.println("--------- Tests passed: " + (totalTests - failedTests) + "/" + totalTests + " ---------\n");
       if (failedTests > 0) {
         Assert.fail();
       }
+  }
+
+  public static String assemblyFileToString(File file) throws FileNotFoundException {
+    Scanner scanner = new Scanner(file);
+    StringBuilder result = new StringBuilder();
+    while (scanner.hasNextLine()) {
+      result.append(scanner.nextLine()).append("\n");
+    }
+    scanner.close();
+    return result.toString();
   }
 
   // Extracts the output part from the .wacc example files
