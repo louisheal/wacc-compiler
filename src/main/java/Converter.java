@@ -467,10 +467,11 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     //TODO: ADD LR
     instructions.add(new Instruction(InstrType.LABEL, "PUSH {lr}"));
 
-    spLocation = totalBytesInProgram(program);
-    if (spLocation > 0) {
-      instructions.add(new Instruction(InstrType.LABEL, "SUB sp, sp, #" + spLocation));
-      //TODO: SUB sp, sp, #spLocation
+    int totalBytes = totalBytesInProgram(program);
+    spLocation = totalBytes;
+    if (totalBytes > 0) {
+      instructions.add(new Instruction(InstrType.LABEL, "SUB sp, sp, #" + totalBytes));
+      //TODO: SUB sp, sp, #totalBytes
     }
 
     currentST = new SymbolTable(null);
@@ -478,10 +479,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Generate the assembly instructions for the program body. */
     instructions.addAll(visitStatement(program.getStatement()));
 
-    spLocation = totalBytesInProgram(program);
-    if (spLocation > 0) {
-      instructions.add(new Instruction(InstrType.LABEL, "ADD sp, sp, #" + spLocation));
-      //TODO: SUB sp, sp, #spLocation
+    if (totalBytes > 0) {
+      instructions.add(new Instruction(InstrType.LABEL, "ADD sp, sp, #" + totalBytes));
+      //TODO: SUB sp, sp, #totalBytes
     }
 
     instructions.add(new Instruction(InstrType.LDR, r0, 0));
@@ -533,16 +533,28 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     List<Instruction> instructions = new ArrayList<>();
 
+    /* Initialise symbol table. */
     currentST = new SymbolTable(null);
 
-    spLocation = totalBytesInFunction(function);
+    instructions.add(new Instruction(InstrType.LABEL, "f_" + function.getIdent() + ":"));
+    instructions.add(new Instruction(InstrType.LABEL, "PUSH {lr}"));
 
-    if (spLocation > 0) {
-      instructions.add(new Instruction(InstrType.LABEL, String.format("SUB sp, sp, #%d", spLocation)));
+    int totalBytes = totalBytesInFunction(function);
+    spLocation = totalBytes;
+    if (totalBytes > 0) {
+      instructions.add(new Instruction(InstrType.LABEL, String.format("SUB sp, sp, #%d", totalBytes)));
     }
 
     /* Evaluate function body. */
     instructions.addAll(visitStatement(function.getStatement()));
+
+    if (totalBytes > 0) {
+      instructions.add(new Instruction(InstrType.LABEL, String.format("ADD sp, sp, #%d", totalBytes)));
+    }
+
+    instructions.add(new Instruction(InstrType.LABEL, "POP {pc}"));
+    instructions.add(new Instruction(InstrType.LABEL, "POP {pc}"));
+    instructions.add(new Instruction(InstrType.LTORG, ""));
 
     return instructions;
   }
