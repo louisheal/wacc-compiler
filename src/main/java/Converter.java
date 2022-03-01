@@ -7,6 +7,7 @@ import assembly.Register;
 import ast.*;
 
 import java.util.*;
+import javax.imageio.spi.RegisterableService;
 
 public class Converter extends ASTVisitor<List<Instruction>> {
 
@@ -735,6 +736,22 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     pushUnusedRegister(rm);
     pushUnusedRegister(rn);
 
+    return instructions;
+  }
+
+  public List<Instruction> visitReassignmentStatement(Statement statement) {
+    int lhsStackLocation = currentST.getSPMapping(statement.getLHS().getIdent());
+    List<Instruction> instructions = new ArrayList<>(visitRHS(statement.getRHS()));
+    Register rn = popUnusedRegister();
+    instructions.add(new Instruction(InstrType.LABEL, String.format("STR %s [sp, #-%d]!", rn,
+        lhsStackLocation)));
+    instructions.add(new Instruction(InstrType.LABEL, String.format("LDR %s [sp, #-%d]!", rn,
+        lhsStackLocation)));
+    instructions.add(new Instruction(InstrType.STR, rn, new Operand2 (sp)));
+    instructions.add(new Instruction(InstrType.LDR, rn, new Operand2 (sp)));
+    instructions.add(new Instruction(InstrType.STR, r0, new Operand2(rn)));
+
+    pushUnusedRegister(rn);
     return instructions;
   }
 
