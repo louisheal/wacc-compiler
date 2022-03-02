@@ -656,8 +656,13 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     // BEQ Lx
     instructions.add(new Instruction(InstrType.LABEL, "BEQ " + label1));
 
-    /* Generate instructions for the 'if' clause of the statement. */
+    /* Mark the register rn as no longer in use. */
+    pushUnusedRegister(rn);
+
+    /* Generate instructions for the 'if' clause of the statement and change scope. */
+    currentST = new SymbolTable(currentST);
     instructions.addAll(visitStatement(statement.getStatement1()));
+    currentST = currentST.getParent();
 
     // BL Lx+1
     instructions.add(new Instruction(InstrType.BL, label2));
@@ -665,11 +670,54 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     //Lx:
     instructions.add(new Instruction(InstrType.LABEL, label1 + ":"));
 
-    /* Generate instructions for the 'else' clause of the statement. */
+    /* Generate instructions for the 'else' clause of the statement and change scope. */
+    currentST = new SymbolTable(currentST);
     instructions.addAll(visitStatement(statement.getStatement2()));
+    currentST = currentST.getParent();
 
     //Lx+1:
     instructions.add(new Instruction(InstrType.LABEL, label2 + ":"));
+
+    return instructions;
+  }
+
+  @Override
+  public List<Instruction> visitWhileStatement(Statement statement) {
+
+    List<Instruction> instructions = new ArrayList<>();
+
+    /* Generate Labels. */
+    String label1 = getLabel();
+    String label2 = getLabel();
+
+    // BL Lx
+    instructions.add(new Instruction(InstrType.BL, label1));
+
+    // Lx+1:
+    instructions.add(new Instruction(InstrType.LABEL, label2 + ":"));
+
+    /* Generate code for the while body and change scope. */
+    currentST = new SymbolTable(currentST);
+    instructions.addAll(visitStatement(statement.getStatement1()));
+    currentST = currentST.getParent();
+
+    // Lx:
+    instructions.add(new Instruction(InstrType.LABEL, label1 + ":"));
+
+    /* Evaluate the condition expression. */
+    instructions.addAll(visitExpression(statement.getExpression()));
+
+    /* Retrieve register containing the evaluation of the conditional. */
+    Register rn = popUnusedRegister();
+
+    // CMP rn, #1
+    instructions.add(new Instruction(InstrType.CMP, rn, new Operand2(1)));
+
+    // BEQ Lx+1
+    instructions.add(new Instruction(InstrType.LABEL, "BEQ " + label2));
+
+    /* Mark the register rn as no longer in use. */
+    pushUnusedRegister(rn);
 
     return instructions;
   }
