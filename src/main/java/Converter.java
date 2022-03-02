@@ -620,6 +620,24 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   }
 
   @Override
+  public List<Instruction> visitReassignmentStatement(Statement statement) {
+    String lhsIdent = getIdentFromLHS(statement.getLHS());
+    int lhsStackLocation = currentST.getSPMapping(lhsIdent);
+    List<Instruction> instructions = new ArrayList<>(visitRHS(statement.getRHS()));
+    Register rn = popUnusedRegister();
+    if (spLocation - currentST.getSPMapping(lhsIdent) > 0 ){
+      instructions.add(new Instruction(InstrType.LABEL, String.format("STR %s [sp, #%d]", rn,
+              lhsStackLocation)));
+    }
+    else{
+      instructions.add(new Instruction(InstrType.STR, rn, new Operand2(sp)));
+    }
+
+    pushUnusedRegister(rn);
+    return instructions;
+  }
+
+  @Override
   public List<Instruction> visitIfStatement(Statement statement) {
 
     /* Evaluate the condition expression. */
@@ -653,23 +671,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     //Lx+1:
     instructions.add(new Instruction(InstrType.LABEL, label2 + ":"));
 
-    return instructions;
-  }
-
-  public List<Instruction> visitReassignmentStatement(Statement statement) {
-    String lhsIdent = getIdentFromLHS(statement.getLHS());
-    int lhsStackLocation = currentST.getSPMapping(lhsIdent);
-    List<Instruction> instructions = new ArrayList<>(visitRHS(statement.getRHS()));
-    Register rn = popUnusedRegister();
-    if (spLocation - currentST.getSPMapping(lhsIdent) > 0 ){
-      instructions.add(new Instruction(InstrType.LABEL, String.format("STR %s [sp, #%d]", rn,
-              lhsStackLocation)));
-    }
-    else{
-      instructions.add(new Instruction(InstrType.STR, rn, new Operand2(sp)));
-    }
-
-    pushUnusedRegister(rn);
     return instructions;
   }
 
