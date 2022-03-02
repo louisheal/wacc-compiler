@@ -688,7 +688,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     String label2 = getLabel();
 
     // BL Lx
-    instructions.add(new Instruction(InstrType.BL, label1 + ":"));
+    instructions.add(new Instruction(InstrType.BL, label1));
 
     // Lx+1:
     instructions.add(new Instruction(InstrType.LABEL, label2 + ":"));
