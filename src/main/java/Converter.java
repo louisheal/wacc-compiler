@@ -460,6 +460,11 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   }
 
   @Override
+  public List<Instruction> visitIfStatement(Statement statement) {
+    return super.visitIfStatement(statement);
+  }
+
+  @Override
   public List<Instruction> visitConcatStatement(Statement statement) {
     List<Instruction> instructions = new ArrayList<>();
 
