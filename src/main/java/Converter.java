@@ -389,8 +389,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* adds error message for overflow error */
     instructions.add(offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
     instructions.add(1 + offset, new Instruction(InstrType.WORD, 83));
-    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "OverflowError: the result is too " +
-            "small/large to store in a 4-byte signed-integer.\n\0"));
+    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "\"OverflowError: the result is too " +
+            "small/large to store in a 4-byte signed-integer.\\n\\0\""));
 
     /* adds function for checking if a calculation overflows */
     //TODO: Register Allocation
