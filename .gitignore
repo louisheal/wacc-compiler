@@ -3,6 +3,8 @@ bin
 gen
 src/main/java/antlr/
 src/main/java/Compiler.java
+antlr_config/antlrBuild
+wacc_examples/
 
 target
 *.class

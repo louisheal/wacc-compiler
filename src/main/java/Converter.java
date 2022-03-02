@@ -18,6 +18,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   /* Function return registers. */
   private final Register r0 = new Register(0);
   private final Register r1 = new Register(1);
+  private final Register r2 = new Register(2);
 
   /* Special registers. */
   private final Register sp = new Register(13);
@@ -25,11 +26,18 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   private int spLocation = 0;
   SymbolTable currentST;
+
+  /* Error flags */
   private boolean isDiv = false;
   private boolean isCalc = false;
   private boolean isArrayLookup = false;
   private boolean runtimeErr = false;
   private boolean checkNullPointer = false;
+
+  /* Print flags */
+  private boolean hasPrintInt = false;
+  private boolean hasPrintString = false;
+  private boolean hasPrintLn = false;
 
   //TODO: DELETE?
   private List<Instruction> getInstructionFromExpression(Expression expr) {
@@ -443,6 +451,39 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
+  public List<Instruction> printInt(List<Instruction> instructions, int msgNumber) {
+
+    int offset = msgNumber * 3;
+
+    /* adds message for pattern matching decimals */
+    instructions.add(offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
+    instructions.add(1 + offset, new Instruction(InstrType.WORD, 3));
+    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "%d\0"));
+
+    /* adds function for printing integers */
+    //TODO: Register Allocation
+    instructions.add(new Instruction(InstrType.LABEL, "p_print_int:"));
+    //TODO: ADD LR
+    instructions.add(new Instruction(InstrType.LABEL, "PUSH {lr}"));
+    instructions.add(new Instruction(InstrType.MOV, r1, new Operand2(r0)));
+    instructions.add(new Instruction(InstrType.LDR, r0, "msg_" + msgNumber));
+    instructions.add(new Instruction(InstrType.ADD, r0, r0, new Operand2(4)));
+    instructions.add(new Instruction(InstrType.BL, "printf"));
+    instructions.add(new Instruction(InstrType.MOV, r0, 0));
+    instructions.add(new Instruction(InstrType.BL, "fflush"));
+    instructions.add(new Instruction(InstrType.LABEL, "POP {pc}"));
+
+    return instructions;
+  }
+
+  public List<Instruction> printString(List<Instruction> instructions, int msgNumber) {
+    return instructions;
+  }
+
+  public List<Instruction> printLn(List<Instruction> instructions, int msgNumber) {
+    return instructions;
+  }
+
   @Override
   public List<Instruction> visitProgram(Program program) {
     List<Instruction> instructions = new ArrayList<>();
@@ -517,6 +558,23 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       instructions.add(new Instruction(InstrType.BL, "p_print_string"));
       instructions.add(new Instruction(InstrType.MOV, r0, -1));
       instructions.add(new Instruction(InstrType.BL, "exit"));
+
+      hasPrintString = true;
+    }
+
+    if(hasPrintInt) {
+      instructions = printInt(instructions, msgNumber);
+      msgNumber++;
+    }
+
+    if(hasPrintString) {
+      instructions = printString(instructions, msgNumber);
+      msgNumber++;
+    }
+
+    if(hasPrintLn) {
+      instructions = printString(instructions, msgNumber);
+      msgNumber++;
     }
 
     if(msgNumber > 0) {
