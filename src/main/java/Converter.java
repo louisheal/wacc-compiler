@@ -477,6 +477,28 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   }
 
   public List<Instruction> printString(List<Instruction> instructions, int msgNumber) {
+
+    int offset = msgNumber * 3;
+
+    /* adds message for pattern matching strings */
+    instructions.add(offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
+    instructions.add(1 + offset, new Instruction(InstrType.WORD, 5));
+    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "%.*s\0"));
+
+    /* adds function for printing strings */
+    //TODO: Register Allocation
+    instructions.add(new Instruction(InstrType.LABEL, "p_print_string:"));
+    //TODO: ADD LR
+    instructions.add(new Instruction(InstrType.LABEL, "PUSH {lr}"));
+    instructions.add(new Instruction(InstrType.LDR, r1, new Operand2(r0)));
+    instructions.add(new Instruction(InstrType.ADD, r2, r0, new Operand2(4)));
+    instructions.add(new Instruction(InstrType.LDR, r0, "msg_" + msgNumber));
+    instructions.add(new Instruction(InstrType.ADD, r0, r0, new Operand2(4)));
+    instructions.add(new Instruction(InstrType.BL, "printf"));
+    instructions.add(new Instruction(InstrType.MOV, r0, 0));
+    instructions.add(new Instruction(InstrType.BL, "fflush"));
+    instructions.add(new Instruction(InstrType.LABEL, "POP {pc}"));
+    
     return instructions;
   }
 
