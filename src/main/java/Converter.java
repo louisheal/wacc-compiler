@@ -723,6 +723,17 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   }
 
   @Override
+  public List<Instruction> visitBeginStatement(Statement statement) {
+
+    /* Generate code for begin body and change scope. */
+    currentST = new SymbolTable(currentST);
+    List<Instruction> instructions = new ArrayList<>(visitStatement(statement.getStatement1()));
+    currentST = currentST.getParent();
+
+    return instructions;
+  }
+
+  @Override
   public List<Instruction> visitConcatStatement(Statement statement) {
     List<Instruction> instructions = new ArrayList<>();
 
