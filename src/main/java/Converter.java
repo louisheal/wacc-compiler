@@ -22,11 +22,18 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   private final Register pc = new Register(15);
 
   private int spLocation = 0;
+  private int labelNum = 0;
   SymbolTable currentST;
   private boolean isDiv = false;
   private boolean isCalc = false;
   private boolean isArrayLookup = false;
   private boolean runtimeErr = false;
+
+  private String getLabel() {
+    int result = labelNum;
+    labelNum++;
+    return "L" + result;
+  }
 
   private List<Instruction> getInstructionFromExpression(Expression expr) {
 
@@ -466,8 +473,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     List<Instruction> instructions = new ArrayList<>(visitExpression(statement.getExpression()));
 
     /* Generate Labels. */
-    String label1 = "L0";
-    String label2 = "L1";
+    String label1 = getLabel();
+    String label2 = getLabel();
 
     /* Retrieve the register containing the result from evaluating the condition. */
     Register rn = popUnusedRegister();
