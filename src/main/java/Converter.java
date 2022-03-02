@@ -32,7 +32,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   private boolean isArrayLookup = false;
   private boolean runtimeErr = false;
   private boolean checkNullPointer = false;
-  
+
   /* Print flags */
   private boolean hasPrintInt = false;
   private boolean hasPrintString = false;
@@ -279,28 +279,24 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   private int totalBytesInScope(Statement statement) {
 
-    //TODO: MAKE A SWITCH STATEMENT?
+    switch(statement.getStatType()) {
 
-    if (statement.getStatType() == Statement.StatType.DECLARATION) {
-      return sizeOfTypeOnStack(statement.getLhsType());
-    }
+      case DECLARATION:
+        return sizeOfTypeOnStack(statement.getLhsType());
 
-    if (statement.getStatType() == Statement.StatType.CONCAT) {
-      return totalBytesInScope(statement.getStatement1()) + totalBytesInScope(statement.getStatement2());
-    }
+      case CONCAT:
+        return totalBytesInScope(statement.getStatement1()) + totalBytesInScope(statement.getStatement2());
 
-    if (statement.getStatType() == Statement.StatType.WHILE) {
-      return totalBytesInScope(statement.getStatement1()) + maxBeginStatement(statement);
-    }
+      case WHILE:
+        return totalBytesInScope(statement.getStatement1()) + maxBeginStatement(statement);
 
-    if (statement.getStatType() == Statement.StatType.IF) {
-      int stat1Size = totalBytesInScope(statement.getStatement1());
-      int stat2Size = totalBytesInScope(statement.getStatement2());
-      return Math.max(stat1Size, stat2Size);
+      case IF:
+        int stat1Size = totalBytesInScope(statement.getStatement1());
+        int stat2Size = totalBytesInScope(statement.getStatement2());
+        return Math.max(stat1Size, stat2Size);
     }
 
     return 0;
-
   }
 
   private int totalBytesInProgram(Program program) {
