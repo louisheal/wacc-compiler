@@ -352,7 +352,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* adds error message for negative index error */
     instructions.add(offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
     instructions.add(1 + offset, new Instruction(InstrType.WORD, 44));
-    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "ArrayIndexOutOfBoundsError: negative index\n\0"));
+    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "\"ArrayIndexOutOfBoundsError: negative index\\n\\0\""));
 
     msgNumber++;
     offset = msgNumber * 3;
@@ -360,7 +360,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* adds error message for too large index error */
     instructions.add(offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
     instructions.add(1 + offset, new Instruction(InstrType.WORD, 45));
-    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "ArrayIndexOutOfBoundsError: index too large\n\0"));
+    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "\"ArrayIndexOutOfBoundsError: index too large\\n\\0\""));
 
     /* adds function for checking array lookup out of bounds error */
     //TODO: Register Allocation
