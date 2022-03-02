@@ -22,12 +22,19 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   private final Register pc = new Register(15);
 
   private int spLocation = 0;
+  private int labelNum = 0;
   SymbolTable currentST;
   private boolean isDiv = false;
   private boolean isCalc = false;
   private boolean isArrayLookup = false;
   private boolean runtimeErr = false;
   private boolean checkNullPointer = false;
+
+  private String getLabel() {
+    int result = labelNum;
+    labelNum++;
+    return "L" + result;
+  }
 
   //TODO: DELETE?
   private List<Instruction> getInstructionFromExpression(Expression expr) {
@@ -613,6 +620,42 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   }
 
   @Override
+  public List<Instruction> visitIfStatement(Statement statement) {
+
+    /* Evaluate the condition expression. */
+    List<Instruction> instructions = new ArrayList<>(visitExpression(statement.getExpression()));
+
+    /* Generate Labels. */
+    String label1 = getLabel();
+    String label2 = getLabel();
+
+    /* Retrieve the register containing the result from evaluating the condition. */
+    Register rn = popUnusedRegister();
+
+    // CMP rn, #0
+    instructions.add(new Instruction(InstrType.CMP, rn, new Operand2(0)));
+
+    // BEQ Lx
+    instructions.add(new Instruction(InstrType.LABEL, "BEQ " + label1));
+
+    /* Generate instructions for the 'if' clause of the statement. */
+    instructions.addAll(visitStatement(statement.getStatement1()));
+
+    // BL Lx+1
+    instructions.add(new Instruction(InstrType.BL, label2));
+
+    //Lx:
+    instructions.add(new Instruction(InstrType.LABEL, label1 + ":"));
+
+    /* Generate instructions for the 'else' clause of the statement. */
+    instructions.addAll(visitStatement(statement.getStatement2()));
+
+    //Lx+1:
+    instructions.add(new Instruction(InstrType.LABEL, label2 + ":"));
+
+    return instructions;
+  }
+
   public List<Instruction> visitReassignmentStatement(Statement statement) {
     String lhsIdent = getIdentFromLHS(statement.getLHS());
     int lhsStackLocation = currentST.getSPMapping(lhsIdent);
