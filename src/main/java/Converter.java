@@ -656,6 +656,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     // BEQ Lx
     instructions.add(new Instruction(InstrType.LABEL, "BEQ " + label1));
 
+    /* Mark the register rn as no longer in use. */
+    pushUnusedRegister(rn);
+
     /* Generate instructions for the 'if' clause of the statement and change scope. */
     currentST = new SymbolTable(currentST);
     instructions.addAll(visitStatement(statement.getStatement1()));
@@ -712,6 +715,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     // BEQ Lx+1
     instructions.add(new Instruction(InstrType.LABEL, "BEQ " + label2));
+
+    /* Mark the register rn as no longer in use. */
+    pushUnusedRegister(rn);
 
     return instructions;
   }
