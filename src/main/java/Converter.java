@@ -324,15 +324,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       beginStatements.add(statement);
     }
 
-    while (statement.getStatType() == Statement.StatType.CONCAT) {
-      if (statement.getStatement2().getStatType() == Statement.StatType.BEGIN) {
-        beginStatements.add(statement.getStatement2());
-      }
-      statement = statement.getStatement1();
-    }
-
-    if (statement.getStatType() == Statement.StatType.BEGIN) {
-      beginStatements.add(statement);
+    if (statement.getStatType() == Statement.StatType.CONCAT) {
+      beginStatements.addAll(getBeginStatements(statement.getStatement1()));
+      beginStatements.addAll(getBeginStatements(statement.getStatement2()));
     }
 
     return beginStatements;
