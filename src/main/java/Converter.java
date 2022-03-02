@@ -34,6 +34,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   private boolean checkNullPointer = false;
 
   /* Print flags */
+  private boolean hasPrintBool = false;
   private boolean hasPrintInt = false;
   private boolean hasPrintString = false;
   private boolean hasPrintLn = false;
@@ -452,6 +453,40 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
+  public List<Instruction> printBool(List<Instruction> instructions, int msgNumber) {
+
+    int offset = msgNumber * 3;
+
+    /* adds message for true */
+    instructions.add(offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
+    instructions.add(1 + offset, new Instruction(InstrType.WORD, 5));
+    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "true\0"));
+
+    msgNumber++;
+    offset = msgNumber * 3;
+
+    /* adds message for false */
+    instructions.add(offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
+    instructions.add(1 + offset, new Instruction(InstrType.WORD, 6));
+    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "false\0"));
+
+    /* adds function for printing integers */
+    //TODO: Register Allocation
+    instructions.add(new Instruction(InstrType.LABEL, "p_print_int:"));
+    //TODO: ADD LR
+    instructions.add(new Instruction(InstrType.LABEL, "PUSH {lr}"));
+    instructions.add(new Instruction(InstrType.CMP, r0, 0));
+    instructions.add(new Instruction(InstrType.LDR, r0, "msg_" + (msgNumber - 1), Conditionals.NE));
+    instructions.add(new Instruction(InstrType.LDR, r0, "msg_" + msgNumber, Conditionals.EQ));
+    instructions.add(new Instruction(InstrType.ADD, r0, r0, new Operand2(4)));
+    instructions.add(new Instruction(InstrType.BL, "printf"));
+    instructions.add(new Instruction(InstrType.MOV, r0, 0));
+    instructions.add(new Instruction(InstrType.BL, "fflush"));
+    instructions.add(new Instruction(InstrType.LABEL, "POP {pc}"));
+
+    return instructions;
+  }
+
   public List<Instruction> printInt(List<Instruction> instructions, int msgNumber) {
 
     int offset = msgNumber * 3;
@@ -602,6 +637,11 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       instructions.add(new Instruction(InstrType.BL, "exit"));
 
       hasPrintString = true;
+    }
+
+    if(hasPrintBool) {
+      instructions = printBool(instructions, msgNumber);
+      msgNumber+=2;
     }
 
     if(hasPrintInt) {
