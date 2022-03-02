@@ -656,8 +656,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     // BEQ Lx
     instructions.add(new Instruction(InstrType.LABEL, "BEQ " + label1));
 
-    /* Generate instructions for the 'if' clause of the statement. */
+    /* Generate instructions for the 'if' clause of the statement and change scope. */
+    currentST = new SymbolTable(currentST);
     instructions.addAll(visitStatement(statement.getStatement1()));
+    currentST = currentST.getParent();
 
     // BL Lx+1
     instructions.add(new Instruction(InstrType.BL, label2));
@@ -665,8 +667,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     //Lx:
     instructions.add(new Instruction(InstrType.LABEL, label1 + ":"));
 
-    /* Generate instructions for the 'else' clause of the statement. */
+    /* Generate instructions for the 'else' clause of the statement and change scope. */
+    currentST = new SymbolTable(currentST);
     instructions.addAll(visitStatement(statement.getStatement2()));
+    currentST = currentST.getParent();
 
     //Lx+1:
     instructions.add(new Instruction(InstrType.LABEL, label2 + ":"));
