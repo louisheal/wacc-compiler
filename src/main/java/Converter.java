@@ -1629,8 +1629,13 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     // BL p_check_null_pointer
     instructions.add(new Instruction(InstrType.BL, "p_check_null_pointer"));
 
-    // LDR rn, [rn]
-    instructions.add(new Instruction(InstrType.LDR, rn, new Operand2(rn)));
+    if (pairElem.getType() == PairElem.PairElemType.FST) {
+      // LDR rn, [rn]
+      instructions.add(new Instruction(InstrType.LDR, rn, new Operand2(rn)));
+    } else {
+      // LDR rn, [rn, #4]
+      instructions.add(new Instruction(InstrType.LABEL, String.format("LDR %s, [%s, #4]", rn, rn)));
+    }
 
     // LDR rn, [rn]
     instructions.add(new Instruction(InstrType.LDR, rn, new Operand2(rn)));
