@@ -411,7 +411,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* adds error message for null reference error */
     instructions.add(offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
     instructions.add(1 + offset, new Instruction(InstrType.WORD, 50));
-    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "NullReferenceError: dereference a null reference\n\0"));
+    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "\"NullReferenceError: dereference a null reference\\n\\0\""));
 
     /* adds function for checking if a pointer is null */
     //TODO: Register Allocation
