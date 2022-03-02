@@ -1611,6 +1611,41 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   }
 
   @Override
+  public List<Instruction> visitPairElemRHS(AssignRHS rhs) {
+
+    PairElem pairElem = rhs.getPairElem();
+
+    List<Instruction> instructions = new ArrayList<>();
+
+    /* Generate code to evaluate expression. */
+    instructions.addAll(visitExpression(pairElem.getExpression()));
+
+    /* Allocate one register: rn for this function to use. */
+    Register rn = popUnusedRegister();
+
+    // MOV r0, rn
+    instructions.add(new Instruction(InstrType.MOV, r0, new Operand2(rn)));
+
+    // BL p_check_null_pointer
+    instructions.add(new Instruction(InstrType.BL, "p_check_null_pointer"));
+
+    if (pairElem.getType() == PairElem.PairElemType.FST) {
+      // LDR rn, [rn]
+      instructions.add(new Instruction(InstrType.LDR, rn, new Operand2(rn)));
+    } else {
+      // LDR rn, [rn, #4]
+      instructions.add(new Instruction(InstrType.LABEL, String.format("LDR %s, [%s, #4]", rn, rn)));
+    }
+
+    // LDR rn, [rn]
+    instructions.add(new Instruction(InstrType.LDR, rn, new Operand2(rn)));
+
+    pushUnusedRegister(rn);
+
+    return instructions;
+  }
+
+  @Override
   public List<Instruction> visitCallRHS(AssignRHS rhs) {
 
     List<Instruction> instructions = new ArrayList<>();
