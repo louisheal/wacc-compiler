@@ -271,8 +271,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   private int totalBytesInScope(Statement statement) {
 
-    //TODO: MAKE A SWITCH STATEMENT?
-
     if (statement.getStatType() == Statement.StatType.DECLARATION) {
       return sizeOfTypeOnStack(statement.getLhsType());
     }
@@ -309,7 +307,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     int size = 0;
     for (Statement s : beginStatements) {
-      int sSize = totalBytesInScope(s);
+      int sSize = totalBytesInScope(s.getStatement1());
       if (sSize > size) {
         size = sSize;
       }
@@ -327,10 +325,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     }
 
     while (statement.getStatType() == Statement.StatType.CONCAT) {
-      if (statement.getStatement1().getStatType() == Statement.StatType.BEGIN) {
-        beginStatements.add(statement.getStatement1());
+      if (statement.getStatement2().getStatType() == Statement.StatType.BEGIN) {
+        beginStatements.add(statement.getStatement2());
       }
-      statement = statement.getStatement2();
+      statement = statement.getStatement1();
     }
 
     if (statement.getStatType() == Statement.StatType.BEGIN) {
