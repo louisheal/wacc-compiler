@@ -18,6 +18,9 @@ public class Register {
 
   @Override
   public String toString() {
+    if (number == 13){
+      return "sp";
+    }
     return "r" + number;
   }
 
