@@ -1482,15 +1482,55 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     // MOV r0, rn
     instructions.add(new Instruction(InstrType.MOV, r0, new Operand2(rn)));
 
+    //TODO: check type before to choose which read function to use
+
     // BL p_read_int
     instructions.add(new Instruction(InstrType.BL, "p_read_int"));
 
-    //TODO: check how much to add to r4 after each branch link
+    //TODO: check how much to add to rn after each branch link
 
     /* Mark register rn as no longer in use. */
     pushUnusedRegister(rn);
     return instructions;
   }
 
+  @Override
+  public List<Instruction> visitFreeStatement(Statement statement) {
+    return null;
+  }
+
+  @Override
+  public List<Instruction> visitExitStatement(Statement statement) {
+    return null;
+  }
+
+
+  @Override
+  public List<Instruction> visitPrintStatement(Statement statement) {
+    List<Instruction> instructions = new ArrayList<>();
+
+    //TODO: check type before to choose which print function to use
+
+    /* Retrieve the first unused register. */
+    Register rn = popUnusedRegister();
+
+    // MOV r0, rn
+    instructions.add(new Instruction(InstrType.MOV, r0, new Operand2(rn)));
+
+    // BL p_print_int
+    instructions.add(new Instruction(InstrType.BL, "p_print_int"));
+
+    //TODO: check how much to add to rn after each branch link (happens when multiple print statements)
+
+    /* Mark register rn as no longer in use. */
+    pushUnusedRegister(rn);
+
+    return instructions;
+  }
+
+  @Override
+  public List<Instruction> visitPrintlnStatement(Statement statement) {
+    return null;
+  }
 
 }
