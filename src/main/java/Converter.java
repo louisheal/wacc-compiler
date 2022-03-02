@@ -1725,9 +1725,11 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     if (type.equals(Type.EType.INT)) {
       // BL p_print_int
       instructions.add(new Instruction(InstrType.BL, "p_print_int"));
+      hasPrintInt = true;
     } else if (type.equals(Type.EType.STRING)) {
       // BL p_print_string
       instructions.add(new Instruction(InstrType.BL, "p_print_string"));
+      hasPrintString = true;
     } else if (type.equals(Type.EType.BOOL)) {
       // BL p_print_bool
       instructions.add(new Instruction(InstrType.BL, "p_print_bool"));
@@ -1743,7 +1745,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     // BL p_print_ln
     instructions.add(new Instruction(InstrType.BL, "p_print_ln"));
-
+    hasPrintLn = true;
+    
     //TODO: check how much to add to rn after each branch link (happens when multiple print statements)
 
     /* Mark register rn as no longer in use. */
