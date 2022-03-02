@@ -435,7 +435,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* adds error message for divide by zero error */
     instructions.add(offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
     instructions.add(1 + offset, new Instruction(InstrType.WORD, 45));
-    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "DivideByZeroError: divide or modulo by zero\n\0"));
+    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "\"DivideByZeroError: divide or modulo by zero\\n\\0\""));
 
     /* adds function for checking if the divisor is zero */
     //TODO: Register Allocation
