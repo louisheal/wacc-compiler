@@ -461,7 +461,39 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitIfStatement(Statement statement) {
-    return super.visitIfStatement(statement);
+
+    /* Evaluate the condition expression. */
+    List<Instruction> instructions = new ArrayList<>(visitExpression(statement.getExpression()));
+
+    /* Generate Labels. */
+    String label1 = "L0";
+    String label2 = "L1";
+
+    /* Retrieve the register containing the result from evaluating the condition. */
+    Register rn = popUnusedRegister();
+
+    // CMP rn, #0
+    instructions.add(new Instruction(InstrType.CMP, rn, new Operand2(0)));
+
+    // BEQ Lx
+    instructions.add(new Instruction(InstrType.LABEL, "BEQ " + label1));
+
+    /* Generate instructions for the 'if' clause of the statement. */
+    instructions.addAll(visitStatement(statement.getStatement1()));
+
+    // BL Lx+1
+    instructions.add(new Instruction(InstrType.BL, label2));
+
+    //Lx:
+    instructions.add(new Instruction(InstrType.LABEL, label1 + ":"));
+
+    /* Generate instructions for the 'else' clause of the statement. */
+    instructions.addAll(visitStatement(statement.getStatement2()));
+
+    //Lx+1:
+    instructions.add(new Instruction(InstrType.LABEL, label2 + ":"));
+
+    return instructions;
   }
 
   @Override
