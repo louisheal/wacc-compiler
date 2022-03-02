@@ -1503,8 +1503,13 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   public List<Instruction> visitExitStatement(Statement statement) {
     List<Instruction> instructions = new ArrayList<>();
 
+    long exitCode = statement.getExpression().getIntLiter();
+
     /* Retrieve the first unused register. */
     Register rn = popUnusedRegister();
+
+    // LDR rn, =exitCode
+    instructions.add(new Instruction(InstrType.LDR, rn, exitCode));
 
     // MOV r0, rn
     instructions.add(new Instruction(InstrType.MOV, r0, new Operand2(rn)));
