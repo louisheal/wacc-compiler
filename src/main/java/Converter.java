@@ -1501,7 +1501,21 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitExitStatement(Statement statement) {
-    return null;
+    List<Instruction> instructions = new ArrayList<>();
+
+    /* Retrieve the first unused register. */
+    Register rn = popUnusedRegister();
+
+    // MOV r0, rn
+    instructions.add(new Instruction(InstrType.MOV, r0, new Operand2(rn)));
+
+    // BL exit
+    instructions.add(new Instruction(InstrType.BL, "exit"));
+
+    /* Mark register rn as no longer in use. */
+    pushUnusedRegister(rn);
+
+    return instructions;
   }
 
 
