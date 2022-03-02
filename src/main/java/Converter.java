@@ -1546,7 +1546,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   public List<Instruction> visitPrintlnStatement(Statement statement) {
     List<Instruction> instructions = new ArrayList<>();
 
-    //TODO: check type before to choose which print function to use
+    Type.EType type = currentST.getType(statement.getExpression().getIdent()).getType();
 
     /* Retrieve the first unused register. */
     Register rn = popUnusedRegister();
@@ -1554,8 +1554,24 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     // MOV r0, rn
     instructions.add(new Instruction(InstrType.MOV, r0, new Operand2(rn)));
 
-    // BL p_print_int
-    instructions.add(new Instruction(InstrType.BL, "p_print_int"));
+    if (type.equals(Type.EType.INT)) {
+      // BL p_print_int
+      instructions.add(new Instruction(InstrType.BL, "p_print_int"));
+    } else if (type.equals(Type.EType.STRING)) {
+      // BL p_print_string
+      instructions.add(new Instruction(InstrType.BL, "p_print_string"));
+    } else if (type.equals(Type.EType.BOOL)) {
+      // BL p_print_bool
+      instructions.add(new Instruction(InstrType.BL, "p_print_bool"));
+    } else if (type.equals(Type.EType.CHAR)) {
+      // BL p_putchar
+      instructions.add(new Instruction(InstrType.BL, "p_putchar"));
+    } else {
+      // For printing arrays and pairs
+      // BL p_print_reference
+      instructions.add(new Instruction(InstrType.BL, "p_print_referencer"));
+    }
+
 
     // BL p_print_ln
     instructions.add(new Instruction(InstrType.BL, "p_print_ln"));
