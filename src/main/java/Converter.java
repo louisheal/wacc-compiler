@@ -522,7 +522,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(InstrType.MOV, r0, 0));
     instructions.add(new Instruction(InstrType.BL, "fflush"));
     instructions.add(new Instruction(InstrType.LABEL, "POP {pc}"));
-    
+
     return instructions;
   }
 
@@ -596,7 +596,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     if(runtimeErr) {
       instructions.add(new Instruction(InstrType.LABEL, "p_throw_runtime_error:"));
-      //TODO: might need p_print_string?
       instructions.add(new Instruction(InstrType.BL, "p_print_string"));
       instructions.add(new Instruction(InstrType.MOV, r0, -1));
       instructions.add(new Instruction(InstrType.BL, "exit"));
