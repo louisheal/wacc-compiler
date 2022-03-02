@@ -1471,4 +1471,26 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     return instructions;
   }
+
+  @Override
+  public List<Instruction> visitReadStatement(Statement statement) {
+    List<Instruction> instructions = new ArrayList<>();
+
+    /* Retrieve the first unused register. */
+    Register rn = popUnusedRegister();
+
+    // MOV r0, rn
+    instructions.add(new Instruction(InstrType.MOV, r0, new Operand2(rn)));
+
+    // BL p_read_int
+    instructions.add(new Instruction(InstrType.BL, "p_read_int"));
+
+    //TODO: check how much to add to r4 after each branch link
+
+    /* Mark register rn as no longer in use. */
+    pushUnusedRegister(rn);
+    return instructions;
+  }
+
+
 }
