@@ -310,6 +310,35 @@ public class PredefinedFunctions {
   private List<Instruction> pCheckArrayBounds() {
     List<Instruction> instructions = new ArrayList<>();
 
+    //  	PUSH {lr}
+    instructions.add(new Instruction(Instruction.InstrType.LABEL, "PUSH {lr}"));
+
+    //  	CMP r0, #0
+    instructions.add(new Instruction(Instruction.InstrType.CMP, r0, new Operand2(0)));
+
+    /* message = .word 44
+           		 .ascii	"ArrayIndexOutOfBoundsError: negative index */
+    //  	LDRLT r0, =msg_0
+    instructions.add(new Instruction(Instruction.InstrType.LDR, r0, "msg_0", Conditionals.LT));
+
+    //  	BLLT p_throw_runtime_error
+    instructions.add(new Instruction(Instruction.InstrType.BL, "p_throw_runtime_error", Conditionals.LT));
+
+    //  	LDR r1, [r1]
+    instructions.add(new Instruction(Instruction.InstrType.LDR, r1, new Operand2(r1)));
+
+    //  	CMP r0, r1
+    instructions.add(new Instruction(Instruction.InstrType.CMP, r0, new Operand2(r1)));
+
+    //  	LDRCS r0, =msg_0
+    instructions.add(new Instruction(Instruction.InstrType.LDR, "msg_0", Conditionals.CS));
+
+    //  	BLCS p_throw_runtime_error
+    instructions.add(new Instruction(Instruction.InstrType.BL, "p_throw_runtime_error", Conditionals.CS));
+
+    //  	POP {pc}
+    instructions.add(new Instruction(Instruction.InstrType.LABEL, "POP {pc}"));
+
     return instructions;
   }
 
