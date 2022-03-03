@@ -459,9 +459,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     }
 
     if (lhsType == EType.ARRAY ){
-      int size = sizeOfTypeOnStack(currentST.getType(statement.getLhsIdent()));
-      instructions.add(new Instruction(ADD, rn, new Operand2(size)));// need to account for elem
-      // on index 2 3 4...
+      visitArrayElemLHS(statement.getLHS());
+      instructions.add(new Instruction(STR, rs, new Operand2(rn)));
     }
 
     pushUnusedRegister(rs);
@@ -470,17 +469,17 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   }
 
   @Override
-  public List<Instruction> visitArrayElemLHS(Statement statement) {
+  public List<Instruction> visitArrayElemLHS(AssignLHS lhs) {
 
     /* Set ArrayLookup flag to true. */
     isArrayLookup = true;
 
-    ArrayElem arrayElem = statement.getLHS().getArrayElem();
+    ArrayElem arrayElem = lhs.getArrayElem();
     List<Instruction> instructions = new ArrayList<>();
     String instruction;
 
     /* Find where the array address is stored on the stack. */
-    int stackOffset = currentST.getSPMapping(statement.getLhsIdent());
+    int stackOffset = currentST.getSPMapping(lhs.getIdent());
 
     /* Allocate one register: rn for this function to use. */
     Register rn = popUnusedRegister();
