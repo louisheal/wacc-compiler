@@ -447,8 +447,17 @@ public class PredefinedFunctions {
     // CMP r0, r1
     instructions.add(new Instruction(CMP, r0, new Operand2(r1)));
 
-    // LDRCS r0, =msg_0
-    instructions.add(new Instruction(LDR, "msg_0", Conditionals.CS));
+
+    /* msg_n:
+         .word 45
+         .ascii	"ArrayIndexOutOfBoundsError: index too large\n\0" */
+    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
+    messages.add(new Instruction(WORD, 45));
+    messages.add(new Instruction(ASCII, "\"ArrayIndexOutOfBoundsError: index too large\\n\\0\""));
+
+    // LDRCS r0, =msg_n
+    instructions.add(new Instruction(LDR, "msg_" + msgCounter, Conditionals.CS));
+    msgCounter++;
 
     // BLCS p_throw_runtime_error
     instructions.add(new Instruction(BL, "p_throw_runtime_error", Conditionals.CS));
@@ -474,8 +483,13 @@ public class PredefinedFunctions {
 
     /* message = .word 3
       		     .ascii	"%d\0" */
+    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
+    messages.add(new Instruction(WORD, 3));
+    messages.add(new Instruction(ASCII, "\"%d\\0\""));
+
     // LDR r0, =msg_0
-    instructions.add(new Instruction(LDR, r0, "msg_0"));
+    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter));
+    msgCounter++;
 
     // ADD r0, r0, #4
     instructions.add(new Instruction(ADD, r0, r0, new Operand2(4)));
