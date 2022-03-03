@@ -316,7 +316,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     int size = 0;
     for (Statement s : beginStatements) {
-      int sSize = totalBytesInScope(s);
+      int sSize = totalBytesInScope(s.getStatement1());
       if (sSize > size) {
         size = sSize;
       }
@@ -333,15 +333,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       beginStatements.add(statement);
     }
 
-    while (statement.getStatType() == Statement.StatType.CONCAT) {
-      if (statement.getStatement1().getStatType() == Statement.StatType.BEGIN) {
-        beginStatements.add(statement.getStatement1());
-      }
-      statement = statement.getStatement2();
-    }
-
-    if (statement.getStatType() == Statement.StatType.BEGIN) {
-      beginStatements.add(statement);
+    if (statement.getStatType() == Statement.StatType.CONCAT) {
+      beginStatements.addAll(getBeginStatements(statement.getStatement1()));
+      beginStatements.addAll(getBeginStatements(statement.getStatement2()));
     }
 
     return beginStatements;
@@ -870,6 +864,17 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     /* Mark the register rn as no longer in use. */
     pushUnusedRegister(rn);
+
+    return instructions;
+  }
+
+  @Override
+  public List<Instruction> visitBeginStatement(Statement statement) {
+
+    /* Generate code for begin body and change scope. */
+    currentST = new SymbolTable(currentST);
+    List<Instruction> instructions = new ArrayList<>(visitStatement(statement.getStatement1()));
+    currentST = currentST.getParent();
 
     return instructions;
   }
