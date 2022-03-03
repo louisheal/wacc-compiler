@@ -263,6 +263,12 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       hasData = true;
     }
 
+    if (checkNullPointer) {
+      instructions.addAll(getFunctionInstructions(P_CHECK_NULL_POINTER));
+      runtimeErr = true;
+      hasData = true;
+    }
+
     if (runtimeErr) {
       instructions.addAll(getFunctionInstructions(P_THROW_RUNTIME_ERROR));
       hasPrintString = true;
@@ -311,11 +317,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     if (isCalc) {
       instructions.addAll(getFunctionInstructions(P_THROW_OVERFLOW_ERROR));
-      hasData = true;
-    }
-
-    if (checkNullPointer) {
-      instructions.addAll(getFunctionInstructions(P_CHECK_NULL_POINTER));
       hasData = true;
     }
 
@@ -557,8 +558,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     return instructions;
   }
-
-
 
   @Override
   public List<Instruction> visitIfStatement(Statement statement) {
@@ -1426,27 +1425,15 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     PairElem pairElem = rhs.getPairElem();
 
-    List<Instruction> instructions = new ArrayList<>();
+    /* Place pairElem inside a new AssignLHS class. */
+    AssignLHS assignLHS = new AssignLHSBuilder().buildPairLHS(pairElem);
 
-    /* Generate code to evaluate expression. */
-    instructions.addAll(visitExpression(pairElem.getExpression()));
+    /* Calculate the address of the pair elem and store it in the first unused register.
+       Uses our already defined visitPairElemLHS function to reduce duplication. */
+    List<Instruction> instructions = new ArrayList<>(visitLHS(assignLHS));
 
-    /* Allocate one register: rn for this function to use. */
+    /* Retrieve first unused register. */
     Register rn = popUnusedRegister();
-
-    // MOV r0, rn
-    instructions.add(new Instruction(MOV, r0, new Operand2(rn)));
-
-    // BL p_check_null_pointer
-    instructions.add(new Instruction(BL, "p_check_null_pointer"));
-
-    if (pairElem.getType() == PairElem.PairElemType.FST) {
-      // LDR rn, [rn]
-      instructions.add(new Instruction(LDR, rn, new Operand2(rn)));
-    } else {
-      // LDR rn, [rn, #4]
-      instructions.add(new Instruction(LABEL, String.format("LDR %s, [%s, #4]", rn, rn)));
-    }
 
     // LDR rn, [rn]
     instructions.add(new Instruction(LDR, rn, new Operand2(rn)));
@@ -1504,24 +1491,41 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   //TODO: Check lhs (arrayelem, pairelem, ident)
   @Override
   public List<Instruction> visitReadStatement(Statement statement) {
-    List<Instruction> instructions = new ArrayList<>();
+
+    /* Generate code to retrieve the address of the LHS. */
+    List<Instruction> instructions = new ArrayList<>(visitLHS(statement.getLHS()));
 
     /* Retrieve the first unused register. */
     Register rn = popUnusedRegister();
 
-    // ADD rn, sp, #0
-    instructions.add(new Instruction(ADD, rn, sp, new Operand2(0)));
-
     // MOV r0, rn
     instructions.add(new Instruction(MOV, r0, new Operand2(rn)));
 
-    Type type = currentST.getType(statement.getLHS().getIdent());
+    Type type = currentST.getType(getIdentFromLHS(statement.getLHS()));
+    EType eType;
 
-    if (type.equals(new Type(INT))) {
+    /* Find the EType of the LHS by using the AssignType. */
+    if (statement.getLHS().getAssignType() == AssignLHS.LHSType.IDENT) {
+      eType = type.getType();
+    } else if (statement.getLHS().getAssignType() == AssignLHS.LHSType.ARRAYELEM) {
+      while (type.getType() == ARRAY) {
+        type = type.getArrayType();
+      }
+      eType = type.getType();
+    } else {
+      if (statement.getLHS().getPairElem().getType() == PairElem.PairElemType.FST) {
+        eType = type.getFstType().getType();
+      } else {
+        eType = type.getSndType().getType();
+      }
+    }
+
+    /* Use int/char instruction depending on the type of the LHS. */
+    if (eType == INT) {
       // BL p_read_int
       instructions.add(new Instruction(BL, "p_read_int"));
       hasReadInt = true;
-    } else if (type.equals(new Type(CHAR))) {
+    } else if (eType == CHAR) {
       // BL p_read_char
       instructions.add(new Instruction(BL, "p_read_char"));
       hasReadChar = true;
@@ -1529,6 +1533,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     /* Mark register rn as no longer in use. */
     pushUnusedRegister(rn);
+
     return instructions;
   }
 
@@ -1581,7 +1586,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     return instructions;
   }
-
 
   @Override
   public List<Instruction> visitPrintStatement(Statement statement) {
@@ -1640,4 +1644,35 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
+  @Override
+  public List<Instruction> visitPairElemLHS(AssignLHS lhs) {
+
+    checkNullPointer = true;
+
+    PairElem pairElem = lhs.getPairElem();
+
+    /* Generate code to evaluate expression. */
+    List<Instruction> instructions = new ArrayList<>(visitExpression(pairElem.getExpression()));
+
+    /* Allocate one register: rn for this function to use. */
+    Register rn = popUnusedRegister();
+
+    // MOV r0, rn
+    instructions.add(new Instruction(MOV, r0, new Operand2(rn)));
+
+    // BL p_check_null_pointer
+    instructions.add(new Instruction(BL, "p_check_null_pointer"));
+
+    if (pairElem.getType() == PairElem.PairElemType.FST) {
+      // LDR rn, [rn]
+      instructions.add(new Instruction(LDR, rn, new Operand2(rn)));
+    } else {
+      // LDR rn, [rn, #4]
+      instructions.add(new Instruction(LABEL, String.format("LDR %s, [%s, #4]", rn, rn)));
+    }
+
+    pushUnusedRegister(rn);
+
+    return instructions;
+  }
 }
