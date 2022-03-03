@@ -218,7 +218,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   public List<Instruction> visitProgram(Program program) {
     List<Instruction> instructions = new ArrayList<>();
 
-    instructions.add(new Instruction(LABEL, "")); // Leave gap in lines
     instructions.add(new Instruction(TEXT, ""));
     instructions.add(new Instruction(LABEL, "")); // Leave gap in lines
 
@@ -327,6 +326,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     if (hasData) {
       instructions.add(0, new Instruction(DATA, ""));
       instructions.add(1, new Instruction(LABEL, ""));
+      instructions.add(2, new Instruction(LABEL, "")); // Leave gap in lines
       instructions.addAll(2, getMessages());
     }
 
