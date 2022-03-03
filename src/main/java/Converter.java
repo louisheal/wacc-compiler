@@ -432,7 +432,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
               lhsStackLocation)));
     }
     else{
-      instructions.add(new Instruction(STR, rn, new Operand2(sp)));
+      instructions.add(new Instruction(STR, sp, new Operand2(rn)));
     }
     if (currentST.getType(lhsIdent).getType() == EType.PAIR){
       if (spLocation - currentST.getSPMapping(lhsIdent) > 0 ){
@@ -1427,19 +1427,31 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitExitStatement(Statement statement) {
+    //TODO: check if need exit code?
     List<Instruction> instructions = new ArrayList<>();
-
-    long exitCode = statement.getExpression().getIntLiter();
+    long exitCode = 0;
 
     /* Retrieve the first unused register. */
     Register rn = popUnusedRegister();
 
-    // LDR rn, =exitCode
-    instructions.add(new Instruction(LDR, rn, exitCode));
+    if (statement.getExpression().getIdent() == null) {
+      exitCode = statement.getExpression().getIntLiter();
 
-    // MOV r0, rn
-    instructions.add(new Instruction(MOV, r0, new Operand2(rn)));
+      // LDR rn, =exitCode
+      instructions.add(new Instruction(LDR, rn, exitCode));
 
+      // MOV r0, rn
+      instructions.add(new Instruction(MOV, r0, new Operand2(rn)));
+
+    } else {
+      exitCode = currentST.getSPMapping(statement.getExpression().getIdent());
+
+      // LDR rn, [sp]
+      instructions.add(new Instruction(LDR, rn, new Operand2(sp)));
+
+      // MOV r0, rn
+      instructions.add(new Instruction(MOV, r0, new Operand2(rn)));
+    }
     // BL exit
     instructions.add(new Instruction(BL, "exit"));
 
