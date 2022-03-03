@@ -8,6 +8,7 @@ import assembly.Register;
 import ast.*;
 
 import ast.Type.EType;
+import java.lang.reflect.Array;
 import java.util.*;
 
 import static assembly.Instruction.InstrType.*;
@@ -423,6 +424,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   @Override
   public List<Instruction> visitReassignmentStatement(Statement statement) {
     String lhsIdent = getIdentFromLHS(statement.getLHS());
+    EType lhsType = currentST.getType(lhsIdent).getType();
     int lhsStackLocation = currentST.getSPMapping(lhsIdent);
     List<Instruction> instructions = new ArrayList<>(visitRHS(statement.getRHS()));
     Register rn = popUnusedRegister();
@@ -442,7 +444,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       }
 
     }
-    if (currentST.getType(lhsIdent).getType() == EType.PAIR){
+    if (lhsType == EType.PAIR){
       if (spLocation - currentST.getSPMapping(lhsIdent) > 0 ){
         instructions.add(new Instruction(LABEL, String.format("LDR %s [sp, #%d]", rs,
             lhsStackLocation)));
@@ -456,10 +458,67 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       instructions.add(new Instruction(STR, rs, new Operand2(rn)));
     }
 
+    if (lhsType == EType.ARRAY ){
+      int size = sizeOfTypeOnStack(currentST.getType(statement.getLhsIdent()));
+      instructions.add(new Instruction(ADD, rn, new Operand2(size)));// need to account for elem
+      // on index 2 3 4...
+    }
+
     pushUnusedRegister(rs);
     pushUnusedRegister(rn);
     return instructions;
   }
+
+  @Override
+  public List<Instruction> visitArrayElemLHS(Statement statement) {
+
+    /* Set ArrayLookup flag to true. */
+    isArrayLookup = true;
+
+    ArrayElem arrayElem = statement.getLHS().getArrayElem();
+    List<Instruction> instructions = new ArrayList<>();
+    String instruction;
+
+    /* Find where the array address is stored on the stack. */
+    int stackOffset = currentST.getSPMapping(statement.getLhsIdent());
+
+    /* Allocate one register: rn for this function to use. */
+    Register rn = popUnusedRegister();
+
+    // ADD rn, sp, #offset
+    instruction = String.format("ADD %s, sp, #%d", rn, stackOffset);
+    instructions.add(new Instruction(LABEL, instruction));
+
+    /* Evaluate the index of the ArrayElem and store it in rm. */
+    instructions.addAll(visitExpression(arrayElem.getExpression().get(0)));
+
+    /* Retrieve the register rm which contains the value of the index. */
+    Register rm = popUnusedRegister();
+
+    // LDR rn, [rn]
+    instructions.add(new Instruction(LDR, rn, new Operand2(rn)));
+
+    // MOV r1, rn
+    instructions.add(new Instruction(MOV, r1, new Operand2(rn)));
+
+    // BL p_check_array_bounds
+    instructions.add(new Instruction(BL, "p_check_array_bounds"));
+
+    // ADD rn, rn, #4
+    instructions.add(new Instruction(ADD, rn, rn, new Operand2(4)));
+
+    // ADD rn, rn, rm, LSL #2
+    instruction = String.format("ADD %s, %s, LSL #2", rn, rn);
+    instructions.add(new Instruction(LABEL, instruction));
+
+    /* Mark the two registers used in the evaluation of this function as no longer in use. */
+    pushUnusedRegister(rm);
+    pushUnusedRegister(rn);
+
+    return instructions;
+  }
+
+
 
   @Override
   public List<Instruction> visitIfStatement(Statement statement) {
