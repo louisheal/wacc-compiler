@@ -423,15 +423,21 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitReassignmentStatement(Statement statement) {
+    /* Initialising properties needed */
     String lhsIdent = getIdentFromLHS(statement.getLHS());
     EType lhsType = currentST.getType(lhsIdent).getType();
     int lhsStackLocation = currentST.getSPMapping(lhsIdent);
     List<Instruction> instructions = new ArrayList<>(visitRHS(statement.getRHS()));
+
+    /* Popped first unused register into rn */
     Register rn = popUnusedRegister();
 
-    
+
+    /* Check if the type is pair and generate instructions for pairs if so */
     if (lhsType == EType.PAIR){
+      /* Initialised second unused register into rs*/
       Register rs = popUnusedRegister();
+      /* Check if the shorthanded [SP] can be used */
       if (spLocation - currentST.getSPMapping(lhsIdent) > 0 ){
         instructions.add(new Instruction(LABEL, String.format("LDR %s [sp, #%d]", rs,
             lhsStackLocation)));
@@ -443,14 +449,18 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       instructions.add(new Instruction(BL, "p_check_null_pointer"));
       instructions.add(new Instruction(LDR, rs, new Operand2(rs)));
       instructions.add(new Instruction(STR, rs, new Operand2(rn)));
+      /* Frees the second unused register RS*/
       pushUnusedRegister(rs);
+      return instructions;
     }
 
+    /* Check if the type is an array and generate relevent code for it*/
     if (lhsType == EType.ARRAY ){
       instructions.addAll(visitArrayElemLHS(statement.getLHS()));
       Register rs = popUnusedRegister();
       instructions.add(new Instruction(STR, rs, new Operand2(rn)));
       pushUnusedRegister(rs);
+      return instructions;
     }
 
 
