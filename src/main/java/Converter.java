@@ -7,6 +7,7 @@ import assembly.Register;
 import ast.*;
 
 import ast.Type.EType;
+import java.awt.image.renderable.RenderableImage;
 import java.util.*;
 
 public class Converter extends ASTVisitor<List<Instruction>> {
@@ -1730,7 +1731,12 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitFreeStatement(Statement statement) {
-    return null;
+    List<Instruction> instructions = new ArrayList<>();
+    Register rn = popUnusedRegister();
+    instructions.add(new Instruction(InstrType.MOV, r0, new Operand2(rn)));
+    instructions.add(new Instruction(InstrType.BL, "p_free_pair"));
+    pushUnusedRegister(rn);
+    return instructions;
   }
 
   @Override
