@@ -470,10 +470,26 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     /* If it is neither a pair nor an array */
 
+    /* Frees the only generated unused register*/
+    pushUnusedRegister(rn);
+    /* Generates code for visiting the LHS if it is an ident*/
+    visitIdentLHS(statement.getLHS());
+
+    return instructions;
+  }
+
+  @Override
+  public List<Instruction> visitIdentLHS (AssignLHS lhs){
+    String lhsIdent = lhs.getIdent();
+    List<Instruction> instructions = new ArrayList<>();
+    Register rn = popUnusedRegister();
+    int lhsStackLocation = currentST.getSPMapping(lhsIdent);
+    EType lhsType = currentST.getType(lhsIdent).getType();
+
     /* Checks if shorthand [SP] can be applied*/
     if (spLocation - currentST.getSPMapping(lhsIdent) > 0 ){
       instructions.add(new Instruction(LABEL, String.format("STR %s [sp, #%d]", rn,
-              lhsStackLocation)));
+          lhsStackLocation)));
     }
     else{
       // TODO: update Symbol table?
@@ -483,10 +499,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       } else {
         instructions.add(new Instruction(STR, sp, new Operand2(rn)));
       }
-
     }
 
-    /* Frees the only generated unused register*/
     pushUnusedRegister(rn);
     return instructions;
   }
