@@ -428,7 +428,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     int lhsStackLocation = currentST.getSPMapping(lhsIdent);
     List<Instruction> instructions = new ArrayList<>(visitRHS(statement.getRHS()));
     Register rn = popUnusedRegister();
-    Register rs = popUnusedRegister();
     if (spLocation - currentST.getSPMapping(lhsIdent) > 0 ){
       instructions.add(new Instruction(LABEL, String.format("STR %s [sp, #%d]", rn,
               lhsStackLocation)));
@@ -444,6 +443,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     }
     if (lhsType == EType.PAIR){
+      Register rs = popUnusedRegister();
       if (spLocation - currentST.getSPMapping(lhsIdent) > 0 ){
         instructions.add(new Instruction(LABEL, String.format("LDR %s [sp, #%d]", rs,
             lhsStackLocation)));
@@ -455,14 +455,16 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       instructions.add(new Instruction(BL, "p_check_null_pointer"));
       instructions.add(new Instruction(LDR, rs, new Operand2(rs)));
       instructions.add(new Instruction(STR, rs, new Operand2(rn)));
+      pushUnusedRegister(rs);
     }
 
     if (lhsType == EType.ARRAY ){
       instructions.addAll(visitArrayElemLHS(statement.getLHS()));
+      Register rs = popUnusedRegister();
       instructions.add(new Instruction(STR, rs, new Operand2(rn)));
+      pushUnusedRegister(rs);
     }
 
-    pushUnusedRegister(rs);
     pushUnusedRegister(rn);
     return instructions;
   }
