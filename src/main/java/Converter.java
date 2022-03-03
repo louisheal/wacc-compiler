@@ -693,6 +693,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     List<Instruction> instructions = new ArrayList<>();
 
+
+    // TODO: check case when charVal is '\0' (testcase: echoPuncChar.wacc)
     // MOV rn, #charVal
     String instruction = String.format("MOV %s, #'%s'", rn, expression.getCharLiter());
     instructions.add(new Instruction(LABEL, instruction));
@@ -714,7 +716,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Generate a message number for the string. */
     String msgLabel = getMessageLabel();
     addMessage(new Instruction(LABEL, msgLabel + ":"));
-    addMessage(new Instruction(WORD, string.length()));
+    // length - 2 to remove to ensure quotation marks aren't include in the length
+    addMessage(new Instruction(WORD, string.length() - 2));
     addMessage(new Instruction(ASCII, string));
 
     /* Allocate a register: rn for this function to use. */
