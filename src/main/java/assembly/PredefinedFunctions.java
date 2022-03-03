@@ -1,5 +1,6 @@
 package assembly;
 
+import com.sun.jdi.PrimitiveValue;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +11,13 @@ public class PredefinedFunctions {
   private final Register r2 = new Register(2);
 
   public enum Functions {
-    P_PRINT_INT, P_PRINT_BOOL, P_PRINT_STRING, P_PRINT_REFERENCE
+    P_PRINT_INT, P_PRINT_BOOL, P_PRINT_STRING, P_PRINT_REFERENCE,
+    P_CHECK_NULL_POINTER,
+    P_THROW_RUNTIME_ERROR, P_THROW_OVERFLOW_ERROR, P_THROW_OVERFLOW_ERROR_NE,
+    P_CHECK_DIVIDE_BY_ZERO,
+    P_CHECK_ARRAY_BOUNDS,
+    P_READ_INT, P_READ_CHAR,
+    P_FREE_PAIR
   }
 
   public List<Instruction> getFunctionInstructions(Functions function) {
@@ -161,4 +168,59 @@ public class PredefinedFunctions {
 
     return instructions;
   }
+
+  private List<Instruction> pCheckNullPointer() {
+    List<Instruction> instructions = new ArrayList<>();
+
+    return instructions;
+  }
+
+  private List<Instruction> pThrowRuntimeError() {
+    List<Instruction> instructions = new ArrayList<>();
+
+    return instructions;
+  }
+
+  private List<Instruction> pThrowOverflowError() {
+    List<Instruction> instructions = new ArrayList<>();
+
+    return instructions;
+  }
+
+  private List<Instruction> pThrowOverflowErrorNE() {
+    List<Instruction> instructions = new ArrayList<>();
+
+    return instructions;
+  }
+
+  private List<Instruction> pCheckDivideByZero() {
+    List<Instruction> instructions = new ArrayList<>();
+
+    return instructions;
+  }
+
+  private List<Instruction> pCheckArrayBounds() {
+    List<Instruction> instructions = new ArrayList<>();
+
+    return instructions;
+  }
+
+  private List<Instruction> pReadInt() {
+    List<Instruction> instructions = new ArrayList<>();
+
+    return instructions;
+  }
+
+  private List<Instruction> pReadChar() {
+    List<Instruction> instructions = new ArrayList<>();
+
+    return instructions;
+  }
+
+  private List<Instruction> pFreePair() {
+    List<Instruction> instructions = new ArrayList<>();
+
+    return instructions;
+  }
+
 }
