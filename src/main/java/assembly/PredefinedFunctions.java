@@ -323,8 +323,17 @@ public class PredefinedFunctions {
     // CMP r0, #0
     instructions.add(new Instruction(CMP, r0, new Operand2(0)));
 
-    // LDREQ r0, =msg_0
-    instructions.add(new Instruction(LDR, r0, "msg_0", Conditionals.EQ));
+    /* msg_n:
+    	      .word 50
+    	      .ascii	"NullReferenceError: dereference a null reference\n\0" */
+
+    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
+    messages.add(new Instruction(WORD, 50));
+    messages.add(new Instruction(ASCII, "\"NullReferenceError: dereference a null reference\\n\\0\""));
+
+
+    // LDREQ r0, =msg_n
+    instructions.add(new Instruction(LDR, r0, "msg_n", Conditionals.EQ));
 
     // BLEQ p_throw_runtime_error
     instructions.add(new Instruction(BL, "p_throw_runtime_error", Conditionals.EQ));
