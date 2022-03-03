@@ -23,7 +23,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   /* Function return registers. */
   private final Register r0 = new Register(0);
   private final Register r1 = new Register(1);
-  private final Register r2 = new Register(2);
 
   /* Special registers. */
   private final Register sp = new Register(13);
@@ -219,6 +218,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   public List<Instruction> visitProgram(Program program) {
     List<Instruction> instructions = new ArrayList<>();
 
+    instructions.add(new Instruction(LABEL, "")); // Leave gap in lines
     instructions.add(new Instruction(TEXT, ""));
     instructions.add(new Instruction(LABEL, "")); // Leave gap in lines
 
@@ -1388,6 +1388,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
+  //TODO: Check lhs (arrayelem, pairelem, ident)
   @Override
   public List<Instruction> visitReadStatement(Statement statement) {
     List<Instruction> instructions = new ArrayList<>();
@@ -1410,6 +1411,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
+  //TODO: Style + Docs
   @Override
   public List<Instruction> visitFreeStatement(Statement statement) {
     List<Instruction> instructions = new ArrayList<>();
@@ -1417,6 +1419,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(MOV, r0, new Operand2(rn)));
     instructions.add(new Instruction(BL, "p_free_pair"));
     pushUnusedRegister(rn);
+
+    hasFreePair = true;
+
     return instructions;
   }
 
