@@ -234,7 +234,7 @@ public class Instruction {
     },
     ASCII{
       public String toString() {
-        return ".ascii";
+        return ".ascii ";
       }
     },
     LABEL
