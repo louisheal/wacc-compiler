@@ -6,6 +6,8 @@ import java.util.List;
 
 public class PredefinedFunctions {
 
+  // TODO: check cases for LDR r0, =msg_(number) for where the number is changed
+
   private final Register r0 = new Register(0);
   private final Register r1 = new Register(1);
   private final Register r2 = new Register(2);
@@ -205,8 +207,8 @@ public class PredefinedFunctions {
     //	PUSH {lr}
     instructions.add(new Instruction(Instruction.InstrType.LABEL, "PUSH {lr}"));
 
-    //	LDR r0, =msg_2
-    instructions.add(new Instruction(Instruction.InstrType.LDR, r0, "msg_2"));
+    //	LDR r0, =msg_1
+    instructions.add(new Instruction(Instruction.InstrType.LDR, r0, "msg_1"));
 
     //	ADD r0, r0, #4
     instructions.add(new Instruction(Instruction.InstrType.ADD, r0, r0, new Operand2(4)));
@@ -228,6 +230,21 @@ public class PredefinedFunctions {
 
   private List<Instruction> pCheckNullPointer() {
     List<Instruction> instructions = new ArrayList<>();
+
+    //	PUSH {lr}
+    instructions.add(new Instruction(Instruction.InstrType.LABEL, "PUSH {lr}"));
+
+    //	CMP r0, #0
+    instructions.add(new Instruction(Instruction.InstrType.CMP, r0, new Operand2(0)));
+
+    //	LDREQ r0, =msg_0
+    instructions.add(new Instruction(Instruction.InstrType.LDR, r0, "msg_0", Conditionals.EQ));
+
+    //	BLEQ p_throw_runtime_error
+    instructions.add(new Instruction(Instruction.InstrType.BL, "p_throw_runtime_error", Conditionals.EQ));
+
+    //	POP {pc}
+    instructions.add(new Instruction(Instruction.InstrType.LABEL, "POP {pc}"));
 
     return instructions;
   }
