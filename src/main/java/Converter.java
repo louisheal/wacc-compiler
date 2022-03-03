@@ -428,20 +428,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     int lhsStackLocation = currentST.getSPMapping(lhsIdent);
     List<Instruction> instructions = new ArrayList<>(visitRHS(statement.getRHS()));
     Register rn = popUnusedRegister();
-    if (spLocation - currentST.getSPMapping(lhsIdent) > 0 ){
-      instructions.add(new Instruction(LABEL, String.format("STR %s [sp, #%d]", rn,
-              lhsStackLocation)));
-    }
-    else{
-      // TODO: update Symbol table?
-      // Adds B suffix when bool or char
-      if (lhsType == EType.BOOL || lhsType == EType.CHAR) {
-        instructions.add(new Instruction(STR, sp, new Operand2(rn), "B"));
-      } else {
-        instructions.add(new Instruction(STR, sp, new Operand2(rn)));
-      }
 
-    }
+    
     if (lhsType == EType.PAIR){
       Register rs = popUnusedRegister();
       if (spLocation - currentST.getSPMapping(lhsIdent) > 0 ){
@@ -463,6 +451,22 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       Register rs = popUnusedRegister();
       instructions.add(new Instruction(STR, rs, new Operand2(rn)));
       pushUnusedRegister(rs);
+    }
+
+
+    if (spLocation - currentST.getSPMapping(lhsIdent) > 0 ){
+      instructions.add(new Instruction(LABEL, String.format("STR %s [sp, #%d]", rn,
+              lhsStackLocation)));
+    }
+    else{
+      // TODO: update Symbol table?
+      // Adds B suffix when bool or char
+      if (lhsType == EType.BOOL || lhsType == EType.CHAR) {
+        instructions.add(new Instruction(STR, sp, new Operand2(rn), "B"));
+      } else {
+        instructions.add(new Instruction(STR, sp, new Operand2(rn)));
+      }
+
     }
 
     pushUnusedRegister(rn);
@@ -508,7 +512,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(ADD, rn, rn, new Operand2(4)));
 
     // ADD rn, rn, rm, LSL #2
-    instruction = String.format("ADD %s, %s, LSL #2", rn, rn);
+    instruction = String.format("ADD %s, %s, %s LSL #2", rn, rn, rm);
     instructions.add(new Instruction(LABEL, instruction));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
