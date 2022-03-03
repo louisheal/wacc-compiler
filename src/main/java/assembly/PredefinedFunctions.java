@@ -11,7 +11,7 @@ public class PredefinedFunctions {
   private final Register r2 = new Register(2);
 
   public enum Functions {
-    P_PRINT_INT, P_PRINT_BOOL, P_PRINT_STRING, P_PRINT_REFERENCE,
+    P_PRINT_INT, P_PRINT_BOOL, P_PRINT_STRING, P_PRINT_REFERENCE, P_PRINT_LN,
     P_CHECK_NULL_POINTER,
     P_THROW_RUNTIME_ERROR, P_THROW_OVERFLOW_ERROR, P_THROW_OVERFLOW_ERROR_NE,
     P_CHECK_DIVIDE_BY_ZERO,
@@ -35,6 +35,9 @@ public class PredefinedFunctions {
         break;
       case P_PRINT_REFERENCE:
         instructions.addAll(pPrintReferenceInstruction());
+        break;
+      case P_PRINT_LN:
+        instructions.addAll(pPrintLn());
         break;
       case P_CHECK_NULL_POINTER:
         instructions.addAll(pCheckNullPointer());
@@ -183,6 +186,33 @@ public class PredefinedFunctions {
 
     //	BL printf
     instructions.add(new Instruction(Instruction.InstrType.BL, "printf"));
+
+    //	MOV r0, #0
+    instructions.add(new Instruction(Instruction.InstrType.MOV, r0, new Operand2(0)));
+
+    //	BL fflush
+    instructions.add(new Instruction(Instruction.InstrType.BL, "fflush"));
+
+    //	POP {pc}
+    instructions.add(new Instruction(Instruction.InstrType.LABEL, "POP {pc}"));
+
+    return instructions;
+  }
+
+  private List<Instruction> pPrintLn() {
+    List<Instruction> instructions = new ArrayList<>();
+
+    //	PUSH {lr}
+    instructions.add(new Instruction(Instruction.InstrType.LABEL, "PUSH {lr}"));
+
+    //	LDR r0, =msg_2
+    instructions.add(new Instruction(Instruction.InstrType.LDR, r0, "msg_2"));
+
+    //	ADD r0, r0, #4
+    instructions.add(new Instruction(Instruction.InstrType.ADD, r0, r0, new Operand2(4)));
+
+    //	BL puts
+    instructions.add(new Instruction(Instruction.InstrType.BL, "puts"));
 
     //	MOV r0, #0
     instructions.add(new Instruction(Instruction.InstrType.MOV, r0, new Operand2(0)));
