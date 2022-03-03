@@ -473,7 +473,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Frees the only generated unused register*/
     pushUnusedRegister(rn);
     /* Generates code for visiting the LHS if it is an ident*/
-    visitIdentLHS(statement.getLHS());
+    instructions.addAll(visitIdentLHS(statement.getLHS()));
 
     return instructions;
   }
