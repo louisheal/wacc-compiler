@@ -91,8 +91,8 @@ public class PredefinedFunctions {
               .word 3
 		      .ascii	"%d\0" */
     messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
-    messages.add(new Instruction(LABEL, ".word 3"));
-    messages.add(new Instruction(LABEL, ".ascii\t\"%d\\0\""));
+    messages.add(new Instruction(WORD, 3));
+    messages.add(new Instruction(ASCII, "\"%d\\0\""));
 
     // LDR r0, =msg_0
     instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter));
@@ -116,11 +116,6 @@ public class PredefinedFunctions {
     return instructions;
   }
 
-  public static void main(String[] args) {
-    System.out.println(pPrintIntInstruction());
-    System.out.println(messages);
-  }
-
   private static List<Instruction> pPrintBoolInstruction() {
 
     List<Instruction> instructions = new ArrayList<>();
@@ -134,13 +129,29 @@ public class PredefinedFunctions {
     // CMP r0, #0
     instructions.add(new Instruction(CMP, r0, new Operand2(0)));
 
-    //TODO: Sort out messages to be added
 
-    // LDRNE r0, =msg_0
-    instructions.add(new Instruction(LDR, r0, "msg_0", Conditionals.NE));
+     /* msg_(number):
+     	      .word 5
+     	      .ascii	"true\0" */
+    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
+    messages.add(new Instruction(WORD, 5));
+    messages.add(new Instruction(ASCII, "\"true\\0\""));
 
-    // LDREQ r0, =msg_1
-    instructions.add(new Instruction(LDR, r0, "msg_1", Conditionals.EQ));
+    // LDRNE r0, =msg_n
+    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter, Conditionals.NE));
+    msgCounter++;
+
+    /* msg_(number + 1):
+     	     .word 6
+     	     .ascii	"false\0" */
+
+    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
+    messages.add(new Instruction(WORD, 6));
+    messages.add(new Instruction(ASCII, "\"false\\0\""));
+
+    // LDREQ r0, =msg_n
+    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter, Conditionals.EQ));
+    msgCounter++;
 
     // ADD r0, r0, #4
     instructions.add(new Instruction(ADD, r0, r0, new Operand2(4)));
@@ -176,8 +187,18 @@ public class PredefinedFunctions {
     // ADD r2, r0, #4
     instructions.add(new Instruction(ADD, r2, r0, new Operand2(4)));
 
-    // LDR r0, =msg_1
-    instructions.add(new Instruction(LDR, r0, "msg_1"));
+     /* msg_n:
+     	      .word 5
+     	      .ascii	"%.*s\0" */
+
+    //TODO: Ensure that the actual string is stored in a message in visit
+
+    messages.add(new Instruction(WORD, 5));
+    messages.add(new Instruction(ASCII, "\"%.*s\\0\""));
+
+    // LDR r0, =msg_n
+    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter));
+    msgCounter++;
 
     // ADD r0, r0, #4
     instructions.add(new Instruction(ADD, r0, r0, new Operand2(4)));
