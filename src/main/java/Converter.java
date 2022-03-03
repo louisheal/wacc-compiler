@@ -1766,7 +1766,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     } else {
       // For printing arrays and pairs
       // BL p_print_reference
-      instructions.add(new Instruction(InstrType.BL, "p_print_referencer"));
+      instructions.add(new Instruction(InstrType.BL, "p_print_reference"));
     }
 
     /* Retrieve the first unused register. */
@@ -1816,7 +1816,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     } else {
       // For printing arrays and pairs
       // BL p_print_reference
-      instructions.add(new Instruction(InstrType.BL, "p_print_referencer"));
+      instructions.add(new Instruction(InstrType.BL, "p_print_reference"));
     }
 
 
