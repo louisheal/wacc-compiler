@@ -449,28 +449,35 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       instructions.add(new Instruction(BL, "p_check_null_pointer"));
       instructions.add(new Instruction(LDR, rs, new Operand2(rs)));
       instructions.add(new Instruction(STR, rs, new Operand2(rn)));
-      /* Frees the second unused register RS*/
+      /* Frees the unused registers and return*/
       pushUnusedRegister(rs);
+      pushUnusedRegister(rn);
       return instructions;
     }
 
-    /* Check if the type is an array and generate relevent code for it*/
+    /* Check if the type is an array and generate relevant code for it*/
     if (lhsType == EType.ARRAY ){
+      /* Generates code for the array element on the LHS*/
       instructions.addAll(visitArrayElemLHS(statement.getLHS()));
+      /* Initialises the second unused register*/
       Register rs = popUnusedRegister();
       instructions.add(new Instruction(STR, rs, new Operand2(rn)));
+      /* Frees the unused registers and return*/
       pushUnusedRegister(rs);
+      pushUnusedRegister(rn);
       return instructions;
     }
 
+    /* If it is neither a pair nor an array */
 
+    /* Checks if shorthand [SP] can be applied*/
     if (spLocation - currentST.getSPMapping(lhsIdent) > 0 ){
       instructions.add(new Instruction(LABEL, String.format("STR %s [sp, #%d]", rn,
               lhsStackLocation)));
     }
     else{
       // TODO: update Symbol table?
-      // Adds B suffix when bool or char
+      /* Checks if B needs to be appended to STR*/
       if (lhsType == EType.BOOL || lhsType == EType.CHAR) {
         instructions.add(new Instruction(STR, sp, new Operand2(rn), "B"));
       } else {
@@ -479,6 +486,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     }
 
+    /* Frees the only generated unused register*/
     pushUnusedRegister(rn);
     return instructions;
   }
