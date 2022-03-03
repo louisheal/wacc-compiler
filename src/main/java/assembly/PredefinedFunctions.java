@@ -11,11 +11,12 @@ public class PredefinedFunctions {
   private final Register r0 = new Register(0);
   private final Register r1 = new Register(1);
   private final Register r2 = new Register(2);
+  private final Register sp = new Register(13);
 
   public enum Functions {
     P_PRINT_INT, P_PRINT_BOOL, P_PRINT_STRING, P_PRINT_REFERENCE, P_PRINT_LN,
     P_CHECK_NULL_POINTER,
-    P_THROW_RUNTIME_ERROR, P_THROW_OVERFLOW_ERROR, P_THROW_OVERFLOW_ERROR_NE,
+    P_THROW_RUNTIME_ERROR, P_THROW_OVERFLOW_ERROR,
     P_CHECK_DIVIDE_BY_ZERO,
     P_CHECK_ARRAY_BOUNDS,
     P_READ_INT, P_READ_CHAR,
@@ -49,9 +50,6 @@ public class PredefinedFunctions {
         break;
       case P_THROW_OVERFLOW_ERROR:
         instructions.addAll(pThrowOverflowError());
-        break;
-      case P_THROW_OVERFLOW_ERROR_NE:
-        instructions.addAll(pThrowOverflowErrorNE());
         break;
       case P_CHECK_DIVIDE_BY_ZERO:
         instructions.addAll(pCheckDivideByZero());
@@ -278,12 +276,6 @@ public class PredefinedFunctions {
     return instructions;
   }
 
-  private List<Instruction> pThrowOverflowErrorNE() {
-    List<Instruction> instructions = new ArrayList<>();
-
-    return instructions;
-  }
-
   private List<Instruction> pCheckDivideByZero() {
     List<Instruction> instructions = new ArrayList<>();
 
@@ -396,6 +388,47 @@ public class PredefinedFunctions {
 
   private List<Instruction> pFreePair() {
     List<Instruction> instructions = new ArrayList<>();
+
+    //  	PUSH {lr}
+    instructions.add(new Instruction(Instruction.InstrType.LABEL, "PUSH {lr}"));
+
+    //  	CMP r0, #0
+    instructions.add(new Instruction(Instruction.InstrType.CMP, r0, new Operand2(0)));
+
+    /* message = .word 50
+		         .ascii	"NullReferenceError: dereference a null reference\n\0" */
+    //  	LDREQ r0, =msg_0
+    instructions.add(new Instruction(Instruction.InstrType.LDR, r0, "msg_0", Conditionals.EQ));
+
+    //  	BEQ p_throw_runtime_error
+    instructions.add(new Instruction(Instruction.InstrType.LABEL, "BEQ p_throw_runtime_error"));
+
+    //  	PUSH {r0}
+    instructions.add(new Instruction(Instruction.InstrType.PUSH, r0));
+
+    //  	LDR r0, [r0]
+    instructions.add(new Instruction(Instruction.InstrType.LDR, r0, new Operand2(r0)));
+
+    //  	BL free
+    instructions.add(new Instruction(Instruction.InstrType.BL, "free"));
+
+    //  	LDR r0, [sp]
+    instructions.add(new Instruction(Instruction.InstrType.LDR, r0, new Operand2(sp)));
+
+    //  	LDR r0, [r0, #4]
+    instructions.add(new Instruction(Instruction.InstrType.LDR, r0, new Operand2(r0, 4)));
+
+    //  	BL free
+    instructions.add(new Instruction(Instruction.InstrType.BL, "free"));
+
+    //  	POP {r0}
+    instructions.add(new Instruction(Instruction.InstrType.POP, r0));
+
+    //  	BL free
+    instructions.add(new Instruction(Instruction.InstrType.BL, "free"));
+
+    //  	POP {pc}
+    instructions.add(new Instruction(Instruction.InstrType.LABEL, "POP {pc}"));
 
     return instructions;
   }
