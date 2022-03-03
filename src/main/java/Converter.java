@@ -297,11 +297,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       hasData = true;
     }
 
-    if (hasPrintLn) {
-      instructions.addAll(getFunctionInstructions(P_PRINT_LN));
-      hasData = true;
-    }
-
     if (runtimeErr) {
       instructions.addAll(getFunctionInstructions(P_THROW_RUNTIME_ERROR));
       hasPrintString = true;
@@ -315,6 +310,11 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     if (hasPrintString) {
       instructions.addAll(getFunctionInstructions(P_PRINT_STRING));
+      hasData = true;
+    }
+
+    if (hasPrintLn) {
+      instructions.addAll(getFunctionInstructions(P_PRINT_LN));
       hasData = true;
     }
 
@@ -474,6 +474,18 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     Type type = currentST.getType(getIdentFromLHS(statement.getLHS()));
 
+    if (statement.getLHS().getAssignType() == AssignLHS.LHSType.PAIRELEM) {
+      if (statement.getLHS().getPairElem().getType() == PairElem.PairElemType.FST) {
+        type = type.getFstType();
+      } else {
+        type = type.getSndType();
+      }
+    }
+
+    if (statement.getLHS().getAssignType() == AssignLHS.LHSType.ARRAYELEM) {
+      type = getExpressionType(new ExpressionBuilder().buildArrayExpr(statement.getLHS().getArrayElem()));
+    }
+
     if (sizeOfTypeOnStack(type) == 1) {
       instructions.add(new Instruction(STR, rm, new Operand2(rn), "B"));
     } else {
@@ -545,8 +557,13 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       // ADD rn, rn, #4
       instructions.add(new Instruction(ADD, rn, rn, new Operand2(4)));
 
-      // ADD rn, rn, rm, LSL #2
-      instruction = String.format("ADD %s, %s, %s, LSL #2", rn, rn, rm);
+      if (sizeOfTypeOnStack(getExpressionType(new ExpressionBuilder().buildArrayExpr(arrayElem))) == 1) {
+        // ADD rn, rn, rm
+        instruction = String.format("ADD %s, %s, %s", rn, rn, rm);
+      } else {
+        // ADD rn, rn, rm, LSL #2
+        instruction = String.format("ADD %s, %s, %s, LSL #2", rn, rn, rm);
+      }
       instructions.add(new Instruction(LABEL, instruction));
 
       pushUnusedRegister(rm);
@@ -1322,7 +1339,11 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       Register rm = popUnusedRegister();
 
       /* Store the evaluated expression into the malloc location at an offset. */
-      instructions.add(new Instruction(LABEL, String.format("STR %s, [%s, #%d]", rm, rn, offset)));
+      if (typeSize == 1) {
+        instructions.add(new Instruction(LABEL, String.format("STRB %s, [%s, #%d]", rm, rn, offset)));
+      } else {
+        instructions.add(new Instruction(LABEL, String.format("STR %s, [%s, #%d]", rm, rn, offset)));
+      }
 
       /* Mark register rm as no longer in use. */
       pushUnusedRegister(rm);
@@ -1594,21 +1615,21 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(MOV, r0, new Operand2(rn)));
 
     // Type of expression is stored
-    Type.EType type = getExpressionType(statement.getExpression()).getType();
+    Type type = getExpressionType(statement.getExpression());
 
-    if (type.equals(INT)) {
+    if (Objects.equals(type, new Type(INT))) {
       // BL p_print_int
       instructions.add(new Instruction(BL, "p_print_int"));
       hasPrintInt = true;
-    } else if (type.equals(STRING)) {
+    } else if (Objects.equals(type, new Type(STRING)) || Objects.equals(type, new Type(ARRAY, new Type(CHAR)))) {
       // BL p_print_string
       instructions.add(new Instruction(BL, "p_print_string"));
       hasPrintString = true;
-    } else if (type.equals(BOOL)) {
+    } else if (Objects.equals(type, new Type(BOOL))) {
       // BL p_print_bool
       instructions.add(new Instruction(BL, "p_print_bool"));
       hasPrintBool = true;
-    } else if (type.equals(CHAR)) {
+    } else if (Objects.equals(type, new Type(CHAR))) {
       // BL putchar
       instructions.add(new Instruction(BL, "putchar"));
     } else {
