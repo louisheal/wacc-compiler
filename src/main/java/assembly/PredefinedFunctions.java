@@ -331,9 +331,9 @@ public class PredefinedFunctions {
     messages.add(new Instruction(WORD, 50));
     messages.add(new Instruction(ASCII, "\"NullReferenceError: dereference a null reference\\n\\0\""));
 
-
     // LDREQ r0, =msg_n
-    instructions.add(new Instruction(LDR, r0, "msg_n", Conditionals.EQ));
+    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter, Conditionals.EQ));
+    msgCounter++;
 
     // BLEQ p_throw_runtime_error
     instructions.add(new Instruction(BL, "p_throw_runtime_error", Conditionals.EQ));
@@ -372,8 +372,14 @@ public class PredefinedFunctions {
 
     /* message = .word 83
                  .ascii	"OverflowError: the result is too small/large to store in a 4-byte signed-integer.\n\0" */
-    // LDR r0, =msg_0
-    instructions.add(new Instruction(LDR, r0, "msg_0"));
+
+    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
+    messages.add(new Instruction(WORD, 83));
+    messages.add(new Instruction(ASCII, "\"OverflowError: the result is too small/large to store in a 4-byte signed-integer.\\n\\0\""));
+
+    // LDR r0, =msg_n
+    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter));
+    msgCounter++;
 
     // BL p_throw_runtime_error
     instructions.add(new Instruction(BL, "p_throw_runtime_error"));
