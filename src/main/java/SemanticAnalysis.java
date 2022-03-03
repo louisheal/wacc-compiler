@@ -185,7 +185,11 @@ public class SemanticAnalysis {
       case IDENT:
         return currentST.getType(lhs.getIdent());
       case ARRAYELEM:
-        return currentST.getType(lhs.getArrayElem().getIdent()).getArrayType();
+        Type result = currentST.getType(lhs.getArrayElem().getIdent());
+        for (int i = 0; i < lhs.getArrayElem().getExpression().size(); i++) {
+          result = result.getArrayType();
+        }
+        return result;
       case PAIRELEM:
         if (lhs.getPairElem().getType() == PairElem.PairElemType.FST) {
           return getExpressionType(lhs.getPairElem().getExpression()).getFstType();

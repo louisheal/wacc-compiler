@@ -427,57 +427,57 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitReassignmentStatement(Statement statement) {
-    /* Initialising properties needed */
-    String lhsIdent = getIdentFromLHS(statement.getLHS());
-    EType lhsType = currentST.getType(lhsIdent).getType();
-    int lhsStackLocation = currentST.getSPMapping(lhsIdent);
+
+    /* Evaluate RHS expression and store result in rn. */
     List<Instruction> instructions = new ArrayList<>(visitRHS(statement.getRHS()));
 
-    /* Popped first unused register into rn */
+    /* Retrieve first unused register. */
     Register rn = popUnusedRegister();
 
+    /* Code generation when the LHS is an identity. */
+    if (statement.getLHS().getAssignType() == AssignLHS.LHSType.IDENT) {
+      int stackOffset = currentST.getSPMapping(statement.getLHS().getIdent());
 
-    /* Check if the type is pair and generate instructions for pairs if so */
-    if (lhsType == EType.PAIR){
-      /* Initialised second unused register into rs*/
-      Register rs = popUnusedRegister();
-      /* Check if the shorthanded [SP] can be used */
-      if (spLocation - currentST.getSPMapping(lhsIdent) > 0 ){
-        instructions.add(new Instruction(LABEL, String.format("LDR %s [sp, #%d]", rs,
-            lhsStackLocation)));
+      Expression expression = new ExpressionBuilder().buildIdentExpr(statement.getLHS().getIdent());
+
+      String instruction = "STR";
+
+      if (sizeOfTypeOnStack(getExpressionType(expression)) == 1) {
+        instruction += "B";
       }
-      else{
-        instructions.add(new Instruction(LDR, rs, new Operand2(sp)));
+
+      if (stackOffset > 0) {
+        instruction += String.format(" %s, [sp, #%d]", rn, stackOffset);
+      } else {
+        instruction += String.format(" %s, [sp]", rn);
       }
-      instructions.add(new Instruction(MOV, r0, new Operand2(rs)));
-      instructions.add(new Instruction(BL, "p_check_null_pointer"));
-      instructions.add(new Instruction(LDR, rs, new Operand2(rs)));
-      instructions.add(new Instruction(STR, rs, new Operand2(rn)));
-      /* Frees the unused registers and return*/
-      pushUnusedRegister(rs);
+
+      instructions.add(new Instruction(LABEL, instruction));
+
       pushUnusedRegister(rn);
+
       return instructions;
     }
 
-    /* Check if the type is an array and generate relevant code for it*/
-    if (lhsType == EType.ARRAY ){
-      /* Generates code for the array element on the LHS*/
-      instructions.addAll(visitArrayElemLHS(statement.getLHS()));
-      /* Initialises the second unused register*/
-      Register rs = popUnusedRegister();
-      instructions.add(new Instruction(STR, rs, new Operand2(rn)));
-      /* Frees the unused registers and return*/
-      pushUnusedRegister(rs);
-      pushUnusedRegister(rn);
-      return instructions;
+    /* Code generation when the LHS is a pair element or array element. */
+
+    /* Evaluate the LHS and store its address in rm. */
+    instructions.addAll(visitLHS(statement.getLHS()));
+
+    /* Retrieve the next unused register. */
+    Register rm = popUnusedRegister();
+
+    Type type = currentST.getType(getIdentFromLHS(statement.getLHS()));
+
+    if (sizeOfTypeOnStack(type) == 1) {
+      instructions.add(new Instruction(STR, rm, new Operand2(rn), "B"));
+    } else {
+      instructions.add(new Instruction(STR, rm, new Operand2(rn)));
     }
 
-    /* If it is neither a pair nor an array */
-
-    /* Frees the only generated unused register*/
+    /* Mark registers as no longer in use. */
+    pushUnusedRegister(rm);
     pushUnusedRegister(rn);
-    /* Generates code for visiting the LHS if it is an ident*/
-    instructions.addAll(visitIdentLHS(statement.getLHS()));
 
     return instructions;
   }
@@ -534,33 +534,39 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     Register rn = popUnusedRegister();
 
     // ADD rn, sp, #offset
-    instruction = String.format("ADD %s, sp, #%d", rn, stackOffset);
-    instructions.add(new Instruction(LABEL, instruction));
+    instructions.add(new Instruction(LABEL, String.format("ADD %s, sp, #%d", rn, stackOffset)));
 
-    /* Evaluate the index of the ArrayElem and store it in rm. */
-    instructions.addAll(visitExpression(arrayElem.getExpression().get(0)));
+    for (Expression expression : arrayElem.getExpression()) {
 
-    /* Retrieve the register rm which contains the value of the index. */
-    Register rm = popUnusedRegister();
+      /* Evaluate the index of the ArrayElem and store it in rm. */
+      instructions.addAll(visitExpression(expression));
 
-    // LDR rn, [rn]
-    instructions.add(new Instruction(LDR, rn, new Operand2(rn)));
+      /* Retrieve the register rm which contains the value of the index. */
+      Register rm = popUnusedRegister();
 
-    // MOV r1, rn
-    instructions.add(new Instruction(MOV, r1, new Operand2(rn)));
+      // LDR rn, [rn]
+      instructions.add(new Instruction(LDR, rn, new Operand2(rn)));
 
-    // BL p_check_array_bounds
-    instructions.add(new Instruction(BL, "p_check_array_bounds"));
+      // MOV r0, rm
+      instructions.add(new Instruction(MOV, r0, new Operand2(rm)));
 
-    // ADD rn, rn, #4
-    instructions.add(new Instruction(ADD, rn, rn, new Operand2(4)));
+      // MOV r1, rn
+      instructions.add(new Instruction(MOV, r1, new Operand2(rn)));
 
-    // ADD rn, rn, rm, LSL #2
-    instruction = String.format("ADD %s, %s, %s LSL #2", rn, rn, rm);
-    instructions.add(new Instruction(LABEL, instruction));
+      // BL p_check_array_bounds
+      instructions.add(new Instruction(BL, "p_check_array_bounds"));
 
-    /* Mark the two registers used in the evaluation of this function as no longer in use. */
-    pushUnusedRegister(rm);
+      // ADD rn, rn, #4
+      instructions.add(new Instruction(ADD, rn, rn, new Operand2(4)));
+
+      // ADD rn, rn, rm, LSL #2
+      instruction = String.format("ADD %s, %s, %s, LSL #2", rn, rn, rm);
+      instructions.add(new Instruction(LABEL, instruction));
+
+      pushUnusedRegister(rm);
+    }
+
+    /* Mark the register used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rn);
 
     return instructions;
@@ -619,8 +625,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     String label1 = getLabel();
     String label2 = getLabel();
 
-    // BL Lx
-    instructions.add(new Instruction(BL, label1));
+    // B Lx
+    instructions.add(new Instruction(LABEL, "B " + label1));
 
     // Lx+1:
     instructions.add(new Instruction(LABEL, label2 + ":"));
@@ -802,54 +808,21 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
-  // TODO: Multi-dimensional array lookup
   @Override
   public List<Instruction> visitArrayElemExp(Expression expression) {
 
-    /* Set ArrayLookup flag to true. */
-    isArrayLookup = true;
+    AssignLHS assignLHS = new AssignLHSBuilder().buildArrayLHS(expression.getArrayElem());
 
-    ArrayElem arrayElem = expression.getArrayElem();
-    List<Instruction> instructions = new ArrayList<>();
-    String instruction;
+    /* Calculate the address of the Array Elem and store it in register rn. */
+    List<Instruction> instructions = new ArrayList<>(visitLHS(assignLHS));
 
-    /* Find where the array address is stored on the stack. */
-    int stackOffset = currentST.getSPMapping(expression.getArrayElem().getIdent());
-
-    /* Allocate one register: rn for this function to use. */
+    /* Retrieve the register rn, which contains the address of the array elem. */
     Register rn = popUnusedRegister();
 
-    // ADD rn, sp, #offset
-    instruction = String.format("ADD %s, sp, #%d", rn, stackOffset);
-    instructions.add(new Instruction(LABEL, instruction));
-
-    /* Evaluate the index of the ArrayElem and store it in rm. */
-    instructions.addAll(visitExpression(arrayElem.getExpression().get(0)));
-
-    /* Retrieve the register rm which contains the value of the index. */
-    Register rm = popUnusedRegister();
-
     // LDR rn, [rn]
     instructions.add(new Instruction(LDR, rn, new Operand2(rn)));
 
-    // MOV r1, rn
-    instructions.add(new Instruction(MOV, r1, new Operand2(rn)));
-
-    // BL p_check_array_bounds
-    instructions.add(new Instruction(BL, "p_check_array_bounds"));
-
-    // ADD rn, rn, #4
-    instructions.add(new Instruction(ADD, rn, rn, new Operand2(4)));
-
-    // ADD rn, rn, rm, LSL #2
-    instruction = String.format("ADD %s, %s, LSL #2", rn, rn);
-    instructions.add(new Instruction(LABEL, instruction));
-
-    // LDR rn, [rn]
-    instructions.add(new Instruction(LDR, rn, new Operand2(rn)));
-
-    /* Mark the two registers used in the evaluation of this function as no longer in use. */
-    pushUnusedRegister(rm);
+    /* Mark the register used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rn);
 
     return instructions;
@@ -1657,7 +1630,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     PairElem pairElem = lhs.getPairElem();
 
-    /* Generate code to evaluate expression. */
+    /* Calculate address of pair and store it in rn. */
     List<Instruction> instructions = new ArrayList<>(visitExpression(pairElem.getExpression()));
 
     /* Allocate one register: rn for this function to use. */

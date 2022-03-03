@@ -460,7 +460,7 @@ public class PredefinedFunctions {
     messages.add(new Instruction(ASCII, "\"ArrayIndexOutOfBoundsError: index too large\\n\\0\""));
 
     // LDRCS r0, =msg_n
-    instructions.add(new Instruction(LDR, "msg_" + msgCounter, Conditionals.CS));
+    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter, Conditionals.CS));
     msgCounter++;
 
     // BLCS p_throw_runtime_error
