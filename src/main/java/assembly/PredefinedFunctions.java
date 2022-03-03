@@ -201,6 +201,7 @@ public class PredefinedFunctions {
 
     //TODO: Ensure that the actual string is stored in a message in visit
 
+    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
     messages.add(new Instruction(WORD, 5));
     messages.add(new Instruction(ASCII, "\"%.*s\\0\""));
 
@@ -239,8 +240,17 @@ public class PredefinedFunctions {
     // MOV r1, r0
     instructions.add(new Instruction(MOV, r1, new Operand2(r0)));
 
-    // LDR r0, =msg_0
-    instructions.add(new Instruction(LDR, r0, "msg_0"));
+   	/* msg_n:
+   		    .word 3
+   		    .ascii	"%p\0" */
+
+    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
+    messages.add(new Instruction(WORD, 3));
+    messages.add(new Instruction(ASCII, "\"%p\\0\""));
+
+    // LDR r0, =msg_n
+    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter));
+    msgCounter++;
 
     // ADD r0, r0, #4
     instructions.add(new Instruction(ADD, r0, r0, new Operand2(4)));
@@ -270,8 +280,17 @@ public class PredefinedFunctions {
     // PUSH {lr}
     instructions.add(new Instruction(LABEL, "PUSH {lr}"));
 
-    // LDR r0, =msg_1
-    instructions.add(new Instruction(LDR, r0, "msg_1"));
+    /* msg_n:
+            .word 1
+            .ascii	"\0" */
+
+    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
+    messages.add(new Instruction(WORD, 1));
+    messages.add(new Instruction(ASCII, "\"\\0\""));
+
+    // LDR r0, =msg_n
+    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter));
+    msgCounter++;
 
     // ADD r0, r0, #4
     instructions.add(new Instruction(ADD, r0, r0, new Operand2(4)));
