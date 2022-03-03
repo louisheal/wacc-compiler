@@ -74,6 +74,14 @@ public class PredefinedFunctions {
     return instructions;
   }
 
+  public void addMessage(Instruction instruction) {
+    messages.add(instruction);
+  }
+
+  public void incrementMsgCounter() {
+    msgCounter++;
+  }
+
   private static List<Instruction> pPrintIntInstruction() {
 
     List<Instruction> instructions = new ArrayList<>();
