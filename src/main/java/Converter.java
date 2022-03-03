@@ -269,6 +269,24 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       hasData = true;
     }
 
+    if (isDiv) {
+      instructions.addAll(getFunctionInstructions(P_CHECK_DIVIDE_BY_ZERO));
+      runtimeErr = true;
+      hasData = true;
+    }
+
+    if (isCalc) {
+      instructions.addAll(getFunctionInstructions(P_THROW_OVERFLOW_ERROR));
+      runtimeErr = true;
+      hasData = true;
+    }
+
+    if (hasFreePair) {
+      instructions.addAll(getFunctionInstructions(P_FREE_PAIR));
+      runtimeErr = true;
+      hasData = true;
+    }
+
     if (runtimeErr) {
       instructions.addAll(getFunctionInstructions(P_THROW_RUNTIME_ERROR));
       hasPrintString = true;
@@ -307,21 +325,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     if (hasReadChar) {
       instructions.addAll(getFunctionInstructions(P_READ_CHAR));
-      hasData = true;
-    }
-
-    if (hasFreePair) {
-      instructions.addAll(getFunctionInstructions(P_FREE_PAIR));
-      hasData = true;
-    }
-
-    if (isCalc) {
-      instructions.addAll(getFunctionInstructions(P_THROW_OVERFLOW_ERROR));
-      hasData = true;
-    }
-
-    if (isDiv) {
-      instructions.addAll(getFunctionInstructions(P_CHECK_DIVIDE_BY_ZERO));
       hasData = true;
     }
 
@@ -811,7 +814,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     String instruction;
 
     /* Find where the array address is stored on the stack. */
-    int stackOffset = currentST.getSPMapping(expression.getIdent());
+    int stackOffset = currentST.getSPMapping(expression.getArrayElem().getIdent());
 
     /* Allocate one register: rn for this function to use. */
     Register rn = popUnusedRegister();
@@ -1492,7 +1495,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
-  //TODO: Check lhs (arrayelem, pairelem, ident)
   @Override
   public List<Instruction> visitReadStatement(Statement statement) {
 
