@@ -1407,15 +1407,23 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Retrieve the first unused register. */
     Register rn = popUnusedRegister();
 
+    // ADD rn, sp, #0
+    instructions.add(new Instruction(ADD, rn, sp, new Operand2(0)));
+
     // MOV r0, rn
     instructions.add(new Instruction(MOV, r0, new Operand2(rn)));
 
-    //TODO: check type before to choose which read function to use
+    Type type = currentST.getType(statement.getLHS().getIdent());
 
-    // BL p_read_int
-    instructions.add(new Instruction(BL, "p_read_int"));
-
-    //TODO: check how much to add to rn after each branch link
+    if (type.equals(new Type(INT))) {
+      // BL p_read_int
+      instructions.add(new Instruction(BL, "p_read_int"));
+      hasReadInt = true;
+    } else if (type.equals(new Type(CHAR))) {
+      // BL p_read_char
+      instructions.add(new Instruction(BL, "p_read_char"));
+      hasReadChar = true;
+    }
 
     /* Mark register rn as no longer in use. */
     pushUnusedRegister(rn);
@@ -1501,8 +1509,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       instructions.add(new Instruction(BL, "p_print_bool"));
       hasPrintBool = true;
     } else if (type.equals(CHAR)) {
-      // BL p_putchar
-      instructions.add(new Instruction(BL, "p_putchar"));
+      // BL putchar
+      instructions.add(new Instruction(BL, "putchar"));
     } else {
       // For printing arrays and pairs
       // BL p_print_reference
