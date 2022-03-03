@@ -460,7 +460,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* adds message for true */
     instructions.add(offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
     instructions.add(1 + offset, new Instruction(InstrType.WORD, 5));
-    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "true\0"));
+    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "\"true\\0\""));
 
     msgNumber++;
     offset = msgNumber * 3;
@@ -468,7 +468,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* adds message for false */
     instructions.add(offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
     instructions.add(1 + offset, new Instruction(InstrType.WORD, 6));
-    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "false\0"));
+    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "\"false\\0\""));
 
     /* adds function for printing integers */
     //TODO: Register Allocation
@@ -494,7 +494,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* adds message for pattern matching decimals */
     instructions.add(offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
     instructions.add(1 + offset, new Instruction(InstrType.WORD, 3));
-    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "%d\0"));
+    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "\"%d\\0\""));
 
     /* adds function for printing integers */
     //TODO: Register Allocation
@@ -519,7 +519,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* adds message for pattern matching strings */
     instructions.add(offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
     instructions.add(1 + offset, new Instruction(InstrType.WORD, 5));
-    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "%.*s\0"));
+    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "\"%.*s\\0\""));
 
     /* adds function for printing strings */
     //TODO: Register Allocation
@@ -545,7 +545,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* adds message for adding new lines */
     instructions.add(offset, new Instruction(InstrType.LABEL, "msg_" + msgNumber));
     instructions.add(1 + offset, new Instruction(InstrType.WORD, 1));
-    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "\0"));
+    instructions.add(2 + offset, new Instruction(InstrType.ASCII, "\"\\0\""));
 
     /* adds function for printing new lines */
     //TODO: Register Allocation
@@ -1747,7 +1747,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     List<Instruction> instructions = new ArrayList<>();
 
     // Type of expression is stored
-    Type.EType type = currentST.getType(statement.getExpression().getIdent()).getType();
+    Type.EType type = getExpressionType(statement.getExpression()).getType();
 
     if (type.equals(Type.EType.INT)) {
       // BL p_print_int
@@ -1791,7 +1791,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     List<Instruction> instructions = new ArrayList<>();
 
     // Type of expression is stored
-    Type.EType type = currentST.getType(statement.getExpression().getIdent()).getType();
+    Type.EType type = getExpressionType(statement.getExpression()).getType();
 
     /* Retrieve the first unused register. */
     Register rn = popUnusedRegister();
