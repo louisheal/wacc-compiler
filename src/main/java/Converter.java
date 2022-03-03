@@ -780,7 +780,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       instructions.add(new Instruction(InstrType.MOV, r0, new Operand2(rs)));
       instructions.add(new Instruction(InstrType.BL, "p_check_null_pointer"));
       instructions.add(new Instruction(InstrType.LDR, rs, new Operand2(rs)));
-      instructions.add(new Instruction(InstrType.STR, rn, new Operand2(rs)));
+      instructions.add(new Instruction(InstrType.STR, rs, new Operand2(rn)));
     }
 
     pushUnusedRegister(rs);
