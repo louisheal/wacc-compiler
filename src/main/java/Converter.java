@@ -491,7 +491,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     Register rn = popUnusedRegister();
 
     /* Checks if shorthand [SP] can be applied*/
-    if (spLocation - currentST.getSPMapping(lhsIdent) > 0 ){
+    if (lhsStackLocation > 0 ){
       instructions.add(new Instruction(LABEL, String.format("STR %s [sp, #%d]", rn,
           lhsStackLocation)));
     }
