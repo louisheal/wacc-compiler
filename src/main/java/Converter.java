@@ -742,11 +742,14 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     String string = expression.getStringLiter();
 
+    String message = string.substring(string.indexOf('"') + 1, string.lastIndexOf('"'));
+    int messageLength = getMessageLength(message);
+
     /* Generate a message number for the string. */
     String msgLabel = getMessageLabel();
     addMessage(new Instruction(LABEL, msgLabel + ":"));
     // length - 2 to remove to ensure quotation marks aren't include in the length
-    addMessage(new Instruction(WORD, string.length() - 2));
+    addMessage(new Instruction(WORD, messageLength));
     addMessage(new Instruction(ASCII, string));
 
     /* Allocate a register: rn for this function to use. */
@@ -762,6 +765,20 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     hasData = true;
 
     return instructions;
+  }
+
+  private int getMessageLength(String message) {
+
+    int messageLength = 0;
+
+    for (int i = 0; i < message.length(); i++) {
+      if (message.charAt(i) == '\\') {
+        i++;
+      }
+      messageLength++;
+    }
+
+    return messageLength;
   }
 
   @Override
