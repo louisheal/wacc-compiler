@@ -36,7 +36,7 @@ public class PredefinedFunctions {
     return instructions;
   }
 
-  public List<Instruction> pPrintIntInstruction() {
+  private List<Instruction> pPrintIntInstruction() {
     List<Instruction> instructions = new ArrayList<>();
 
     // PUSH {lr}
@@ -67,28 +67,55 @@ public class PredefinedFunctions {
     return instructions;
   }
 
-  public List<Instruction> pPrintBoolInstruction() {
+  private List<Instruction> pPrintBoolInstruction() {
+    List<Instruction> instructions = new ArrayList<>();
+    //	PUSH {lr}
+    instructions.add(new Instruction(Instruction.InstrType.LABEL, "PUSH {lr}"));
+
+    //	CMP r0, #0
+    instructions.add(new Instruction(Instruction.InstrType.CMP, r0, new Operand2(0)));
+
+    //TODO: Sort out messages to be added
+
+    //	LDRNE r0, =msg_0
+    instructions.add(new Instruction(Instruction.InstrType.LDR, r0, "=msg_0", Conditionals.NE));
+
+    //	LDREQ r0, =msg_1
+    instructions.add(new Instruction(Instruction.InstrType.LDR, r0, "=msg_1", Conditionals.EQ));
+
+    //	ADD r0, r0, #4
+    instructions.add(new Instruction(Instruction.InstrType.ADD, r0, r0, new Operand2(4)));
+
+    //	BL printf
+    instructions.add(new Instruction(Instruction.InstrType.BL, "printf"));
+
+    //	MOV r0, #0
+    instructions.add(new Instruction(Instruction.InstrType.MOV, r0, new Operand2(0)));
+
+    //	BL fflush
+    instructions.add(new Instruction(Instruction.InstrType.BL, "fflush"));
+
+    //	POP {pc}
+    instructions.add(new Instruction(Instruction.InstrType.LABEL, "POP {pc}"));
+
+    return instructions;
+  }
+
+  private List<Instruction> pPrintStringInstruction() {
     List<Instruction> instructions = new ArrayList<>();
 
 
     return instructions;
   }
 
-  public List<Instruction> pPrintStringInstruction() {
+  private List<Instruction> pPutCharInstruction() {
     List<Instruction> instructions = new ArrayList<>();
 
 
     return instructions;
   }
 
-  public List<Instruction> pPutCharInstruction() {
-    List<Instruction> instructions = new ArrayList<>();
-
-
-    return instructions;
-  }
-
-  public List<Instruction> pPrintReferenceInstruction() {
+  private List<Instruction> pPrintReferenceInstruction() {
     List<Instruction> instructions = new ArrayList<>();
 
     //p_print_reference:
