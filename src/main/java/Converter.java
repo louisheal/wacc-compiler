@@ -3,12 +3,14 @@ import assembly.Flags;
 import assembly.Instruction;
 import assembly.Instruction.InstrType;
 import assembly.Operand2;
+import assembly.PredefinedFunctions;
 import assembly.Register;
 import ast.*;
 
 import ast.Type.EType;
-import java.awt.image.renderable.RenderableImage;
 import java.util.*;
+
+import static assembly.PredefinedFunctions.getFunctionInstructions;
 
 public class Converter extends ASTVisitor<List<Instruction>> {
 
@@ -28,18 +30,26 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   private int labelNum = 0;
   SymbolTable currentST;
 
+  /* Print flags */
+  private boolean hasPrintInt = false;
+  private boolean hasPrintBool = false;
+  private boolean hasPrintString = false;
+  private boolean hasPrintReference = false;
+  private boolean hasPrintLn = false;
+
+  /* Read flags */
+  private boolean hasReadInt = false;
+  private boolean hasReadChar = false;
+
+  /* Free flags */
+  private boolean hasFreePair = false;
+
   /* Error flags */
+  private boolean checkNullPointer = false;
+  private boolean runtimeErr = false;
   private boolean isDiv = false;
   private boolean isCalc = false;
   private boolean isArrayLookup = false;
-  private boolean runtimeErr = false;
-  private boolean checkNullPointer = false;
-
-  /* Print flags */
-  private boolean hasPrintBool = false;
-  private boolean hasPrintInt = false;
-  private boolean hasPrintString = false;
-  private boolean hasPrintLn = false;
 
   private String getLabel() {
     int result = labelNum;
@@ -619,6 +629,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     if(checkNullPointer) {
       instructions = checkNullPointer(instructions, msgNumber);
       msgNumber++;
+      instructions.addAll(getFunctionInstructions(PredefinedFunctions.Functions.P_CHECK_NULL_POINTER));
     }
 
     if(isDiv) {
@@ -638,21 +649,25 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     if(hasPrintBool) {
       instructions = printBool(instructions, msgNumber);
       msgNumber+=2;
+      instructions.addAll(getFunctionInstructions(PredefinedFunctions.Functions.P_PRINT_BOOL));
     }
 
     if(hasPrintInt) {
       instructions = printInt(instructions, msgNumber);
       msgNumber++;
+      instructions.addAll(getFunctionInstructions(PredefinedFunctions.Functions.P_PRINT_INT));
     }
 
     if(hasPrintString) {
       instructions = printString(instructions, msgNumber);
       msgNumber++;
+      instructions.addAll(getFunctionInstructions(PredefinedFunctions.Functions.P_PRINT_STRING));
     }
 
     if(hasPrintLn) {
       instructions = printString(instructions, msgNumber);
       msgNumber++;
+      instructions.addAll(getFunctionInstructions(PredefinedFunctions.Functions.P_PRINT_LN));
     }
 
     if(msgNumber > 0) {
@@ -1771,7 +1786,15 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitPrintStatement(Statement statement) {
-    List<Instruction> instructions = new ArrayList<>();
+
+    /* Evaluate the expression to be printed and store the result in the first unused register. */
+    List<Instruction> instructions = new ArrayList<>(visitExpression(statement.getExpression()));
+
+    /* Retrieve the first unused register. */
+    Register rn = popUnusedRegister();
+
+    // MOV r0, rn
+    instructions.add(new Instruction(InstrType.MOV, r0, new Operand2(rn)));
 
     // Type of expression is stored
     Type.EType type = getExpressionType(statement.getExpression()).getType();
@@ -1795,15 +1818,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       // BL p_print_reference
       instructions.add(new Instruction(InstrType.BL, "p_print_reference"));
     }
-
-    /* Retrieve the first unused register. */
-    Register rn = popUnusedRegister();
-
-    // MOV r0, rn
-    instructions.add(new Instruction(InstrType.MOV, r0, new Operand2(rn)));
-
-    // BL p_print_int
-    instructions.add(new Instruction(InstrType.BL, "p_print_int"));
 
     //TODO: check how much to add to rn after each branch link (happens when multiple print statements)
 
@@ -1815,46 +1829,12 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitPrintlnStatement(Statement statement) {
-    List<Instruction> instructions = new ArrayList<>();
 
-    // Type of expression is stored
-    Type.EType type = getExpressionType(statement.getExpression()).getType();
-
-    /* Retrieve the first unused register. */
-    Register rn = popUnusedRegister();
-
-    // MOV r0, rn
-    instructions.add(new Instruction(InstrType.MOV, r0, new Operand2(rn)));
-
-    if (type.equals(Type.EType.INT)) {
-      // BL p_print_int
-      instructions.add(new Instruction(InstrType.BL, "p_print_int"));
-      hasPrintInt = true;
-    } else if (type.equals(Type.EType.STRING)) {
-      // BL p_print_string
-      instructions.add(new Instruction(InstrType.BL, "p_print_string"));
-      hasPrintString = true;
-    } else if (type.equals(Type.EType.BOOL)) {
-      // BL p_print_bool
-      instructions.add(new Instruction(InstrType.BL, "p_print_bool"));
-    } else if (type.equals(Type.EType.CHAR)) {
-      // BL p_putchar
-      instructions.add(new Instruction(InstrType.BL, "p_putchar"));
-    } else {
-      // For printing arrays and pairs
-      // BL p_print_reference
-      instructions.add(new Instruction(InstrType.BL, "p_print_reference"));
-    }
-
+    List<Instruction> instructions = new ArrayList<>(visitPrintStatement(statement));
 
     // BL p_print_ln
     instructions.add(new Instruction(InstrType.BL, "p_print_ln"));
     hasPrintLn = true;
-
-    //TODO: check how much to add to rn after each branch link (happens when multiple print statements)
-
-    /* Mark register rn as no longer in use. */
-    pushUnusedRegister(rn);
 
     return instructions;
   }
