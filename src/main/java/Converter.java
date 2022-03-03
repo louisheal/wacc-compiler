@@ -769,7 +769,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     else{
       instructions.add(new Instruction(InstrType.STR, rn, new Operand2(sp)));
     }
-    if (statement.getLhsType().getType() == EType.PAIR){
+    if (currentST.getType(lhsIdent).getType() == EType.PAIR){
       if (spLocation - currentST.getSPMapping(lhsIdent) > 0 ){
         instructions.add(new Instruction(InstrType.LABEL, String.format("LDR %s [sp, #%d]", rs,
             lhsStackLocation)));
