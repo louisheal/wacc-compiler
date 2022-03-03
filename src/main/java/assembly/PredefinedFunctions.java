@@ -36,6 +36,33 @@ public class PredefinedFunctions {
       case P_PRINT_REFERENCE:
         instructions.addAll(pPrintReferenceInstruction());
         break;
+      case P_CHECK_NULL_POINTER:
+        instructions.addAll(pCheckNullPointer());
+        break;
+      case P_THROW_RUNTIME_ERROR:
+        instructions.addAll(pThrowRuntimeError());
+        break;
+      case P_THROW_OVERFLOW_ERROR:
+        instructions.addAll(pThrowOverflowError());
+        break;
+      case P_THROW_OVERFLOW_ERROR_NE:
+        instructions.addAll(pThrowOverflowErrorNE());
+        break;
+      case P_CHECK_DIVIDE_BY_ZERO:
+        instructions.addAll(pCheckDivideByZero());
+        break;
+      case P_CHECK_ARRAY_BOUNDS:
+        instructions.addAll(pCheckArrayBounds());
+        break;
+      case P_READ_INT:
+        instructions.addAll(pReadInt());
+        break;
+      case P_READ_CHAR:
+        instructions.addAll(pReadChar());
+        break;
+      case P_FREE_PAIR:
+        instructions.addAll(pFreePair());
+        break;
     }
 
     return instructions;
