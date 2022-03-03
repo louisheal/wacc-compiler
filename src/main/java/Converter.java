@@ -644,7 +644,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     String msgLabel = getMessageLabel();
     addMessage(new Instruction(LABEL, msgLabel));
     addMessage(new Instruction(WORD, string.length()));
-    addMessage(new Instruction(ASCII, '"' + string + '"'));
+    addMessage(new Instruction(ASCII, string));
 
     /* Allocate a register: rn for this function to use. */
     Register rn = popUnusedRegister();
@@ -1471,6 +1471,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     } else if (type.equals(BOOL)) {
       // BL p_print_bool
       instructions.add(new Instruction(BL, "p_print_bool"));
+      hasPrintBool = true;
     } else if (type.equals(CHAR)) {
       // BL p_putchar
       instructions.add(new Instruction(BL, "p_putchar"));
@@ -1478,6 +1479,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       // For printing arrays and pairs
       // BL p_print_reference
       instructions.add(new Instruction(BL, "p_print_reference"));
+      hasPrintReference = true;
     }
 
     //TODO: check how much to add to rn after each branch link (happens when multiple print statements)
