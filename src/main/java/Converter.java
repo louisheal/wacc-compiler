@@ -458,7 +458,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     }
 
     if (lhsType == EType.ARRAY ){
-      visitArrayElemLHS(statement.getLHS());
+      instructions.addAll(visitArrayElemLHS(statement.getLHS()));
       instructions.add(new Instruction(STR, rs, new Operand2(rn)));
     }
 
