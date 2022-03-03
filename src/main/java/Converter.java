@@ -478,7 +478,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     String instruction;
 
     /* Find where the array address is stored on the stack. */
-    int stackOffset = currentST.getSPMapping(lhs.getIdent());
+    int stackOffset = currentST.getSPMapping(arrayElem.getIdent());
 
     /* Allocate one register: rn for this function to use. */
     Register rn = popUnusedRegister();
