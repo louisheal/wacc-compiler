@@ -429,8 +429,14 @@ public class PredefinedFunctions {
 
     /* message = .word 44
            		 .ascii	"ArrayIndexOutOfBoundsError: negative index */
+
+    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
+    messages.add(new Instruction(WORD, 44));
+    messages.add(new Instruction(ASCII, "\"ArrayIndexOutOfBoundsError: negative index\\n\\0\""));
+
     // LDRLT r0, =msg_0
-    instructions.add(new Instruction(LDR, r0, "msg_0", Conditionals.LT));
+    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter, Conditionals.LT));
+    msgCounter++;
 
     // BLLT p_throw_runtime_error
     instructions.add(new Instruction(BL, "p_throw_runtime_error", Conditionals.LT));
