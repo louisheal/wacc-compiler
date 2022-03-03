@@ -97,7 +97,7 @@ public class PredefinedFunctions {
     instructions.add(new Instruction(LABEL, "PUSH {lr}"));
 
     // MOV r1, r0
-    instructions.add(new Instruction(MOV, r0, new Operand2(r1)));
+    instructions.add(new Instruction(MOV, r1, new Operand2(r0)));
 
     /* msg_(number):
               .word 3
