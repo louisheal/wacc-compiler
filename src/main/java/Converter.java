@@ -54,6 +54,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   private boolean isCalc = false;
   private boolean isArrayLookup = false;
 
+  /* Data flag */
+  private boolean hasData = false;
+
   private String getLabel() {
     int result = labelNum;
     labelNum++;
@@ -616,64 +619,76 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(LABEL, "POP {pc}"));
     instructions.add(new Instruction(LTORG, ""));
 
-    //number of messages
-    int msgNumber = 0;
+    //TODO: Add instructions as args
 
-    if(isArrayLookup) {
-      instructions = arrayIndexOutOfBoundsError(instructions, msgNumber);
-      msgNumber+=2;
+    if (isArrayLookup) {
+      instructions = getFunctionInstructions(P_CHECK_ARRAY_BOUNDS);
+      runtimeErr = true;
+      hasData = true;
     }
 
-    if(isCalc) {
-      instructions = throwOverflowError(instructions, msgNumber);
-      msgNumber++;
-    }
-
-    if(checkNullPointer) {
-      instructions = checkNullPointer(instructions, msgNumber);
-      msgNumber++;
-      instructions.addAll(getFunctionInstructions(P_CHECK_NULL_POINTER));
-    }
-
-    if(isDiv) {
-      instructions = checkDivideByZero(instructions, msgNumber);
-      msgNumber++;
-    }
-
-    if(runtimeErr) {
-      instructions.add(new Instruction(LABEL, "p_throw_runtime_error:"));
-      instructions.add(new Instruction(BL, "p_print_string"));
-      instructions.add(new Instruction(MOV, r0, -1));
-      instructions.add(new Instruction(BL, "exit"));
-
+    if (runtimeErr) {
+      instructions = getFunctionInstructions(P_THROW_RUNTIME_ERROR);
       hasPrintString = true;
+      hasData = true;
     }
 
-    if(hasPrintBool) {
-      instructions = printBool(instructions, msgNumber);
-      msgNumber+=2;
-      instructions.addAll(getFunctionInstructions(P_PRINT_BOOL));
+    if (hasPrintInt) {
+      instructions = getFunctionInstructions(P_PRINT_INT);
+      hasData = true;
     }
 
-    if(hasPrintInt) {
-      instructions = printInt(instructions, msgNumber);
-      msgNumber++;
-      instructions.addAll(getFunctionInstructions(P_PRINT_INT));
+    if (hasPrintBool) {
+      instructions = getFunctionInstructions(P_PRINT_BOOL);
+      hasData = true;
     }
 
-    if(hasPrintString) {
-      instructions = printString(instructions, msgNumber);
-      msgNumber++;
-      instructions.addAll(getFunctionInstructions(P_PRINT_STRING));
+    if (hasPrintString) {
+      instructions = getFunctionInstructions(P_PRINT_STRING);
+      hasData = true;
     }
 
-    if(hasPrintLn) {
-      instructions = printString(instructions, msgNumber);
-      msgNumber++;
-      instructions.addAll(getFunctionInstructions(P_PRINT_LN));
+    if (hasPrintReference) {
+      instructions = getFunctionInstructions(P_PRINT_REFERENCE);
+      hasData = true;
     }
 
-    if(msgNumber > 0) {
+    if (hasPrintLn) {
+      instructions = getFunctionInstructions(P_PRINT_LN);
+      hasData = true;
+    }
+
+    if (hasReadInt) {
+      instructions = getFunctionInstructions(P_READ_INT);
+      hasData = true;
+    }
+
+    if (hasReadChar) {
+      instructions = getFunctionInstructions(P_READ_CHAR);
+      hasData = true;
+    }
+
+    if (hasFreePair) {
+      instructions = getFunctionInstructions(P_FREE_PAIR);
+      hasData = true;
+    }
+
+    if (isCalc) {
+      instructions = getFunctionInstructions(P_THROW_OVERFLOW_ERROR);
+      hasData = true;
+    }
+
+    if (checkNullPointer) {
+      instructions = getFunctionInstructions(P_CHECK_NULL_POINTER);
+      hasData = true;
+    }
+
+    if (isDiv) {
+      instructions = getFunctionInstructions(P_CHECK_DIVIDE_BY_ZERO);
+      hasData = true;
+    }
+
+    if (hasData) {
       instructions.add(0, new Instruction(DATA, ""));
       instructions.add(1, new Instruction(LABEL, "")); // Leave gap in lines
     }
