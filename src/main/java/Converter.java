@@ -11,8 +11,8 @@ import ast.Type.EType;
 import java.util.*;
 
 import static assembly.Instruction.InstrType.*;
+import static assembly.PredefinedFunctions.*;
 import static assembly.PredefinedFunctions.Functions.*;
-import static assembly.PredefinedFunctions.getFunctionInstructions;
 import static ast.Type.EType.*;
 
 public class Converter extends ASTVisitor<List<Instruction>> {
@@ -61,148 +61,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     int result = labelNum;
     labelNum++;
     return "L" + result;
-  }
-
-  //TODO: DELETE?
-  private List<Instruction> getInstructionFromExpression(Expression expr) {
-
-    if (expr == null) {
-      return null;
-    }
-
-    switch (expr.getExprType()) {
-
-      case INTLITER:
-        return visitIntLiterExp(expr);
-
-      case BOOLLITER:
-        return visitBoolLiterExp(expr);
-
-      case CHARLITER:
-        return visitCharLiterExp(expr);
-
-      case STRINGLITER:
-        return visitStringLiterExp(expr);
-
-      case IDENT:
-        switch (currentST.getType(expr.getIdent()).getType()){
-          case INT:
-            return visitIntLiterExp(expr);
-          case BOOL:
-            return visitBoolLiterExp(expr);
-          case CHAR:
-            return visitCharLiterExp(expr);
-          case STRING:
-            return visitStringLiterExp(expr);
-          case PAIR:
-            List<Instruction> pairInstructions = new ArrayList<>();
-            pairInstructions.add(new Instruction(LDR, unusedRegisters.get(0),
-                calculateMallocSize(expr, currentST.getType(expr.getIdent()))));
-            pairInstructions.add(new Instruction(BL, "malloc"));
-            pairInstructions.addAll(getInstructionFromExpression(expr.getExpression1()));
-            pairInstructions.addAll(getInstructionFromExpression(expr.getExpression2()));
-            return pairInstructions;
-          case ARRAY:
-            List<Instruction> arrayInstructions = new ArrayList<>();
-            arrayInstructions.add(new Instruction(LDR, unusedRegisters.get(0),
-                calculateMallocSize(expr, currentST.getType(expr.getIdent()))));
-            arrayInstructions.add(new Instruction(BL, "malloc"));
-            for (Expression arrayExp: expr.getArrayElem().getExpression()){
-              arrayInstructions.addAll(getInstructionFromExpression(arrayExp));
-            }
-            return arrayInstructions;
-        }
-
-      case ARRAYELEM:
-        List<Instruction> arrayInstructions = new ArrayList<>();
-        switch (currentST.getType(expr.getArrayElem().getIdent()).getArrayType().getType()) {
-          case INT:
-            arrayInstructions.add(new Instruction(LDR, unusedRegisters.get(0),
-                8L * expr.getArrayElem().getExpression().size()));
-            arrayInstructions.add(new Instruction(BL, "malloc"));
-            for (Expression element: expr.getArrayElem().getExpression()){
-              arrayInstructions.addAll(visitIntLiterExp(element));
-            }
-            return arrayInstructions;
-          case BOOL:
-            arrayInstructions.add(new Instruction(LDR, unusedRegisters.get(0),
-                expr.getArrayElem().getExpression().size()));
-            arrayInstructions.add(new Instruction(BL, "malloc"));
-            for (Expression element: expr.getArrayElem().getExpression()){
-              arrayInstructions.addAll(visitBoolLiterExp(element));
-            }
-            return arrayInstructions;
-          case CHAR:
-            arrayInstructions.add(new Instruction(LDR, unusedRegisters.get(0),
-                expr.getArrayElem().getExpression().size()));
-            arrayInstructions.add(new Instruction(BL, "malloc"));
-            for (Expression element: expr.getArrayElem().getExpression()){
-              arrayInstructions.addAll(visitCharLiterExp(element));
-            }
-            return arrayInstructions;
-          case STRING:
-            long charCount = 0;
-            for (Expression element: expr.getArrayElem().getExpression()){
-              charCount += element.getStringLiter().length();
-            }
-            arrayInstructions.add(new Instruction(LDR, unusedRegisters.get(0), charCount));
-            arrayInstructions.add(new Instruction(BL, "malloc"));
-            for (Expression element: expr.getArrayElem().getExpression()){
-              arrayInstructions.addAll(visitStringLiterExp(element));
-            }
-            return arrayInstructions;
-          case PAIR:
-            // TODO Ask about how the size of malloc works for pair
-            long pairMallocSize = 0;
-
-            for (Expression element : expr.getArrayElem().getExpression()) {
-              pairMallocSize += calculateMallocSize(element,
-                  currentST.getType(expr.getArrayElem().getIdent()));
-            }
-
-            arrayInstructions.add(new Instruction(LDR, unusedRegisters.get(0), pairMallocSize));
-            arrayInstructions.add(new Instruction(BL, "malloc"));
-            for (Expression element : expr.getArrayElem().getExpression()) {
-              arrayInstructions.addAll(getInstructionFromExpression(element.getExpression1()));
-              arrayInstructions.addAll(getInstructionFromExpression(element.getExpression2()));
-            }
-            return arrayInstructions;
-          case ARRAY:
-            long arrayMallocSize = 4;
-
-            for (Expression element : expr.getArrayElem().getExpression()) {
-              arrayMallocSize += calculateMallocSize(element,
-                  currentST.getType(expr.getArrayElem().getIdent()));
-            }
-
-            arrayInstructions.add(new Instruction(LDR, unusedRegisters.get(0), arrayMallocSize));
-            arrayInstructions.add(new Instruction(BL, "malloc"));
-            for (Expression element : expr.getArrayElem().getExpression()) {
-              arrayInstructions.addAll(getInstructionFromExpression(element));
-            }
-            return arrayInstructions;
-        }
-
-    }
-    return null;
-  }
-
-  //TODO: DELETE?
-  private long calculateMallocSize(Expression exp, Type type){
-    switch(type.getType()){
-
-      case PAIR:
-        return 8;
-
-      case ARRAY:
-        long size = 0;
-        for (Expression arrayExpression : exp.getArrayElem().getExpression()){
-          size += calculateMallocSize(arrayExpression, type.getArrayType());
-        }
-        return size;
-    }
-    return sizeOfTypeOnStack(type);
-
   }
 
   private Type getExpressionType(Expression expr) {
@@ -357,230 +215,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return beginStatements;
   }
 
-  public List<Instruction> arrayIndexOutOfBoundsError(List<Instruction> instructions, int msgNumber) {
-
-    int offset = msgNumber * 3;
-
-    /* adds error message for negative index error */
-    instructions.add(offset, new Instruction(LABEL, "msg_" + msgNumber));
-    instructions.add(1 + offset, new Instruction(WORD, 44));
-    instructions.add(2 + offset, new Instruction(ASCII, "\"ArrayIndexOutOfBoundsError: negative index\\n\\0\""));
-
-    msgNumber++;
-    offset = msgNumber * 3;
-
-    /* adds error message for too large index error */
-    instructions.add(offset, new Instruction(LABEL, "msg_" + msgNumber));
-    instructions.add(1 + offset, new Instruction(WORD, 45));
-    instructions.add(2 + offset, new Instruction(ASCII, "\"ArrayIndexOutOfBoundsError: index too large\\n\\0\""));
-
-    /* adds function for checking array lookup out of bounds error */
-    //TODO: Register Allocation
-    instructions.add(new Instruction(LABEL, "p_check_array_bounds:"));
-    //TODO: ADD LR
-    instructions.add(new Instruction(LABEL, "PUSH {lr}"));
-    instructions.add(new Instruction(CMP, r0, 0));
-    instructions.add(new Instruction(LDR, r0, "msg_" + (msgNumber - 1), Conditionals.LT));
-    instructions.add(new Instruction(BL, "p_throw_runtime_error", Conditionals.LT));
-    instructions.add(new Instruction(LDR, r1, new Operand2(r1)));
-    instructions.add(new Instruction(CMP, r0, new Operand2(r1)));
-    instructions.add(new Instruction(LDR, r0, "msg_" + msgNumber, Conditionals.CS));
-    instructions.add(new Instruction(BL, "p_throw_runtime_error", Conditionals.CS));
-    instructions.add(new Instruction(LABEL, "POP {pc}"));
-
-    /* set flag to add p_throw_runtime_error function */
-    runtimeErr = true;
-
-    return instructions;
-  }
-
-  public List<Instruction> throwOverflowError(List<Instruction> instructions, int msgNumber) {
-
-    int offset = msgNumber * 3;
-
-    /* adds error message for overflow error */
-    instructions.add(offset, new Instruction(LABEL, "msg_" + msgNumber));
-    instructions.add(1 + offset, new Instruction(WORD, 83));
-    instructions.add(2 + offset, new Instruction(ASCII, "\"OverflowError: the result is too " +
-            "small/large to store in a 4-byte signed-integer.\\n\\0\""));
-
-    /* adds function for checking if a calculation overflows */
-    //TODO: Register Allocation
-    instructions.add(new Instruction(LABEL, "p_throw_overflow_error:"));
-    instructions.add(new Instruction(LDR, r0, "msg_" + msgNumber));
-    instructions.add(new Instruction(BL, "p_throw_runtime_error"));
-
-    /* set flag to add p_throw_runtime_error function */
-    runtimeErr = true;
-
-    return instructions;
-  }
-
-  public List<Instruction> checkNullPointer(List<Instruction> instructions, int msgNumber) {
-
-    int offset = msgNumber * 3;
-
-    /* adds error message for null reference error */
-    instructions.add(offset, new Instruction(LABEL, "msg_" + msgNumber));
-    instructions.add(1 + offset, new Instruction(WORD, 50));
-    instructions.add(2 + offset, new Instruction(ASCII, "\"NullReferenceError: dereference a null reference\\n\\0\""));
-
-    /* adds function for checking if a pointer is null */
-    //TODO: Register Allocation
-    instructions.add(new Instruction(LABEL, "p_check_null_pointer:"));
-    instructions.add(new Instruction(LABEL, "PUSH {lr}"));
-    instructions.add(new Instruction(CMP, r0, 0));
-    instructions.add(new Instruction(LDR, r0, "msg_" + msgNumber, Conditionals.EQ));
-    instructions.add(new Instruction(BL, "p_throw_runtime_error", Conditionals.EQ));
-    instructions.add(new Instruction(LABEL, "POP {pc}"));
-
-    /* set flag to add p_throw_runtime_error function */
-    runtimeErr = true;
-
-    return instructions;
-  }
-
-  public List<Instruction> checkDivideByZero(List<Instruction> instructions, int msgNumber) {
-
-    int offset = msgNumber * 3;
-
-    /* adds error message for divide by zero error */
-    instructions.add(offset, new Instruction(LABEL, "msg_" + msgNumber));
-    instructions.add(1 + offset, new Instruction(WORD, 45));
-    instructions.add(2 + offset, new Instruction(ASCII, "\"DivideByZeroError: divide or modulo by zero\\n\\0\""));
-
-    /* adds function for checking if the divisor is zero */
-    //TODO: Register Allocation
-    instructions.add(new Instruction(LABEL, "p_check_divide_by_zero:"));
-    //TODO: ADD LR
-    instructions.add(new Instruction(LABEL, "PUSH {lr}"));
-    instructions.add(new Instruction(CMP, r1, 0));
-    instructions.add(new Instruction(LDR, r0, "msg_" + msgNumber, Conditionals.EQ));
-    instructions.add(new Instruction(BL, "p_throw_runtime_error", Conditionals.EQ));
-    instructions.add(new Instruction(LABEL, "POP {pc}"));
-
-    /* set flag to add p_throw_runtime_error function */
-    runtimeErr = true;
-
-    return instructions;
-  }
-
-  public List<Instruction> printBool(List<Instruction> instructions, int msgNumber) {
-
-    int offset = msgNumber * 3;
-
-    /* adds message for true */
-    instructions.add(offset, new Instruction(LABEL, "msg_" + msgNumber));
-    instructions.add(1 + offset, new Instruction(WORD, 5));
-    instructions.add(2 + offset, new Instruction(ASCII, "\"true\\0\""));
-
-    msgNumber++;
-    offset = msgNumber * 3;
-
-    /* adds message for false */
-    instructions.add(offset, new Instruction(LABEL, "msg_" + msgNumber));
-    instructions.add(1 + offset, new Instruction(WORD, 6));
-    instructions.add(2 + offset, new Instruction(ASCII, "\"false\\0\""));
-
-    /* adds function for printing integers */
-    //TODO: Register Allocation
-    instructions.add(new Instruction(LABEL, "p_print_int:"));
-    //TODO: ADD LR
-    instructions.add(new Instruction(LABEL, "PUSH {lr}"));
-    instructions.add(new Instruction(CMP, r0, 0));
-    instructions.add(new Instruction(LDR, r0, "msg_" + (msgNumber - 1), Conditionals.NE));
-    instructions.add(new Instruction(LDR, r0, "msg_" + msgNumber, Conditionals.EQ));
-    instructions.add(new Instruction(ADD, r0, r0, new Operand2(4)));
-    instructions.add(new Instruction(BL, "printf"));
-    instructions.add(new Instruction(MOV, r0, 0));
-    instructions.add(new Instruction(BL, "fflush"));
-    instructions.add(new Instruction(LABEL, "POP {pc}"));
-
-    return instructions;
-  }
-
-  public List<Instruction> printInt(List<Instruction> instructions, int msgNumber) {
-
-    int offset = msgNumber * 3;
-
-    /* adds message for pattern matching decimals */
-    instructions.add(offset, new Instruction(LABEL, "msg_" + msgNumber));
-    instructions.add(1 + offset, new Instruction(WORD, 3));
-    instructions.add(2 + offset, new Instruction(ASCII, "\"%d\\0\""));
-
-    /* adds function for printing integers */
-    //TODO: Register Allocation
-    instructions.add(new Instruction(LABEL, "p_print_int:"));
-    //TODO: ADD LR
-    instructions.add(new Instruction(LABEL, "PUSH {lr}"));
-    instructions.add(new Instruction(MOV, r1, new Operand2(r0)));
-    instructions.add(new Instruction(LDR, r0, "msg_" + msgNumber));
-    instructions.add(new Instruction(ADD, r0, r0, new Operand2(4)));
-    instructions.add(new Instruction(BL, "printf"));
-    instructions.add(new Instruction(MOV, r0, 0));
-    instructions.add(new Instruction(BL, "fflush"));
-    instructions.add(new Instruction(LABEL, "POP {pc}"));
-
-    return instructions;
-  }
-
-  public List<Instruction> printString(List<Instruction> instructions, int msgNumber) {
-
-    int offset = msgNumber * 3;
-
-    /* adds message for pattern matching strings */
-    instructions.add(offset, new Instruction(LABEL, "msg_" + msgNumber));
-    instructions.add(1 + offset, new Instruction(WORD, 5));
-    instructions.add(2 + offset, new Instruction(ASCII, "\"%.*s\\0\""));
-
-    /* adds function for printing strings */
-    //TODO: Register Allocation
-    instructions.add(new Instruction(LABEL, "p_print_string:"));
-    //TODO: ADD LR
-    instructions.add(new Instruction(LABEL, "PUSH {lr}"));
-    instructions.add(new Instruction(LDR, r1, new Operand2(r0)));
-    instructions.add(new Instruction(ADD, r2, r0, new Operand2(4)));
-    instructions.add(new Instruction(LDR, r0, "msg_" + msgNumber));
-    instructions.add(new Instruction(ADD, r0, r0, new Operand2(4)));
-    instructions.add(new Instruction(BL, "printf"));
-    instructions.add(new Instruction(MOV, r0, 0));
-    instructions.add(new Instruction(BL, "fflush"));
-    instructions.add(new Instruction(LABEL, "POP {pc}"));
-
-    return instructions;
-  }
-
-  public List<Instruction> printLn(List<Instruction> instructions, int msgNumber) {
-
-    int offset = msgNumber * 3;
-
-    /* adds message for adding new lines */
-    instructions.add(offset, new Instruction(LABEL, "msg_" + msgNumber));
-    instructions.add(1 + offset, new Instruction(WORD, 1));
-    instructions.add(2 + offset, new Instruction(ASCII, "\"\\0\""));
-
-    /* adds function for printing new lines */
-    //TODO: Register Allocation
-    instructions.add(new Instruction(LABEL, "p_print_ln:"));
-    //TODO: ADD LR
-    instructions.add(new Instruction(LABEL, "PUSH {lr}"));
-    instructions.add(new Instruction(LDR, r0, "msg_" + msgNumber));
-    instructions.add(new Instruction(ADD, r0, r0, new Operand2(4)));
-    instructions.add(new Instruction(BL, "puts"));
-    instructions.add(new Instruction(MOV, r0, 0));
-    instructions.add(new Instruction(BL, "fflush"));
-    instructions.add(new Instruction(LABEL, "POP {pc}"));
-
-    return instructions;
-  }
-
   @Override
   public List<Instruction> visitProgram(Program program) {
     List<Instruction> instructions = new ArrayList<>();
-
-    //TODO: ADD CONSTRUCTOR FOR DIRECTIVES
-
-    //TODO: ADD VARIABLE INSTRUCTIONS HERE
 
     instructions.add(new Instruction(TEXT, ""));
     instructions.add(new Instruction(LABEL, "")); // Leave gap in lines
@@ -592,7 +229,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       instructions.addAll(visitFunction(function));
     }
 
-    //TODO: ADD ENUM FOR LABEL
     instructions.add(new Instruction(LABEL, "main:"));
 
     //TODO: ADD LR
@@ -622,75 +258,76 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     //TODO: Add instructions as args
 
     if (isArrayLookup) {
-      instructions = getFunctionInstructions(P_CHECK_ARRAY_BOUNDS);
+      instructions.addAll(getFunctionInstructions(P_CHECK_ARRAY_BOUNDS));
       runtimeErr = true;
       hasData = true;
     }
 
     if (runtimeErr) {
-      instructions = getFunctionInstructions(P_THROW_RUNTIME_ERROR);
+      instructions.addAll(getFunctionInstructions(P_THROW_RUNTIME_ERROR));
       hasPrintString = true;
       hasData = true;
     }
 
     if (hasPrintInt) {
-      instructions = getFunctionInstructions(P_PRINT_INT);
+      instructions.addAll(getFunctionInstructions(P_PRINT_INT));
       hasData = true;
     }
 
     if (hasPrintBool) {
-      instructions = getFunctionInstructions(P_PRINT_BOOL);
+      instructions.addAll(getFunctionInstructions(P_PRINT_BOOL));
       hasData = true;
     }
 
     if (hasPrintString) {
-      instructions = getFunctionInstructions(P_PRINT_STRING);
+      instructions.addAll(getFunctionInstructions(P_PRINT_STRING));
       hasData = true;
     }
 
     if (hasPrintReference) {
-      instructions = getFunctionInstructions(P_PRINT_REFERENCE);
+      instructions.addAll(getFunctionInstructions(P_PRINT_REFERENCE));
       hasData = true;
     }
 
     if (hasPrintLn) {
-      instructions = getFunctionInstructions(P_PRINT_LN);
+      instructions.addAll(getFunctionInstructions(P_PRINT_LN));
       hasData = true;
     }
 
     if (hasReadInt) {
-      instructions = getFunctionInstructions(P_READ_INT);
+      instructions.addAll(getFunctionInstructions(P_READ_INT));
       hasData = true;
     }
 
     if (hasReadChar) {
-      instructions = getFunctionInstructions(P_READ_CHAR);
+      instructions.addAll(getFunctionInstructions(P_READ_CHAR));
       hasData = true;
     }
 
     if (hasFreePair) {
-      instructions = getFunctionInstructions(P_FREE_PAIR);
+      instructions.addAll(getFunctionInstructions(P_FREE_PAIR));
       hasData = true;
     }
 
     if (isCalc) {
-      instructions = getFunctionInstructions(P_THROW_OVERFLOW_ERROR);
+      instructions.addAll(getFunctionInstructions(P_THROW_OVERFLOW_ERROR));
       hasData = true;
     }
 
     if (checkNullPointer) {
-      instructions = getFunctionInstructions(P_CHECK_NULL_POINTER);
+      instructions.addAll(getFunctionInstructions(P_CHECK_NULL_POINTER));
       hasData = true;
     }
 
     if (isDiv) {
-      instructions = getFunctionInstructions(P_CHECK_DIVIDE_BY_ZERO);
+      instructions.addAll(getFunctionInstructions(P_CHECK_DIVIDE_BY_ZERO));
       hasData = true;
     }
 
     if (hasData) {
       instructions.add(0, new Instruction(DATA, ""));
-      instructions.add(1, new Instruction(LABEL, "")); // Leave gap in lines
+      instructions.add(1, new Instruction(LABEL, ""));
+      instructions.addAll(2, getMessages());
     }
 
     return instructions;
@@ -996,18 +633,24 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
-  //TODO: How do we know that it will be msg_0, what happens if there are 2 strings
   @Override
   public List<Instruction> visitStringLiterExp(Expression expression) {
 
-    //TODO Generate initial message label
     List<Instruction> instructions = new ArrayList<>();
+
+    String string = expression.getStringLiter();
+
+    /* Generate a message number for the string. */
+    String msgLabel = getMessageLabel();
+    addMessage(new Instruction(LABEL, msgLabel));
+    addMessage(new Instruction(WORD, string.length()));
+    addMessage(new Instruction(ASCII, '"' + string + '"'));
 
     /* Allocate a register: rn for this function to use. */
     Register rn = popUnusedRegister();
 
     // LDR rn, =msg_0
-    instructions.add(new Instruction(LDR, rn, "msg_0"));
+    instructions.add(new Instruction(LDR, rn, msgLabel));
 
     /* Mark the register used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rn);
