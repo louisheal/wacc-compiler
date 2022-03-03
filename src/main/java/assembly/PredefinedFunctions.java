@@ -287,6 +287,23 @@ public class PredefinedFunctions {
   private List<Instruction> pCheckDivideByZero() {
     List<Instruction> instructions = new ArrayList<>();
 
+    // 	PUSH {lr}
+    instructions.add(new Instruction(Instruction.InstrType.LABEL, "PUSH {lr}"));
+
+    // 	CMP r1, #0
+    instructions.add(new Instruction(Instruction.InstrType.CMP, r1, new Operand2(0)));
+
+    /* message = .word 45
+                 .ascii	"DivideByZeroError: divide or modulo by zero\n\0" */
+    // 	LDREQ r0, =msg_0
+    instructions.add(new Instruction(Instruction.InstrType.LDR, r0, "msg_0", Conditionals.EQ));
+
+    // 	BLEQ p_throw_runtime_error
+    instructions.add(new Instruction(Instruction.InstrType.BL, "p_throw_runtime_error", Conditionals.EQ));
+
+    // 	POP {pc}
+    instructions.add(new Instruction(Instruction.InstrType.LABEL, "POP {pc}"));
+
     return instructions;
   }
 
