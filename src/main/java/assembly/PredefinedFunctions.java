@@ -9,6 +9,8 @@ public class PredefinedFunctions {
 
   // TODO: check cases for LDR r0, =msg_(number) for where the number is changed
 
+  private static final List<Instruction> messages = new ArrayList<>();
+  private static int msgCounter = 0;
   private static final Register r0 = new Register(0);
   private static final Register r1 = new Register(1);
   private static final Register r2 = new Register(2);
@@ -85,9 +87,16 @@ public class PredefinedFunctions {
     // MOV r1, r0
     instructions.add(new Instruction(MOV, r0, new Operand2(r1)));
 
-    // TODO: sort out how messages will be added
+    /* msg_(number):
+              .word 3
+		      .ascii	"%d\0" */
+    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
+    messages.add(new Instruction(LABEL, ".word 3"));
+    messages.add(new Instruction(LABEL, ".ascii\t\"%d\\0\""));
+
     // LDR r0, =msg_0
-    instructions.add(new Instruction(LDR, r0, "msg_0"));
+    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter));
+    msgCounter++;
 
     // ADD r0, r0, #4
     instructions.add(new Instruction(ADD, r0, r0, new Operand2(4)));
@@ -105,6 +114,11 @@ public class PredefinedFunctions {
     instructions.add(new Instruction(LABEL, "POP {pc}"));
 
     return instructions;
+  }
+
+  public static void main(String[] args) {
+    System.out.println(pPrintIntInstruction());
+    System.out.println(messages);
   }
 
   private static List<Instruction> pPrintBoolInstruction() {
