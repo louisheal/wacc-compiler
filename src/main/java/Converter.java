@@ -105,7 +105,12 @@ public class Converter extends ASTVisitor<List<Instruction>> {
         return currentST.getType(expr.getIdent());
 
       case ARRAYELEM:
-        return currentST.getType(expr.getArrayElem().getIdent()).getArrayType();
+        ArrayElem arrayElem = expr.getArrayElem();
+        Type result = currentST.getType(arrayElem.getIdent());
+        for (int i = 0; i < arrayElem.getExpression().size(); i++) {
+          result = result.getArrayType();
+        }
+        return result;
 
       case BRACKETS:
         return getExpressionType(expr.getExpression1());
@@ -287,14 +292,19 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       hasData = true;
     }
 
-    if (runtimeErr) {
-      instructions.addAll(getFunctionInstructions(P_THROW_RUNTIME_ERROR));
-      hasPrintString = true;
+    if (hasPrintInt) {
+      instructions.addAll(getFunctionInstructions(P_PRINT_INT));
       hasData = true;
     }
 
-    if (hasPrintInt) {
-      instructions.addAll(getFunctionInstructions(P_PRINT_INT));
+    if (hasPrintLn) {
+      instructions.addAll(getFunctionInstructions(P_PRINT_LN));
+      hasData = true;
+    }
+
+    if (runtimeErr) {
+      instructions.addAll(getFunctionInstructions(P_THROW_RUNTIME_ERROR));
+      hasPrintString = true;
       hasData = true;
     }
 
@@ -310,11 +320,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     if (hasPrintReference) {
       instructions.addAll(getFunctionInstructions(P_PRINT_REFERENCE));
-      hasData = true;
-    }
-
-    if (hasPrintLn) {
-      instructions.addAll(getFunctionInstructions(P_PRINT_LN));
       hasData = true;
     }
 
