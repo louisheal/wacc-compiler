@@ -433,7 +433,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     }
     else{
       // TODO: update Symbol table?
-      if (currentST.getType(statement.getLHS().getIdent()).equals(new Type(BOOL))) {
+      // Adds B suffix when bool or char
+      if (currentST.getType(statement.getLHS().getIdent()).equals(new Type(BOOL))
+          | currentST.getType(statement.getLHS().getIdent()).equals(new Type(CHAR))) {
         instructions.add(new Instruction(STR, sp, new Operand2(rn), "B"));
       } else {
         instructions.add(new Instruction(STR, sp, new Operand2(rn)));
