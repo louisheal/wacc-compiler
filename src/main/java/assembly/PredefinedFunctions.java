@@ -553,8 +553,13 @@ public class PredefinedFunctions {
 
     /* message = .word 50
 		         .ascii	"NullReferenceError: dereference a null reference\n\0" */
+    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
+    messages.add(new Instruction(WORD, 50));
+    messages.add(new Instruction(ASCII, "\"NullReferenceError: dereference a null reference\\n\\0\""));
+
     // LDREQ r0, =msg_0
-    instructions.add(new Instruction(LDR, r0, "msg_0", Conditionals.EQ));
+    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter, Conditionals.EQ));
+    msgCounter++;
 
     // BEQ p_throw_runtime_error
     instructions.add(new Instruction(LABEL, "BEQ p_throw_runtime_error"));
