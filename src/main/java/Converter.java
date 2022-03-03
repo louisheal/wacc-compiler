@@ -648,7 +648,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     /* Generate a message number for the string. */
     String msgLabel = getMessageLabel();
-    addMessage(new Instruction(LABEL, msgLabel));
+    addMessage(new Instruction(LABEL, msgLabel + ":"));
     addMessage(new Instruction(WORD, string.length()));
     addMessage(new Instruction(ASCII, string));
 
