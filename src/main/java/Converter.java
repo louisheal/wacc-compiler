@@ -661,6 +661,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Mark the register used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rn);
 
+    // To ensure the messages are added to the top of assembly code
+    hasData = true;
+
     return instructions;
   }
 
