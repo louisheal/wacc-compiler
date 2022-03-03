@@ -345,11 +345,51 @@ public class PredefinedFunctions {
   private List<Instruction> pReadInt() {
     List<Instruction> instructions = new ArrayList<>();
 
+    //  	PUSH {lr}
+    instructions.add(new Instruction(Instruction.InstrType.LABEL, "PUSH {lr}"));
+
+    //  	MOV r1, r0
+    instructions.add(new Instruction(Instruction.InstrType.MOV, r1, new Operand2(r0)));
+
+    /* message = .word 3
+      		     .ascii	"%d\0" */
+    //  	LDR r0, =msg_0
+    instructions.add(new Instruction(Instruction.InstrType.LDR, r0, "msg_0"));
+
+    //  	ADD r0, r0, #4
+    instructions.add(new Instruction(Instruction.InstrType.ADD, r0, r0, new Operand2(4)));
+
+    //  	BL scanf
+    instructions.add(new Instruction(Instruction.InstrType.BL, "scanf"));
+
+    //	POP {pc}
+    instructions.add(new Instruction(Instruction.InstrType.LABEL, "POP {pc}"));
+
     return instructions;
   }
 
   private List<Instruction> pReadChar() {
     List<Instruction> instructions = new ArrayList<>();
+
+    //  PUSH {lr}
+    instructions.add(new Instruction(Instruction.InstrType.LABEL, "PUSH {lr}"));
+
+    //  MOV r1, r0
+    instructions.add(new Instruction(Instruction.InstrType.MOV, r1, new Operand2(r0)));
+
+    /* message = .word 4
+      		     .ascii	" %c\0" */
+    //  LDR r0, =msg_0
+    instructions.add(new Instruction(Instruction.InstrType.LDR, r0, "msg_0"));
+
+    //  ADD r0, r0, #4
+    instructions.add(new Instruction(Instruction.InstrType.ADD, r0, r0, new Operand2(4)));
+
+    //  	BL scanf
+    instructions.add(new Instruction(Instruction.InstrType.BL, "scanf"));
+
+    //	POP {pc}
+    instructions.add(new Instruction(Instruction.InstrType.LABEL, "POP {pc}"));
 
     return instructions;
   }
