@@ -252,11 +252,28 @@ public class PredefinedFunctions {
   private List<Instruction> pThrowRuntimeError() {
     List<Instruction> instructions = new ArrayList<>();
 
+    //  	BL p_print_string
+    instructions.add(new Instruction(Instruction.InstrType.BL, "p_print_string"));
+
+    //  	MOV r0, #-1
+    instructions.add(new Instruction(Instruction.InstrType.MOV, r0, new Operand2(-1)));
+
+    //  	BL exit
+    instructions.add(new Instruction(Instruction.InstrType.BL, "exit"));
+
     return instructions;
   }
 
   private List<Instruction> pThrowOverflowError() {
     List<Instruction> instructions = new ArrayList<>();
+
+    /* message = .word 83
+                 .ascii	"OverflowError: the result is too small/large to store in a 4-byte signed-integer.\n\0" */
+    //  LDR r0, =msg_0
+    instructions.add(new Instruction(Instruction.InstrType.LDR, r0, "msg_0"));
+
+    //  BL p_throw_runtime_error
+    instructions.add(new Instruction(Instruction.InstrType.BL, "p_throw_runtime_error"));
 
     return instructions;
   }
