@@ -5,8 +5,9 @@ import java.util.List;
 
 public class PredefinedFunctions {
 
-  Register r0 = new Register(0);
-  Register r1 = new Register(1);
+  private final Register r0 = new Register(0);
+  private final Register r1 = new Register(1);
+  private final Register r2 = new Register(2);
 
   public enum Functions {
     P_PRINT_INT, P_PRINT_BOOL, P_PRINT_STRING, P_PUTCHAR, P_PRINT_REFERENCE
@@ -104,8 +105,39 @@ public class PredefinedFunctions {
   private List<Instruction> pPrintStringInstruction() {
     List<Instruction> instructions = new ArrayList<>();
 
+    // PUSH {lr}
+    instructions.add(new Instruction(Instruction.InstrType.LABEL, "PUSH {lr}"));
+
+    // LDR r1, [r0]
+    instructions.add(new Instruction(Instruction.InstrType.LDR, r1, new Operand2(r0)));
+
+    // ADD r2, r0, #4
+    instructions.add(new Instruction(Instruction.InstrType.ADD, r2, r0, new Operand2(4)));
+
+    // LDR r0, =msg_1
+    instructions.add(new Instruction(Instruction.InstrType.LDR, r0, "=msg_1"));
+
+    // ADD r0, r0, #4
+    instructions.add(new Instruction(Instruction.InstrType.ADD, r0, r0, new Operand2(4)));
+
+    // BL printf
+    instructions.add(new Instruction(Instruction.InstrType.BL, "printf"));
+
+    // MOV r0, #0
+    instructions.add(new Instruction(Instruction.InstrType.MOV, r0, new Operand2(0)));
+
+    //	BL fflush
+    instructions.add(new Instruction(Instruction.InstrType.BL, "fflush"));
+
+    //	POP {pc}
+    instructions.add(new Instruction(Instruction.InstrType.LABEL, "POP {pc}"));
 
     return instructions;
+  }
+
+  public static void main(String[] args) {
+    PredefinedFunctions predefinedFunctions = new PredefinedFunctions();
+    System.out.println(predefinedFunctions.pPrintStringInstruction());
   }
 
   private List<Instruction> pPutCharInstruction() {
