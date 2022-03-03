@@ -74,12 +74,18 @@ public class PredefinedFunctions {
     return instructions;
   }
 
-  public void addMessage(Instruction instruction) {
+  public static void addMessage(Instruction instruction) {
     messages.add(instruction);
   }
 
-  public void incrementMsgCounter() {
+  public static String getMessageLabel() {
+    int msgNum = msgCounter;
     msgCounter++;
+    return "msg_" + msgNum;
+  }
+
+  public static List<Instruction> getMessages() {
+    return messages;
   }
 
   private static List<Instruction> pPrintIntInstruction() {
