@@ -485,25 +485,29 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     String lhsIdent = lhs.getIdent();
     List<Instruction> instructions = new ArrayList<>();
     int lhsStackLocation = currentST.getSPMapping(lhsIdent);
-    EType lhsType = currentST.getType(lhsIdent).getType();
+    Type lhsType = currentST.getType(lhsIdent);
 
-    /* Spawns the only unused register needed*/
+    /* Spawns the only unused register needed. */
     Register rn = popUnusedRegister();
 
-    /* Checks if shorthand [SP] can be applied*/
-    if (lhsStackLocation > 0 ){
-      instructions.add(new Instruction(LABEL, String.format("STR %s [sp, #%d]", rn,
-          lhsStackLocation)));
+    //TODO: CLEAN UP?
+
+    String instruction = "STR";
+
+    if (sizeOfTypeOnStack(lhsType) == 1) {
+      instruction += "B";
     }
-    else{
-      // TODO: update Symbol table?
-      /* Checks if B needs to be appended to STR*/
-      if (lhsType == EType.BOOL || lhsType == EType.CHAR) {
-        instructions.add(new Instruction(STR, sp, new Operand2(rn), "B"));
-      } else {
-        instructions.add(new Instruction(STR, sp, new Operand2(rn)));
-      }
+
+    instruction += " " + rn;
+
+    /* Checks if shorthand [SP] can be applied. */
+    if (lhsStackLocation > 0) {
+      instruction += String.format(", [sp, #%d]", lhsStackLocation);
+    } else {
+      instruction += ", [sp]";
     }
+
+    instructions.add(new Instruction(LABEL, instruction));
 
     /* Frees the unused register RN and returns */
     pushUnusedRegister(rn);
