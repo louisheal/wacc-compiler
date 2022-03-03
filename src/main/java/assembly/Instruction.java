@@ -102,6 +102,15 @@ public class Instruction {
     this.extraInformation = conditionals.toString();
   }
 
+  //STR{B} dest, operand
+  //LDR{B} dest, operand
+  public Instruction(InstrType type, Register dest, Operand2 operand2, String suffix) {
+    this.type = type;
+    this.dest = dest;
+    this.operand2 = operand2;
+    this.extraInformation += suffix;
+  }
+
   //BL label
   //.ascii label
   public Instruction(InstrType type, String label) {
@@ -175,7 +184,7 @@ public class Instruction {
       }
     } else if (type == InstrType.STR) { //STR instruction format
       // STR src dest
-      return type + " " + operand2 + ", [" + dest + "]";
+      return type + extraInformation + " " + operand2 + ", [" + dest + "]";
     }
 
     //.word instruction format

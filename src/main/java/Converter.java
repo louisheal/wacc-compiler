@@ -432,7 +432,13 @@ public class Converter extends ASTVisitor<List<Instruction>> {
               lhsStackLocation)));
     }
     else{
-      instructions.add(new Instruction(STR, sp, new Operand2(rn)));
+      // TODO: update Symbol table?
+      if (currentST.getType(statement.getLHS().getIdent()).equals(new Type(BOOL))) {
+        instructions.add(new Instruction(STR, sp, new Operand2(rn), "B"));
+      } else {
+        instructions.add(new Instruction(STR, sp, new Operand2(rn)));
+      }
+
     }
     if (currentST.getType(lhsIdent).getType() == EType.PAIR){
       if (spLocation - currentST.getSPMapping(lhsIdent) > 0 ){
