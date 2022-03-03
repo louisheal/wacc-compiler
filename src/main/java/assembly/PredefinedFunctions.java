@@ -518,8 +518,13 @@ public class PredefinedFunctions {
 
     /* message = .word 4
       		     .ascii	" %c\0" */
+    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
+    messages.add(new Instruction(WORD, 4));
+    messages.add(new Instruction(ASCII, "\" %c\\0\""));
+
     //  LDR r0, =msg_0
-    instructions.add(new Instruction(LDR, r0, "msg_0"));
+    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter));
+    msgCounter++;
 
     //  ADD r0, r0, #4
     instructions.add(new Instruction(ADD, r0, r0, new Operand2(4)));
