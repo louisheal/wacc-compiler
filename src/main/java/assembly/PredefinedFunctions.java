@@ -7,8 +7,6 @@ import static assembly.Instruction.InstrType.*;
 
 public class PredefinedFunctions {
 
-  // TODO: check cases for LDR r0, =msg_(number) for where the number is changed
-
   private static final List<Instruction> messages = new ArrayList<>();
   private static int msgCounter = 0;
   private static final Register r0 = new Register(0);
@@ -205,7 +203,7 @@ public class PredefinedFunctions {
      	      .word 5
      	      .ascii	"%.*s\0" */
 
-    //TODO: Ensure that the actual string is stored in a message in visit
+    // The string is stored in visitStringLiter
 
     messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
     messages.add(new Instruction(WORD, 5));
