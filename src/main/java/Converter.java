@@ -775,11 +775,16 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Allocate a register: rn for this function to use. */
     Register rn = popUnusedRegister();
 
-    String instruction;
+    String instruction = "LDR";
+
+    if (sizeOfTypeOnStack(getExpressionType(expression)) == 1){
+      instruction += "SB";
+    }
+
     if (stackOffset != 0) {
-      instruction = String.format("LDR %s, [sp, #%d]", rn, stackOffset);
+      instruction += String.format(" %s, [sp, #%d]", rn, stackOffset);
     } else {
-      instruction = String.format("LDR %s, [sp]", rn);
+      instruction += String.format(" %s, [sp]", rn);
     }
     instructions.add(new Instruction(LABEL, instruction));
 
