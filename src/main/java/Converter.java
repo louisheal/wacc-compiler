@@ -480,11 +480,14 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitIdentLHS (AssignLHS lhs){
+    /* Initialises useful variables*/
     String lhsIdent = lhs.getIdent();
     List<Instruction> instructions = new ArrayList<>();
-    Register rn = popUnusedRegister();
     int lhsStackLocation = currentST.getSPMapping(lhsIdent);
     EType lhsType = currentST.getType(lhsIdent).getType();
+
+    /* Spawns the only unused register needed*/
+    Register rn = popUnusedRegister();
 
     /* Checks if shorthand [SP] can be applied*/
     if (spLocation - currentST.getSPMapping(lhsIdent) > 0 ){
@@ -501,6 +504,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       }
     }
 
+    /* Frees the unused register RN and returns */
     pushUnusedRegister(rn);
     return instructions;
   }
