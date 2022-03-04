@@ -1521,16 +1521,16 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     // BL malloc
     instructions.add(new Instruction(BL, "malloc"));
 
-    // STR rm, [r0]
-    instructions.add(new Instruction(STR, r0, new Operand2(rm)));
-
     if (sizeOfExp1 == 1) {
-      // STRB r0, [rn]
-      instructions.add(new Instruction(STR, rn, new Operand2(r0), "B"));
+      // STRB rm, [r0]
+      instructions.add(new Instruction(STR, r0, new Operand2(rm), "B"));
     } else {
-      // STR r0, [rn]
-      instructions.add(new Instruction(STR, rn, new Operand2(r0)));
+      // STR rm, [r0]
+      instructions.add(new Instruction(STR, r0, new Operand2(rm)));
     }
+
+    // STR r0, [rn]
+    instructions.add(new Instruction(STR, rn, new Operand2(r0)));
 
     /* Mark the register rm as no longer in use. */
     pushUnusedRegister(rm);
@@ -1555,8 +1555,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       instructions.add(new Instruction(STR, r0, new Operand2(rm)));
     }
 
-    // STR r0, [rn, #sizeOfExp1]
-    instructions.add(new Instruction(LABEL, String.format("STR r0, [%s, #%d]", rn, sizeOfExp1)));
+    // STR r0, [rn, #4]
+    instructions.add(new Instruction(LABEL, String.format("STR r0, [%s, #4]", rn)));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rm);
