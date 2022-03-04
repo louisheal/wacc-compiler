@@ -1718,17 +1718,21 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
-  //TODO: Style + Docs
   @Override
   public List<Instruction> visitFreeStatement(Statement statement) {
 
+    /* Evaluate the expression to be printed and store the result in the first unused register. */
     List<Instruction> instructions = new ArrayList<>(visitExpression(statement.getExpression()));
 
+    /* Retrieve the first unused register. */
     Register rn = popUnusedRegister();
 
+    // MOV r0, rn
     instructions.add(new Instruction(MOV, r0, new Operand2(rn)));
+    // BL p_free_pair
     instructions.add(new Instruction(BL, "p_free_pair"));
 
+    /* Mark register rn as no longer in use. */
     pushUnusedRegister(rn);
 
     hasFreePair = true;
