@@ -954,7 +954,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       pushUnusedRegister(rn);
 
       /* Generate code for expression2, this is put into register 10 */
-      visitExpression(expression.getExpression2());
+      instructions.addAll(visitExpression(expression.getExpression2()));
 
       /* Declare that rn is in use. */
       rn = popUnusedRegister();
