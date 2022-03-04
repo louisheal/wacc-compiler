@@ -31,6 +31,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   private int spLocation = 0;
   private int labelNum = 0;
+  private int functionByte = 0;
   SymbolTable currentST;
 
   /* Print flags */
@@ -360,6 +361,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     List<Instruction> instructions = new ArrayList<>();
 
+    /* Everytime entering a new function, functionByte is updated */
+    functionByte = totalBytesInFunction(function);
+
     /* Initialise symbol table. */
     currentST = new SymbolTable(null);
 
@@ -392,17 +396,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Evaluate function body. */
     instructions.addAll(visitStatement(function.getStatement()));
 
-    while (totalBytes > 1024) {
-      instructions.add(new Instruction(LABEL, "ADD sp, sp, #1024"));
-      totalBytes -= 1024;
-    }
-    if (totalBytes > 0) {
-      instructions.add(new Instruction(LABEL, String.format("ADD sp, sp, #%d", totalBytes)));
-    }
-
-    /* Function wrapper instructions. */
-    instructions.add(new Instruction(LABEL, "POP {pc}"));
-    instructions.add(new Instruction(LABEL, "POP {pc}"));
     instructions.add(new Instruction(LTORG, ""));
 
     return instructions;
@@ -716,6 +709,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     // MOV r0, rn
     instructions.add(new Instruction(MOV, r0, new Operand2(rn)));
+
+    instructions.add(new Instruction(ADD, sp, sp, new Operand2(functionByte)));
+
+    instructions.add(new Instruction(POP, pc));
 
     /* Mark the allocated register as no longer in use. */
     pushUnusedRegister(rn);
