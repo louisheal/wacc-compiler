@@ -1398,8 +1398,18 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
+  //TODO: Add Docs
   @Override
   public List<Instruction> visitExprRHS(AssignRHS rhs) {
+
+    if (rhs.getExpression1() == null) {
+      List<Instruction> instructions = new ArrayList<>();
+      Register rn = popUnusedRegister();
+      instructions.add(new Instruction(LDR, rn, 0));
+      pushUnusedRegister(rn);
+      return instructions;
+    }
+
     return visitExpression(rhs.getExpression1());
   }
 
@@ -1664,10 +1674,14 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   //TODO: Style + Docs
   @Override
   public List<Instruction> visitFreeStatement(Statement statement) {
-    List<Instruction> instructions = new ArrayList<>();
+
+    List<Instruction> instructions = new ArrayList<>(visitExpression(statement.getExpression()));
+
     Register rn = popUnusedRegister();
+
     instructions.add(new Instruction(MOV, r0, new Operand2(rn)));
     instructions.add(new Instruction(BL, "p_free_pair"));
+
     pushUnusedRegister(rn);
 
     hasFreePair = true;
