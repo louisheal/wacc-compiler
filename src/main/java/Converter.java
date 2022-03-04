@@ -1561,9 +1561,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
       int expSize = sizeOfTypeOnStack(getExpressionType(expression));
       if (expSize > 1) {
-        instructions.add(new Instruction(LABEL, String.format("STR %s [sp, #-%d]!", rn, expSize)));
+        instructions.add(new Instruction(LABEL, String.format("STR %s, [sp, #-%d]!", rn, expSize)));
       } else {
-        instructions.add(new Instruction(LABEL, String.format("STRB %s [sp, #-%d]!", rn, expSize)));
+        instructions.add(new Instruction(LABEL, String.format("STRB %s, [sp, #-%d]!", rn, expSize)));
       }
 
       totalSize += expSize;
