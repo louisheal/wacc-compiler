@@ -1023,15 +1023,12 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     // TODO: Is this a strong enough check?
     /* Swap registers for accumulator register allocation. */
     if (Objects.equals(rn.toString(), "r10")) {
-      // MOV R0, Rn+1
-      instructions.add(new Instruction(MOV, r0, new Operand2(rm)));
-
-      // MOV R1, Rn
-      instructions.add(new Instruction(MOV, r1, new Operand2(rn)));
+      // SUBS Rn+1, Rn+1, Rn
+      instructions.add(new Instruction(SUB, rm, rm, new Operand2(rn), Flags.S));
+    } else {
+      // SUBS Rn, Rn, Rn+1
+      instructions.add(new Instruction(SUB, rn, rn, new Operand2(rm), Flags.S));
     }
-
-    // SUBS Rn, Rn, Rn+1
-    instructions.add(new Instruction(SUB, rn, rn, new Operand2(rm), Flags.S));
 
     // BLVS p_throw_overflow_error
     instructions.add(new Instruction(BL, "p_throw_overflow_error", Conditionals.VS));
@@ -1137,13 +1134,13 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
       // MOV R1, Rn
       instructions.add(new Instruction(MOV, r1, new Operand2(rn)));
+    } else {
+      // MOV R0, Rn
+      instructions.add(new Instruction(MOV, r0, new Operand2(rn)));
+
+      // MOV R1, Rn+1
+      instructions.add(new Instruction(MOV, r1, new Operand2(rm)));
     }
-
-    // MOV R0, Rn
-    instructions.add(new Instruction(MOV, r0, new Operand2(rn)));
-
-    // MOV R1, Rn+1
-    instructions.add(new Instruction(MOV, r1, new Operand2(rm)));
 
     // BL p_check_divide_by_zero
     instructions.add(new Instruction(BL, "p_check_divide_by_zero"));
@@ -1171,8 +1168,15 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     Register rn = popUnusedRegister();
     Register rm = popUnusedRegister();
 
-    // CMP Rn, Rn+1
-    instructions.add(new Instruction(CMP, rn, new Operand2(rm)));
+    // TODO: Is this a strong enough check?
+    /* Swap registers for accumulator register allocation. */
+    if (Objects.equals(rn.toString(), "r10")) {
+      // CMP Rn+1, Rn
+      instructions.add(new Instruction(CMP, rm, new Operand2(rn)));
+    } else {
+      // CMP Rn, Rn+1
+      instructions.add(new Instruction(CMP, rn, new Operand2(rm)));
+    }
 
     // MOVLE Rn, #0
     instructions.add(new Instruction(MOV, rn, 0, Conditionals.LE));
@@ -1197,8 +1201,15 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     Register rn = popUnusedRegister();
     Register rm = popUnusedRegister();
 
-    // CMP Rn, Rn+1
-    instructions.add(new Instruction(CMP, rn, new Operand2(rm)));
+    // TODO: Is this a strong enough check?
+    /* Swap registers for accumulator register allocation. */
+    if (Objects.equals(rn.toString(), "r10")) {
+      // CMP Rn+1, Rn
+      instructions.add(new Instruction(CMP, rm, new Operand2(rn)));
+    } else {
+      // CMP Rn, Rn+1
+      instructions.add(new Instruction(CMP, rn, new Operand2(rm)));
+    }
 
     // MOVLT Rn, #0
     instructions.add(new Instruction(MOV, rn, 0, Conditionals.LT));
@@ -1223,8 +1234,15 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     Register rn = popUnusedRegister();
     Register rm = popUnusedRegister();
 
-    // CMP Rn, Rn+1
-    instructions.add(new Instruction(CMP, rn, new Operand2(rm)));
+    // TODO: Is this a strong enough check?
+    /* Swap registers for accumulator register allocation. */
+    if (Objects.equals(rn.toString(), "r10")) {
+      // CMP Rn+1, Rn
+      instructions.add(new Instruction(CMP, rm, new Operand2(rn)));
+    } else {
+      // CMP Rn, Rn+1
+      instructions.add(new Instruction(CMP, rn, new Operand2(rm)));
+    }
 
     // MOVGE Rn, #0
     instructions.add(new Instruction(MOV, rn, 0, Conditionals.GE));
@@ -1249,8 +1267,15 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     Register rn = popUnusedRegister();
     Register rm = popUnusedRegister();
 
-    // CMP Rn, Rn+1
-    instructions.add(new Instruction(CMP, rn, new Operand2(rm)));
+    // TODO: Is this a strong enough check?
+    /* Swap registers for accumulator register allocation. */
+    if (Objects.equals(rn.toString(), "r10")) {
+      // CMP Rn+1, Rn
+      instructions.add(new Instruction(CMP, rm, new Operand2(rn)));
+    } else {
+      // CMP Rn, Rn+1
+      instructions.add(new Instruction(CMP, rn, new Operand2(rm)));
+    }
 
     // MOVGT Rn, #0
     instructions.add(new Instruction(MOV, rn, 0, Conditionals.GT));
