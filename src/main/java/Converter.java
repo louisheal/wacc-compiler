@@ -242,6 +242,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     int totalBytes = totalBytesInProgram(program);
     spLocation = totalBytes;
     if (totalBytes > 0) {
+      // TODO: Ensure total bytes doesn't exceed 2014, otherwise causes invalid constant error
       instructions.add(new Instruction(LABEL, "SUB sp, sp, #" + totalBytes));
       //TODO: SUB sp, sp, #totalBytes
     }
@@ -252,6 +253,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.addAll(visitStatement(program.getStatement()));
 
     if (totalBytes > 0) {
+      // TODO: Ensure total bytes doesn't exceed 2014, otherwise causes invalid constant error
       instructions.add(new Instruction(LABEL, "ADD sp, sp, #" + totalBytes));
       //TODO: SUB sp, sp, #totalBytes
     }
@@ -744,6 +746,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     List<Instruction> instructions = new ArrayList<>();
 
+    System.out.println(expression);
 
     // TODO: check case when charVal is '\0' (testcase: echoPuncChar.wacc)
     // MOV rn, #charVal
