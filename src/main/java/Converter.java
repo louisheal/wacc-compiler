@@ -1412,15 +1412,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   //TODO: Add Docs
   @Override
   public List<Instruction> visitExprRHS(AssignRHS rhs) {
-
-    if (rhs.getExpression1() == null) {
-      List<Instruction> instructions = new ArrayList<>();
-      Register rn = popUnusedRegister();
-      instructions.add(new Instruction(LDR, rn, 0));
-      pushUnusedRegister(rn);
-      return instructions;
-    }
-
     return visitExpression(rhs.getExpression1());
   }
 
@@ -1514,11 +1505,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(MOV, rn, new Operand2(r0)));
 
     /* Evaluate the first expression in the pair. */
-    if (rhs.getExpression2() == null){
-      instructions.add(new Instruction(LDR, rn, 0));
-    } else {
-      instructions.addAll(visitExpression(rhs.getExpression1()));
-    }
+    instructions.addAll(visitExpression(rhs.getExpression1()));
+
 
     /* Retrieve the register containing the value of the first expression. */
     rm = popUnusedRegister();
@@ -1540,13 +1528,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Mark the register rm as no longer in use. */
     pushUnusedRegister(rm);
 
-    if (rhs.getExpression2() == null){
-      instructions.add(new Instruction(LDR, rm, 0));
-    }
-    else{
-      /* Evaluate the second expression in the pair. */
-      instructions.addAll(visitExpression(rhs.getExpression2()));
-    }
+    /* Evaluate the second expression in the pair. */
+    instructions.addAll(visitExpression(rhs.getExpression2()));
 
     /* Retrieve the register containing the value of the first expression. */
     rm = popUnusedRegister();
