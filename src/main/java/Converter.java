@@ -767,11 +767,31 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     List<Instruction> instructions = new ArrayList<>();
 
-    // TODO: check case when charVal is '\0' (testcase: echoPuncChar.wacc)
     // MOV rn, #charVal
     String instruction = String.format("MOV %s, #'%s'", rn, expression.getCharLiter());
+
+    switch (expression.getCharLiter()) {
+      case '\0':
+        instruction = String.format("MOV %s, #0", rn);
+        break;
+      case '\b':
+        instruction = String.format("MOV %s, #8", rn);
+        break;
+      case '\t':
+        instruction = String.format("MOV %s, #9", rn);
+        break;
+      case '\n':
+        instruction = String.format("MOV %s, #10", rn);
+        break;
+      case '\f':
+        instruction = String.format("MOV %s, #12", rn);
+        break;
+      case '\r':
+        instruction = String.format("MOV %s, #13", rn);
+        break;
+    }
+
     instructions.add(new Instruction(LABEL, instruction));
-    //TODO: Ensure that following instruction is "STRB rn, [sp]"
 
     /* Mark the register used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rn);
@@ -1410,7 +1430,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
-  //TODO: Add Docs
   @Override
   public List<Instruction> visitExprRHS(AssignRHS rhs) {
     return visitExpression(rhs.getExpression1());
@@ -1580,8 +1599,21 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Retrieve first unused register. */
     Register rn = popUnusedRegister();
 
-    // LDR rn, [rn]
-    instructions.add(new Instruction(LDR, rn, new Operand2(rn)));
+    Type type = getExpressionType(pairElem.getExpression());
+
+    if (pairElem.getType() == PairElem.PairElemType.FST) {
+      type = type.getFstType();
+    } else {
+      type = type.getSndType();
+    }
+
+    if (sizeOfTypeOnStack(type) == 1) {
+      // LDRSB rn, [rn]
+      instructions.add(new Instruction(LABEL, String.format("LDRSB %s, [%s]", rn, rn)));
+    } else {
+      // LDR rn, [rn]
+      instructions.add(new Instruction(LDR, rn, new Operand2(rn)));
+    }
 
     pushUnusedRegister(rn);
 

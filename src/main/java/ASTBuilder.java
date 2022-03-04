@@ -363,6 +363,28 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
 
   @Override
   public Character visitCharLiter(BasicParser.CharLiterContext ctx) {
+    if (ctx.CHAR_LITER().getText().charAt(1) == '\\') {
+      switch (ctx.CHAR_LITER().getText().charAt(2)) {
+        case '0':
+          return '\0';
+        case 'b':
+          return '\b';
+        case 't':
+          return '\t';
+        case 'n':
+          return '\n';
+        case 'f':
+          return '\f';
+        case 'r':
+          return '\r';
+        case '"':
+          return '\"';
+        case '\'':
+          return '\'';
+        case '\\':
+          return '\\';
+      }
+    }
     return ctx.CHAR_LITER().getText().charAt(1);
   }
 
