@@ -746,8 +746,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     List<Instruction> instructions = new ArrayList<>();
 
-    System.out.println(expression);
-
     // TODO: check case when charVal is '\0' (testcase: echoPuncChar.wacc)
     // MOV rn, #charVal
     String instruction = String.format("MOV %s, #'%s'", rn, expression.getCharLiter());
