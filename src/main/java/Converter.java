@@ -987,6 +987,16 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     Register rn = popUnusedRegister();
     Register rm = popUnusedRegister();
 
+    // TODO: Is this a strong enough check?
+    /* Swap registers for accumulator register allocation. */
+    if (Objects.equals(rn.toString(), "r10")) {
+      // MOV R0, Rn+1
+      instructions.add(new Instruction(MOV, r0, new Operand2(rm)));
+
+      // MOV R1, Rn
+      instructions.add(new Instruction(MOV, r1, new Operand2(rn)));
+    }
+
     // SUBS Rn, Rn, Rn+1
     instructions.add(new Instruction(SUB, rn, rn, new Operand2(rm), Flags.S));
 
