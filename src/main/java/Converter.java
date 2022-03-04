@@ -1,14 +1,12 @@
 import assembly.Conditionals;
 import assembly.Flags;
 import assembly.Instruction;
-import assembly.Instruction.InstrType;
 import assembly.Operand2;
-import assembly.PredefinedFunctions;
 import assembly.Register;
 import ast.*;
 
 import ast.Type.EType;
-import java.lang.reflect.Array;
+
 import java.util.*;
 
 import static assembly.Instruction.InstrType.*;
@@ -29,7 +27,15 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   private final Register sp = new Register(13);
   private final Register pc = new Register(15);
 
+  /* Next available stack location. */
+  private int spNextAvailable = 0;
+
+  /* Size of scope. */
+  private int spScopeSize = 0;
+
+  /* Location of stack pointer */
   private int spLocation = 0;
+
   private int labelNum = 0;
   SymbolTable currentST;
 
@@ -171,56 +177,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
       case CONCAT:
         return totalBytesInScope(statement.getStatement1()) + totalBytesInScope(statement.getStatement2());
-
-      case WHILE:
-        return totalBytesInScope(statement.getStatement1()) + maxBeginStatement(statement);
-
-      case IF:
-        int stat1Size = totalBytesInScope(statement.getStatement1());
-        int stat2Size = totalBytesInScope(statement.getStatement2());
-        return Math.max(stat1Size, stat2Size);
     }
 
     return 0;
-  }
-
-  private int totalBytesInProgram(Program program) {
-    return totalBytesInScope(program.getStatement()) + maxBeginStatement(program.getStatement());
-  }
-
-  private int totalBytesInFunction(Function function) {
-    return totalBytesInScope(function.getStatement()) + maxBeginStatement(function.getStatement());
-  }
-
-  private int maxBeginStatement(Statement statement) {
-
-    List<Statement> beginStatements = getBeginStatements(statement);
-
-    int size = 0;
-    for (Statement s : beginStatements) {
-      int sSize = totalBytesInScope(s.getStatement1());
-      if (sSize > size) {
-        size = sSize;
-      }
-    }
-
-    return size;
-  }
-
-  private List<Statement> getBeginStatements(Statement statement) {
-
-    List<Statement> beginStatements = new ArrayList<>();
-
-    if (statement.getStatType() == Statement.StatType.BEGIN) {
-      beginStatements.add(statement);
-    }
-
-    if (statement.getStatType() == Statement.StatType.CONCAT) {
-      beginStatements.addAll(getBeginStatements(statement.getStatement1()));
-      beginStatements.addAll(getBeginStatements(statement.getStatement2()));
-    }
-
-    return beginStatements;
   }
 
   @Override
@@ -242,7 +201,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     //TODO: ADD LR
     instructions.add(new Instruction(LABEL, "PUSH {lr}"));
 
-    int totalBytes = totalBytesInProgram(program);
+    int totalBytes = totalBytesInScope(program.getStatement());
+    spNextAvailable = totalBytes;
+    spScopeSize = totalBytes;
     spLocation = totalBytes;
 
     while (totalBytes > 1024) {
@@ -253,7 +214,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       instructions.add(new Instruction(LABEL, "SUB sp, sp, #" + totalBytes));
     }
 
-    totalBytes = spLocation;
+    totalBytes = spNextAvailable;
 
     currentST = new SymbolTable(null);
 
@@ -368,7 +329,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(LABEL, "PUSH {lr}"));
 
     /* Move stack pointer to allocate space on the stack for the function to use. */
-    int totalBytes = totalBytesInFunction(function);
+    int totalBytes = totalBytesInScope(function.getStatement());
+    spNextAvailable = totalBytes;
+    spScopeSize = totalBytes;
     spLocation = totalBytes;
 
     while (totalBytes > 1024) {
@@ -379,7 +342,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       instructions.add(new Instruction(LABEL, String.format("SUB sp, sp, #%d", totalBytes)));
     }
 
-    totalBytes = spLocation;
+    totalBytes = spNextAvailable;
 
     /* Add parameters to symbol table. */
     int stackOffset = totalBytes + 4;
@@ -423,7 +386,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Retrieve the first register which is where the value of the RHS is stored. */
     Register rn = popUnusedRegister();
 
-    int stackOffset = spLocation - sizeOfTypeOnStack(statement.getLhsType());
+    int stackOffset = spNextAvailable - sizeOfTypeOnStack(statement.getLhsType());
+    int relativeOffset = spScopeSize - sizeOfTypeOnStack(statement.getLhsType());
 
     String instruction = "STR";
 
@@ -431,9 +395,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       instruction += "B";
     }
 
-    if (stackOffset > 0) {
+    if (relativeOffset > 0) {
       // STR rn, [sp]
-      instruction += String.format(" %s, [sp, #%d]", rn, stackOffset);
+      instruction += String.format(" %s, [sp, #%d]", rn, relativeOffset);
     } else {
       // STR rn, [sp, #i]
       instruction += String.format(" %s, [sp]", rn);
@@ -445,7 +409,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     currentST.newVariable(statement.getLhsIdent(), statement.getLhsType());
 
     /* Update the spLocation variable to point to the next available space on the stack. */
-    spLocation = stackOffset;
+    spNextAvailable = stackOffset;
+    spScopeSize = relativeOffset;
 
     /* Mark the register used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rn);
@@ -464,7 +429,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     /* Code generation when the LHS is an identity. */
     if (statement.getLHS().getAssignType() == AssignLHS.LHSType.IDENT) {
-      int stackOffset = currentST.getSPMapping(statement.getLHS().getIdent());
+      int stackOffset = spLocation - currentST.getSPMapping(statement.getLHS().getIdent());
 
       Expression expression = new ExpressionBuilder().buildIdentExpr(statement.getLHS().getIdent());
 
@@ -527,7 +492,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     List<Instruction> instructions = new ArrayList<>();
 
-    int stackOffset = currentST.getSPMapping(lhs.getIdent());
+    int stackOffset = spLocation - currentST.getSPMapping(lhs.getIdent());
 
     Register rn = popUnusedRegister();
 
@@ -549,7 +514,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     String instruction;
 
     /* Find where the array address is stored on the stack. */
-    int stackOffset = currentST.getSPMapping(arrayElem.getIdent());
+    int stackOffset = spLocation - currentST.getSPMapping(arrayElem.getIdent());
 
     /* Allocate one register: rn for this function to use. */
     Register rn = popUnusedRegister();
@@ -620,10 +585,27 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Mark the register rn as no longer in use. */
     pushUnusedRegister(rn);
 
-    /* Generate instructions for the 'if' clause of the statement and change scope. */
+    int stackOffset1 = totalBytesInScope(statement.getStatement1());
+
+    /* Generate code for the if body and change scope. */
+    currentST.incrementOffset(stackOffset1);
     currentST = new SymbolTable(currentST);
-    instructions.addAll(visitStatement(statement.getStatement1()));
+    int tmpOffset1 = spScopeSize;
+    spScopeSize = stackOffset1;
+    spNextAvailable += stackOffset1;
+    spLocation += stackOffset1;
+    List<Instruction> ifInstructions = new ArrayList<>(visitStatement(statement.getStatement1()));
     currentST = currentST.getParent();
+    currentST.resetOffset();
+    spLocation -= stackOffset1;
+    spScopeSize = tmpOffset1;
+
+    if (stackOffset1 > 0) {
+      ifInstructions.add(0, new Instruction(LABEL, String.format("SUB sp, sp, #%d", stackOffset1)));
+      ifInstructions.add(new Instruction(LABEL, String.format("ADD sp, sp, #%d", stackOffset1)));
+    }
+
+    instructions.addAll(ifInstructions);
 
     // BL Lx+1
     instructions.add(new Instruction(BL, label2));
@@ -631,10 +613,26 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     //Lx:
     instructions.add(new Instruction(LABEL, label1 + ":"));
 
-    /* Generate instructions for the 'else' clause of the statement and change scope. */
+    int stackOffset2 = totalBytesInScope(statement.getStatement2());
+
+    /* Generate code for the else body and change scope. */
+    currentST.incrementOffset(stackOffset2);
     currentST = new SymbolTable(currentST);
-    instructions.addAll(visitStatement(statement.getStatement2()));
+    int tempOffset2 = spScopeSize;
+    spScopeSize = stackOffset2;
+    spNextAvailable += stackOffset2;
+    List<Instruction> elseInstructions = new ArrayList<>(visitStatement(statement.getStatement2()));
     currentST = currentST.getParent();
+    currentST.resetOffset();
+    spLocation -= stackOffset2;
+    spScopeSize = tempOffset2;
+
+    if (stackOffset2 > 0) {
+      elseInstructions.add(0, new Instruction(LABEL, String.format("SUB sp, sp, #%d", stackOffset2)));
+      elseInstructions.add(new Instruction(LABEL, String.format("ADD sp, sp, #%d", stackOffset2)));
+    }
+
+    instructions.addAll(elseInstructions);
 
     //Lx+1:
     instructions.add(new Instruction(LABEL, label2 + ":"));
@@ -657,10 +655,26 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     // Lx+1:
     instructions.add(new Instruction(LABEL, label2 + ":"));
 
+    int stackOffset = totalBytesInScope(statement.getStatement1());
+
     /* Generate code for the while body and change scope. */
+    currentST.incrementOffset(stackOffset);
     currentST = new SymbolTable(currentST);
-    instructions.addAll(visitStatement(statement.getStatement1()));
+    int tempOffset = spScopeSize;
+    spScopeSize = stackOffset;
+    spNextAvailable += stackOffset;
+    List<Instruction> bodyInstructions = new ArrayList<>(visitStatement(statement.getStatement1()));
     currentST = currentST.getParent();
+    currentST.resetOffset();
+    spLocation -= stackOffset;
+    spScopeSize = tempOffset;
+
+    if (stackOffset > 0) {
+      bodyInstructions.add(0, new Instruction(LABEL, String.format("SUB sp, sp, #%d", stackOffset)));
+      bodyInstructions.add(new Instruction(LABEL, String.format("ADD sp, sp, #%d", stackOffset)));
+    }
+
+    instructions.addAll(bodyInstructions);
 
     // Lx:
     instructions.add(new Instruction(LABEL, label1 + ":"));
@@ -686,10 +700,24 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   @Override
   public List<Instruction> visitBeginStatement(Statement statement) {
 
+    int stackOffset = totalBytesInScope(statement.getStatement1());
+
     /* Generate code for begin body and change scope. */
+    currentST.incrementOffset(stackOffset);
     currentST = new SymbolTable(currentST);
+    int tempOffset = spScopeSize;
+    spScopeSize = stackOffset;
+    spNextAvailable += stackOffset;
     List<Instruction> instructions = new ArrayList<>(visitStatement(statement.getStatement1()));
     currentST = currentST.getParent();
+    currentST.resetOffset();
+    spLocation -= stackOffset;
+    spScopeSize = tempOffset;
+
+    if (stackOffset > 0) {
+      instructions.add(0, new Instruction(LABEL, String.format("SUB sp, sp, #%d", stackOffset)));
+      instructions.add(new Instruction(LABEL, String.format("ADD sp, sp, #%d", stackOffset)));
+    }
 
     return instructions;
   }
@@ -851,7 +879,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     List<Instruction> instructions = new ArrayList<>();
 
     /* Retrieve the position of the variable on the stack from the symbol table. */
-    int stackOffset = currentST.getSPMapping(expression.getIdent());
+    int stackOffset = spLocation - currentST.getSPMapping(expression.getIdent());
 
     /* Allocate a register: rn for this function to use. */
     Register rn = popUnusedRegister();
@@ -1755,7 +1783,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       instructions.add(new Instruction(MOV, r0, new Operand2(rn)));
 
     } else {
-      exitCode = currentST.getSPMapping(statement.getExpression().getIdent());
+      exitCode = spLocation - currentST.getSPMapping(statement.getExpression().getIdent());
 
       // LDR rn, [sp]
       instructions.add(new Instruction(LDR, rn, new Operand2(sp)));

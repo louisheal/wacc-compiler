@@ -24,7 +24,7 @@ public class SymbolTable {
 
   public Integer getSPMapping (String ident) {
     if (!variableSPMapping.containsKey(ident) && parent != null) {
-      return parent.getSPMapping(ident);
+      return parent.getSPMapping(ident) + stackOffset;
     }
     return variableSPMapping.get(ident) + stackOffset;
   }
