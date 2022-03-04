@@ -241,21 +241,28 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     int totalBytes = totalBytesInProgram(program);
     spLocation = totalBytes;
-    if (totalBytes > 0) {
-      // TODO: Ensure total bytes doesn't exceed 2014, otherwise causes invalid constant error
-      instructions.add(new Instruction(LABEL, "SUB sp, sp, #" + totalBytes));
-      //TODO: SUB sp, sp, #totalBytes
+
+    while (totalBytes > 1024) {
+      instructions.add(new Instruction(LABEL, "SUB sp, sp, #1024"));
+      totalBytes -= 1024;
     }
+    if (totalBytes > 0) {
+      instructions.add(new Instruction(LABEL, "SUB sp, sp, #" + totalBytes));
+    }
+
+    totalBytes = spLocation;
 
     currentST = new SymbolTable(null);
 
     /* Generate the assembly instructions for the program body. */
     instructions.addAll(visitStatement(program.getStatement()));
 
+    while (totalBytes > 1024) {
+      instructions.add(new Instruction(LABEL, "ADD sp, sp, #1024"));
+      totalBytes -= 1024;
+    }
     if (totalBytes > 0) {
-      // TODO: Ensure total bytes doesn't exceed 2014, otherwise causes invalid constant error
       instructions.add(new Instruction(LABEL, "ADD sp, sp, #" + totalBytes));
-      //TODO: SUB sp, sp, #totalBytes
     }
 
     instructions.add(new Instruction(LDR, r0, 0));
@@ -360,9 +367,16 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Move stack pointer to allocate space on the stack for the function to use. */
     int totalBytes = totalBytesInFunction(function);
     spLocation = totalBytes;
+
+    while (totalBytes > 1024) {
+      instructions.add(new Instruction(LABEL, "SUB sp, sp, #1024"));
+      totalBytes -= 1024;
+    }
     if (totalBytes > 0) {
       instructions.add(new Instruction(LABEL, String.format("SUB sp, sp, #%d", totalBytes)));
     }
+
+    totalBytes = spLocation;
 
     /* Add parameters to symbol table. */
     int stackOffset = totalBytes + 4;
@@ -375,6 +389,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Evaluate function body. */
     instructions.addAll(visitStatement(function.getStatement()));
 
+    while (totalBytes > 1024) {
+      instructions.add(new Instruction(LABEL, "ADD sp, sp, #1024"));
+      totalBytes -= 1024;
+    }
     if (totalBytes > 0) {
       instructions.add(new Instruction(LABEL, String.format("ADD sp, sp, #%d", totalBytes)));
     }
