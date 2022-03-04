@@ -1513,6 +1513,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     rm = popUnusedRegister();
 
     int sizeOfExp1 = sizeOfTypeOnStack(getExpressionType(rhs.getExpression1()));
+    int sizeOfExp2 = sizeOfTypeOnStack(getExpressionType(rhs.getExpression2()));
 
     // LDR r0, =sizeOfType
     instructions.add(new Instruction(LDR, r0, sizeOfExp1));
@@ -1523,8 +1524,13 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     // STR rm, [r0]
     instructions.add(new Instruction(STR, r0, new Operand2(rm)));
 
-    // STR r0, [rn]
-    instructions.add(new Instruction(STR, rn, new Operand2(r0)));
+    if (sizeOfExp1 == 1) {
+      // STRB r0, [rn]
+      instructions.add(new Instruction(STR, rn, new Operand2(r0), "B"));
+    } else {
+      // STR r0, [rn]
+      instructions.add(new Instruction(STR, rn, new Operand2(r0)));
+    }
 
     /* Mark the register rm as no longer in use. */
     pushUnusedRegister(rm);
@@ -1541,8 +1547,13 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     // BL malloc
     instructions.add(new Instruction(BL, "malloc"));
 
-    // STR rm, [r0]
-    instructions.add(new Instruction(STR, r0, new Operand2(rm)));
+    if (sizeOfExp2 == 1) {
+      // STRB rm, [r0]
+      instructions.add(new Instruction(STR, r0, new Operand2(rm), "B"));
+    } else {
+      // STR rm, [r0]
+      instructions.add(new Instruction(STR, r0, new Operand2(rm)));
+    }
 
     // STR r0, [rn, #sizeOfExp1]
     instructions.add(new Instruction(LABEL, String.format("STR r0, [%s, #%d]", rn, sizeOfExp1)));
