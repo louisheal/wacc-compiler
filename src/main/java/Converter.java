@@ -960,6 +960,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     ArrayList<Instruction> instructions = new ArrayList<>();
     Register rn = popUnusedRegister();
     instructions.add(new Instruction(LDR, rn, 0));
+    pushUnusedRegister(rn);
     return instructions;
   }
 
