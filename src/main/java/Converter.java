@@ -942,7 +942,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     Register rn = popUnusedRegister();
 
     /* Decides if the compiler should switch to accumulator mode*/
-    if (rn == unusedRegisters.get(10)){
+    if (rn == unusedRegisters.get(6)){
 
       /* Push result of expression1 in R10 into stack */
       instructions.add(new Instruction(PUSH, rn));
