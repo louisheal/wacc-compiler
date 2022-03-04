@@ -11,8 +11,6 @@ import java.io.StringReader;
 import java.util.Arrays;
 
 public class EmulatorValidTests {
-  //TODO: Add assert fail in correct spaces
-
   MySecurityManager securityManager = new MySecurityManager();
 
   int failedTests = 0;
@@ -24,7 +22,7 @@ public class EmulatorValidTests {
   public void runTests(File[] files) throws IOException {
     for (File file : files) {
       totalTests++;
-      // Extracts the # Output part of the .wacc example file
+      // Runs the reference compiler on the .wacc file and extracts the output
       String expectedOutput = extractExpectedOutputFromAssembly(file);
       String actualOutput;
       System.out.print("RUNNING " + file.getName() + ": ");
@@ -73,30 +71,6 @@ public class EmulatorValidTests {
     }
     scanner.close();
     return result.toString();
-  }
-
-  // Extracts the output part from the .wacc example files
-  public static String scan(File file) throws FileNotFoundException {
-    final Scanner scanner = new Scanner(file);
-    StringBuilder output = new StringBuilder();
-    while (scanner.hasNextLine()) {
-      final String lineFromFile = scanner.nextLine();
-      if (lineFromFile.contains("Output")) {
-        String nextLine = scanner.nextLine();
-        // Keeps appending the outputs until there is a gap which is where output stops
-        while (!nextLine.equals("")) {
-          output.append(nextLine.substring(1).strip()).append("\n");
-          nextLine = scanner.nextLine();
-        }
-      }
-    }
-    scanner.close();
-
-    if (output.toString().equals("#empty#\n")) {
-      return "";
-    }
-
-    return output.toString();
   }
 
   public static String runEmulatorOnFile(File file) throws IOException {
