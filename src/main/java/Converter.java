@@ -944,6 +944,36 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Declare that rn is in use. */
     Register rn = popUnusedRegister();
 
+    /* Decides if the compiler should switch to accumulator mode*/
+    if (rn == unusedRegisters.get(6)){
+
+      /* Push result of expression1 in R10 into stack */
+      instructions.add(new Instruction(PUSH, rn));
+
+      /* Declare rn is free to use */
+      pushUnusedRegister(rn);
+
+      /* Generate code for expression2, this is put into register 10 */
+      visitExpression(expression.getExpression2());
+
+      /* Declare that rn is in use. */
+      rn = popUnusedRegister();
+
+      /* Register rs is the final unused register R11 */
+      Register rs = popUnusedRegister();
+
+      /* The result of expression 1 on the stack is popped into register rs */
+      instructions.add(new Instruction(POP, rs));
+
+      /* Declare that rs is no longer in use. */
+      pushUnusedRegister(rs);
+
+      /* Declare that rn is no longer in use. */
+      pushUnusedRegister(rn);
+
+      return instructions;
+    }
+
     /* Generate assembly instructions for the second expression. */
     instructions.addAll(visitExpression(expression.getExpression2()));
 
@@ -989,6 +1019,16 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Allocate two registers: rn and rm (rn+1) for this function to use. */
     Register rn = popUnusedRegister();
     Register rm = popUnusedRegister();
+
+    // TODO: Is this a strong enough check?
+    /* Swap registers for accumulator register allocation. */
+    if (Objects.equals(rn.toString(), "r10")) {
+      // MOV R0, Rn+1
+      instructions.add(new Instruction(MOV, r0, new Operand2(rm)));
+
+      // MOV R1, Rn
+      instructions.add(new Instruction(MOV, r1, new Operand2(rn)));
+    }
 
     // SUBS Rn, Rn, Rn+1
     instructions.add(new Instruction(SUB, rn, rn, new Operand2(rm), Flags.S));
@@ -1044,6 +1084,16 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     Register rn = popUnusedRegister();
     Register rm = popUnusedRegister();
 
+    // TODO: Is this a strong enough check?
+    /* Swap registers for accumulator register allocation. */
+    if (Objects.equals(rn.toString(), "r10")) {
+      // MOV R0, Rn+1
+      instructions.add(new Instruction(MOV, r0, new Operand2(rm)));
+
+      // MOV R1, Rn
+      instructions.add(new Instruction(MOV, r1, new Operand2(rn)));
+    }
+
     // MOV R0, Rn
     instructions.add(new Instruction(MOV, r0, new Operand2(rn)));
 
@@ -1078,6 +1128,16 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Allocate two registers: rn and rm (rn+1) for this function to use. */
     Register rn = popUnusedRegister();
     Register rm = popUnusedRegister();
+
+    // TODO: Is this a strong enough check?
+    /* Swap registers for accumulator register allocation. */
+    if (Objects.equals(rn.toString(), "r10")) {
+      // MOV R0, Rn+1
+      instructions.add(new Instruction(MOV, r0, new Operand2(rm)));
+
+      // MOV R1, Rn
+      instructions.add(new Instruction(MOV, r1, new Operand2(rn)));
+    }
 
     // MOV R0, Rn
     instructions.add(new Instruction(MOV, r0, new Operand2(rn)));
