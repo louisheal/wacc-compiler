@@ -1551,7 +1551,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     List<Instruction> instructions = new ArrayList<>();
     int totalSize = 0;
 
-    for (Expression expression : rhs.getArgList()) {
+    for (int i = rhs.getArgList().size() - 1; i >= 0; i--) {
+
+      Expression expression = rhs.getArgList().get(i);
 
       /* Evaluate argument and store in first unused register. */
       instructions.addAll(visitExpression(expression));
@@ -1567,10 +1569,13 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       }
 
       totalSize += expSize;
+      currentST.incrementOffset(expSize);
 
       /* Mark register rn as no longer in use. */
       pushUnusedRegister(rn);
     }
+
+    currentST.resetOffset();
 
     // BL f_functionIdentity
     instructions.add(new Instruction(BL, "f_" + rhs.getFunctionIdent()));
