@@ -406,8 +406,14 @@ public class PredefinedFunctions {
 
     /* message = .word 45
                  .ascii	"DivideByZeroError: divide or modulo by zero\n\0" */
+
+    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
+    messages.add(new Instruction(WORD, 45));
+    messages.add(new Instruction(ASCII, "\"DivideByZeroError: divide or modulo or zero\\n\\0\""));
+
     // LDREQ r0, =msg_0
-    instructions.add(new Instruction(LDR, r0, "msg_0", Conditionals.EQ));
+    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter, Conditionals.EQ));
+    msgCounter++;
 
     // BLEQ p_throw_runtime_error
     instructions.add(new Instruction(BL, "p_throw_runtime_error", Conditionals.EQ));
