@@ -941,6 +941,36 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Declare that rn is in use. */
     Register rn = popUnusedRegister();
 
+    /* Decides if the compiler should switch to accumulator mode*/
+    if (rn == unusedRegisters.get(10)){
+
+      /* Push result of expression1 in R10 into stack */
+      instructions.add(new Instruction(PUSH, rn));
+
+      /* Declare rn is free to use */
+      pushUnusedRegister(rn);
+
+      /* Generate code for expression2, this is put into register 10 */
+      visitExpression(expression.getExpression2());
+
+      /* Declare that rn is in use. */
+      rn = popUnusedRegister();
+
+      /* Register rs is the final unused register R11 */
+      Register rs = popUnusedRegister();
+
+      /* The result of expression 1 on the stack is popped into register rs */
+      instructions.add(new Instruction(POP, rs));
+
+      /* Declare that rs is no longer in use. */
+      pushUnusedRegister(rs);
+
+      /* Declare that rn is no longer in use. */
+      pushUnusedRegister(rn);
+
+      return instructions;
+    }
+
     /* Generate assembly instructions for the second expression. */
     instructions.addAll(visitExpression(expression.getExpression2()));
 
