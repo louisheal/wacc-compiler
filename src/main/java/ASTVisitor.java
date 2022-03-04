@@ -243,7 +243,14 @@ public class ASTVisitor<T> {
         return null;
     }
 
+    public T visitNull(Expression expression) {
+      return null;
+    }
+
     public T visitExpression(Expression expression) {
+      if(expression == null){
+        return visitNull(null);
+      }
         switch (expression.getExprType()) {
             case INTLITER:
                 return visitIntLiterExp(expression);

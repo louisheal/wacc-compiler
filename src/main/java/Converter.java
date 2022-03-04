@@ -146,6 +146,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   }
 
   private int sizeOfTypeOnStack(Type type) {
+    if (type == null){
+      return 4;
+    }
     switch (type.getType()) {
       case INT:
       case PAIR:
@@ -952,6 +955,14 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return translateUnaryExpression(expression);
   }
 
+  @Override
+  public List<Instruction> visitNull(Expression expression) {
+    ArrayList<Instruction> instructions = new ArrayList<>();
+    Register rn = popUnusedRegister();
+    instructions.add(new Instruction(LDR, rn, 0));
+    return instructions;
+  }
+
   private List<Instruction> translateBinaryExpression(Expression expression) {
 
     /* Generate assembly instructions for the first expression. */
@@ -1503,7 +1514,11 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(MOV, rn, new Operand2(r0)));
 
     /* Evaluate the first expression in the pair. */
-    instructions.addAll(visitExpression(rhs.getExpression1()));
+    if (rhs.getExpression2() == null){
+      instructions.add(new Instruction(LDR, rn, 0));
+    } else {
+      instructions.addAll(visitExpression(rhs.getExpression1()));
+    }
 
     /* Retrieve the register containing the value of the first expression. */
     rm = popUnusedRegister();
@@ -1525,8 +1540,13 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Mark the register rm as no longer in use. */
     pushUnusedRegister(rm);
 
-    /* Evaluate the second expression in the pair. */
-    instructions.addAll(visitExpression(rhs.getExpression2()));
+    if (rhs.getExpression2() == null){
+      instructions.add(new Instruction(LDR, rm, 0));
+    }
+    else{
+      /* Evaluate the second expression in the pair. */
+      instructions.addAll(visitExpression(rhs.getExpression2()));
+    }
 
     /* Retrieve the register containing the value of the first expression. */
     rm = popUnusedRegister();
