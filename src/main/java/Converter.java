@@ -147,9 +147,11 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   }
 
   private int sizeOfTypeOnStack(Type type) {
-    if (type == null){
+
+    if (type == null) {
       return 4;
     }
+
     switch (type.getType()) {
       case INT:
       case PAIR:
@@ -160,10 +162,15 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       case BOOL:
         return 1;
     }
+
     return 0;
   }
 
   private int totalBytesInScope(Statement statement) {
+    return totalBytesInStatement(statement) + maxBeginStatement(statement);
+  }
+
+  private int totalBytesInStatement(Statement statement) {
 
     switch(statement.getStatType()) {
 
@@ -171,26 +178,18 @@ public class Converter extends ASTVisitor<List<Instruction>> {
         return sizeOfTypeOnStack(statement.getLhsType());
 
       case CONCAT:
-        return totalBytesInScope(statement.getStatement1()) + totalBytesInScope(statement.getStatement2());
+        return totalBytesInStatement(statement.getStatement1()) + totalBytesInStatement(statement.getStatement2());
 
       case WHILE:
-        return totalBytesInScope(statement.getStatement1()) + maxBeginStatement(statement);
+        return totalBytesInStatement(statement.getStatement1()) + maxBeginStatement(statement);
 
       case IF:
-        int stat1Size = totalBytesInScope(statement.getStatement1());
-        int stat2Size = totalBytesInScope(statement.getStatement2());
+        int stat1Size = totalBytesInStatement(statement.getStatement1());
+        int stat2Size = totalBytesInStatement(statement.getStatement2());
         return Math.max(stat1Size, stat2Size);
     }
 
     return 0;
-  }
-
-  private int totalBytesInProgram(Program program) {
-    return totalBytesInScope(program.getStatement()) + maxBeginStatement(program.getStatement());
-  }
-
-  private int totalBytesInFunction(Function function) {
-    return totalBytesInScope(function.getStatement()) + maxBeginStatement(function.getStatement());
   }
 
   private int maxBeginStatement(Statement statement) {
@@ -226,6 +225,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitProgram(Program program) {
+
     List<Instruction> instructions = new ArrayList<>();
 
     instructions.add(new Instruction(TEXT, ""));
@@ -243,7 +243,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     //TODO: ADD LR
     instructions.add(new Instruction(LABEL, "PUSH {lr}"));
 
-    int totalBytes = totalBytesInProgram(program);
+    int totalBytes = totalBytesInScope(program.getStatement());
     spLocation = totalBytes;
 
     while (totalBytes > 1024) {
@@ -362,7 +362,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     List<Instruction> instructions = new ArrayList<>();
 
     /* Everytime entering a new function, functionByte is updated */
-    functionByte = totalBytesInFunction(function);
+    functionByte = totalBytesInScope(function.getStatement());
 
     /* Initialise symbol table. */
     currentST = new SymbolTable(null);
@@ -372,7 +372,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Instruction(LABEL, "PUSH {lr}"));
 
     /* Move stack pointer to allocate space on the stack for the function to use. */
-    int totalBytes = totalBytesInFunction(function);
+    int totalBytes = totalBytesInScope(function.getStatement());
     spLocation = totalBytes;
 
     while (totalBytes > 1024) {
@@ -615,7 +615,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     /* Generate instructions for the 'if' clause of the statement and change scope. */
     currentST = new SymbolTable(currentST);
+    int temp = spLocation;
     instructions.addAll(visitStatement(statement.getStatement1()));
+    spLocation = temp;
     currentST = currentST.getParent();
 
     // BL Lx+1
@@ -626,7 +628,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     /* Generate instructions for the 'else' clause of the statement and change scope. */
     currentST = new SymbolTable(currentST);
+    temp = spLocation;
     instructions.addAll(visitStatement(statement.getStatement2()));
+    spLocation = temp;
     currentST = currentST.getParent();
 
     //Lx+1:
@@ -652,7 +656,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     /* Generate code for the while body and change scope. */
     currentST = new SymbolTable(currentST);
+    int temp = spLocation;
     instructions.addAll(visitStatement(statement.getStatement1()));
+    spLocation = temp;
     currentST = currentST.getParent();
 
     // Lx:
@@ -681,7 +687,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     /* Generate code for begin body and change scope. */
     currentST = new SymbolTable(currentST);
+    int temp = spLocation;
     List<Instruction> instructions = new ArrayList<>(visitStatement(statement.getStatement1()));
+    spLocation = temp;
     currentST = currentST.getParent();
 
     return instructions;
@@ -877,14 +885,25 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     AssignLHS assignLHS = new AssignLHSBuilder().buildArrayLHS(expression.getArrayElem());
 
+    Type type = currentST.getType(expression.getArrayElem().getIdent());
+    System.out.println(type);
+
     /* Calculate the address of the Array Elem and store it in register rn. */
     List<Instruction> instructions = new ArrayList<>(visitLHS(assignLHS));
 
     /* Retrieve the register rn, which contains the address of the array elem. */
     Register rn = popUnusedRegister();
 
+    String instruction = "LDR";
+
+    if (sizeOfTypeOnStack(type.getArrayType()) == 1) {
+      instruction += "SB";
+    }
+
+    instruction += String.format(" %s, [%s]", rn, rn);
+
     // LDR rn, [rn]
-    instructions.add(new Instruction(LDR, rn, new Operand2(rn)));
+    instructions.add(new Instruction(LABEL, instruction));
 
     /* Mark the register used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rn);
