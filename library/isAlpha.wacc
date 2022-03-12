@@ -1,0 +1,14 @@
+#library function that takes a char and returns true if it is alphabetic, false otherwise
+
+begin
+  bool isAlpha(char c) is
+    int x = ord(c);
+    if ((x >= 65 && x <= 90) || (x >= 97 && x <= 122))
+    then
+      return true
+    else
+      return false
+    fi 
+  end
+  skip
+end
