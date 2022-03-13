@@ -1,0 +1,21 @@
+#library function that takes a char c and returns the upper case version of it, or just c if its not alphabetic
+
+begin
+  char toLower(char c) is
+    int x = ord(c);
+    if (x >= 91 && x <= 96 || x >= 123 || x <= 64)
+    then
+      return c
+    else
+      if (x >= 97)
+      then
+        x = x - 32
+      else
+        skip
+      fi
+    fi;
+    char z = chr(x);
+    return z 
+  end
+  skip
+end
