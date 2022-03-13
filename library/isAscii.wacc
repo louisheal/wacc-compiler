@@ -1,7 +1,8 @@
-#library function that takes an int and returns true if it is in range of ascii, false otherwise
+#library function that takes an char and returns true if it is an ascii charecter, false otherwise
 
 begin
-  bool isAscii(int x) is
+  bool isAscii(char c) is
+    int x = ord(c);
     if ((x >= 0 && x <= 127))
     then
       return true
