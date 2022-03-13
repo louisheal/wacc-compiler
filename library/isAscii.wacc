@@ -1,0 +1,13 @@
+#library function that takes an int and returns true if it is in range of ascii, false otherwise
+
+begin
+  bool isAscii(int x) is
+    if ((x >= 0 && x <= 127))
+    then
+      return true
+    else
+      return false
+    fi 
+  end
+  skip
+end
