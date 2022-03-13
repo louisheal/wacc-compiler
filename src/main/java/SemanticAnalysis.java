@@ -230,6 +230,30 @@ public class SemanticAnalysis {
            Objects.equals(t2, new Type(EType.BOOL));
   }
 
+  private String getParamTypes(List<Param> params) {
+    StringBuilder result = new StringBuilder();
+    for (int i = 0; i < params.size(); i++) {
+      String functionParam = params.get(i).toString();
+      result.append(functionParam, 0, functionParam.indexOf(','));
+      if (i != params.size() - 1) {
+        result.append("_");
+      }
+    }
+    return result.toString();
+  }
+
+  private String getParamTypesFromFunction(Function function) {
+    StringBuilder result = new StringBuilder();
+    for (int i = 0; i < function.getParams().size(); i++) {
+      String functionParam = function.getParams().get(i).toString();
+      result.append(functionParam, 0, functionParam.indexOf(','));
+      if (i != function.getParams().size() - 1) {
+        result.append("_");
+      }
+    }
+    return result.toString();
+  }
+
   public void traverse(Program program) {
 
     for (Function function : program.getFunctions()) {
