@@ -1,0 +1,24 @@
+#library function that calculates a int x raised to an integer power y
+begin
+  int pow(int x, int y) is
+    if (y == 0)
+    then
+      return 1
+    else
+      int i = 1;
+      int z = x;
+      while (i != y)
+      do
+        i = i + 1;
+        z = z * x
+      done;
+      return z
+    fi
+  end
+  int s = call pow(3, 3);
+  int t = call pow(2, 5);
+  int u = call pow(7,0);
+  println s;
+  println t;
+  println u
+end
