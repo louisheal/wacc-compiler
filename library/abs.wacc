@@ -1,0 +1,14 @@
+#library function that takes an int and returns the absolute value of that int
+
+begin
+  int abs(int x) is
+    if (x >= 0)
+    then
+      return x
+    else
+    int y = x - (x*2);
+      return y
+    fi 
+  end
+  skip
+end
