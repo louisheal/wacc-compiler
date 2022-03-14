@@ -569,6 +569,7 @@ public class SemanticAnalysis {
           errors++;
         }
       }
+      // Changes the name of the ident to include the parammeters for the converter
       rhs.setFunctionIdent(getIdentWithParams(rhs));
     }
   }

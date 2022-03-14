@@ -886,7 +886,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     AssignLHS assignLHS = new AssignLHSBuilder().buildArrayLHS(expression.getArrayElem());
 
     Type type = currentST.getType(expression.getArrayElem().getIdent());
-    System.out.println(type);
 
     /* Calculate the address of the Array Elem and store it in register rn. */
     List<Instruction> instructions = new ArrayList<>(visitLHS(assignLHS));
