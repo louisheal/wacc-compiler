@@ -181,7 +181,6 @@ public class SemanticAnalysis {
         for (Expression expression : rhs.getArgList()) {
           ident.append("_").append(getExpressionType(expression));
         }
-        rhs.setFunctionIdent(ident.toString());
         return functionReturnTypes.get(ident.toString());
     }
     return null;
@@ -529,7 +528,13 @@ public class SemanticAnalysis {
 
     if (rhs.getAssignType() == RHSType.CALL) {
 
-//      System.out.println("here?");
+      StringBuilder ident = new StringBuilder();
+      ident.append(rhs.getFunctionIdent());
+
+      for (Expression expression : rhs.getArgList()) {
+        ident.append("_").append(getExpressionType(expression));
+      }
+      rhs.setFunctionIdent(ident.toString());
 
       if (rhs.getArgList().size() != functionParams.get(rhs.getFunctionIdent()).size()) {
         errorMsgs.add("Wrong number of arguments in call to function: " + rhs);
