@@ -50,7 +50,6 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     Type type = (Type) this.visit(ctx.type());
     String ident = ctx.IDENT().getText();
     AssignRHS rhs = (AssignRHS) this.visit(ctx.assignRHS());
-
     return new StatementBuilder().buildDeclaration(type, ident, rhs);
   }
 
@@ -58,7 +57,6 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
   public Statement visitReassignment(BasicParser.ReassignmentContext ctx) {
     AssignLHS lhs = (AssignLHS) this.visit(ctx.assignLHS());
     AssignRHS rhs = (AssignRHS) this.visit(ctx.assignRHS());
-
     return new StatementBuilder().buildReassignment(lhs, rhs);
   }
 

@@ -87,7 +87,30 @@ public class SemanticAnalysis {
     return errorMsgs;
   }
 
-  private Type getExpressionType(Expression expr) {
+  private String typeToString(Type type) {
+    if (type == null) {
+      return "pair";
+    } else if (type.getType() == EType.PAIR) {
+      return "pair";
+    } else if (type.getType() == EType.ARRAY) {
+      return String.format("array_%s", typeToString(type.getArrayType()));
+    } else {
+      return type.getType().toString().toLowerCase();
+    }
+  }
+
+  public String getIdentWithParams(AssignRHS rhs) {
+    StringBuilder ident = new StringBuilder();
+
+    for (Expression expression : rhs.getArgList()) {
+      ident.append(typeToString(getExpressionType(expression))).append("_");
+    }
+    ident.append("f_").append(rhs.getFunctionIdent());
+
+    return ident.toString();
+  }
+
+  public Type getExpressionType(Expression expr) {
 
     if (expr == null) {
       return null;
@@ -175,7 +198,7 @@ public class SemanticAnalysis {
         }
 
       case CALL:
-        return functionReturnTypes.get(rhs.getFunctionIdent());
+        return functionReturnTypes.get(getIdentWithParams(rhs));
     }
     return null;
   }
@@ -233,6 +256,15 @@ public class SemanticAnalysis {
   public void traverse(Program program) {
 
     for (Function function : program.getFunctions()) {
+
+      StringBuilder ident = new StringBuilder();
+      for (Param param : function.getParams()) {
+        ident.append(typeToString(param.getType())).append("_");
+      }
+      ident.append("f_").append(function.getIdent());
+
+      function.setIdent(ident.toString());
+
       if (functionParams.containsKey(function.getIdent())) {
         errorMsgs.add("Second Declaration of function " + function.getIdent());
         errors++;
@@ -352,6 +384,7 @@ public class SemanticAnalysis {
     if (lhs == null) {
       return true;
     }
+
 
     boolean sameType = lhs.equals(getRHSType(rhs));
 
@@ -501,6 +534,18 @@ public class SemanticAnalysis {
 
   }
 
+  private String getParamTypes(List<Param> params) {
+    StringBuilder result = new StringBuilder();
+    for (int i = 0; i < params.size(); i++) {
+      String functionParam = params.get(i).toString();
+      result.append(functionParam, 0, functionParam.indexOf(','));
+      if (i != params.size() - 1) {
+        result.append("_");
+      }
+    }
+    return result.toString();
+  }
+
   private void traverse(AssignRHS rhs) {
 
     if (rhs.getAssignType() == RHSType.EXPR) {
@@ -508,22 +553,24 @@ public class SemanticAnalysis {
     }
 
     if (rhs.getAssignType() == RHSType.CALL) {
-      if (rhs.getArgList().size() != functionParams.get(rhs.getFunctionIdent()).size()) {
+      if (rhs.getArgList().size() != functionParams.get(getIdentWithParams(rhs)).size()) {
         errorMsgs.add("Wrong number of arguments in call to function: " + rhs);
         errors++;
         return;
       }
       for (int i = 0; i < rhs.getArgList().size(); i++) {
         if (!Objects.equals(getExpressionType(rhs.getArgList().get(i)),
-                functionParams.get(rhs.getFunctionIdent()).get(i).getType()) &&
+                functionParams.get(getIdentWithParams(rhs)).get(i).getType()) &&
                 rhs.getArgList().get(i) != null) {
           errorMsgs.add("Type mismatch in call to function!" +
-                  "\n - Expected: " + functionParams.get(rhs.getFunctionIdent()).get(i).getType() +
+                  "\n - Expected: " + functionParams.get(getIdentWithParams(rhs)).get(i).getType() +
                   "\n - Actual: " + rhs.getArgList().get(i) + ":" + getExpressionType(rhs.getArgList().get(i)) +
                   "\n - In expression: " + rhs);
           errors++;
         }
       }
+      // Changes the name of the ident to include the parammeters for the converter
+      rhs.setFunctionIdent(getIdentWithParams(rhs));
     }
   }
 

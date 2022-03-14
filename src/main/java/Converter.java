@@ -368,7 +368,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     currentST = new SymbolTable(null);
 
     /* Function wrapper instructions. */
-    instructions.add(new Instruction(LABEL, "f_" + function.getIdent() + ":"));
+    instructions.add(new Instruction(LABEL, function.getIdent() + ":"));
     instructions.add(new Instruction(LABEL, "PUSH {lr}"));
 
     /* Move stack pointer to allocate space on the stack for the function to use. */
@@ -886,7 +886,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     AssignLHS assignLHS = new AssignLHSBuilder().buildArrayLHS(expression.getArrayElem());
 
     Type type = currentST.getType(expression.getArrayElem().getIdent());
-    System.out.println(type);
 
     /* Calculate the address of the Array Elem and store it in register rn. */
     List<Instruction> instructions = new ArrayList<>(visitLHS(assignLHS));
@@ -1669,7 +1668,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     currentST.resetOffset();
 
     // BL f_functionIdentity
-    instructions.add(new Instruction(BL, "f_" + rhs.getFunctionIdent()));
+    instructions.add(new Instruction(BL, rhs.getFunctionIdent()));
 
     // ADD sp, sp, #totalSize
     instructions.add(new Instruction(LABEL, "ADD sp, sp, #" + totalSize));
