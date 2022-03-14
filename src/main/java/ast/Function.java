@@ -11,8 +11,8 @@ public class Function {
 
   public Function(Type returnType, String ident, List<Param> params, Statement statement) {
     this.returnType = returnType;
-    this.ident = ident;
     this.params = params;
+    this.ident = ident + "_" + getParamTypes();
     this.statement = statement;
   }
 
@@ -22,6 +22,14 @@ public class Function {
 
   public String getIdent() {
     return ident;
+  }
+
+  public String getParamTypes() {
+    StringBuilder indentWithTypes = new StringBuilder();
+    for (Param param : params) {
+      indentWithTypes.append(param.getType()).append("_");
+    }
+    return indentWithTypes.substring(0, indentWithTypes.toString().length() - 1);
   }
 
   public List<Param> getParams() {

@@ -87,7 +87,7 @@ public class SemanticAnalysis {
     return errorMsgs;
   }
 
-  private Type getExpressionType(Expression expr) {
+  public Type getExpressionType(Expression expr) {
 
     if (expr == null) {
       return null;
@@ -258,13 +258,10 @@ public class SemanticAnalysis {
 
     for (Function function : program.getFunctions()) {
       if (functionParams.containsKey(function.getIdent())) {
-        if (getParamTypesFromFunction(function).equals(
-            getParamTypes(functionParams.get(function.getIdent())))) {
-          errorMsgs.add("Second Declaration of function " + function.getIdent());
-          errors++;
-          program.getFunctions().remove(function);
-          break;
-        }
+        errorMsgs.add("Second Declaration of function " + function.getIdent());
+        errors++;
+        program.getFunctions().remove(function);
+        break;
       }
       functionParams.put(function.getIdent(), function.getParams());
       functionReturnTypes.put(function.getIdent(), function.getReturnType());

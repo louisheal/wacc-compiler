@@ -299,13 +299,17 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
   public AssignRHS visitCallRHS(BasicParser.CallRHSContext ctx) {
 
     List<Expression> expressions = new ArrayList<>();
-    String functionIdent = ctx.IDENT().getText();
+    StringBuilder functionIdent = new StringBuilder();
+    functionIdent.append(ctx.IDENT().getText()).append("_");
 
     for (int i = 0; i < ctx.argList().expr().size(); i++) {
       expressions.add((Expression) this.visit(ctx.argList().expr(i)));
+      SemanticAnalysis semanticAnalysis = new SemanticAnalysis();
+      //Appends types onto the function name to match with Function class
+      functionIdent.append(semanticAnalysis.getExpressionType((Expression) this.visit(ctx.argList().expr(i)))).append("_");
     }
 
-    return new AssignRHSBuilder().buildCallRHS(functionIdent, expressions);
+    return new AssignRHSBuilder().buildCallRHS(functionIdent.substring(0, functionIdent.lastIndexOf("_")), expressions);
   }
 
   //EXPRESSIONS
