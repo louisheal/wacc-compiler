@@ -87,12 +87,24 @@ public class SemanticAnalysis {
     return errorMsgs;
   }
 
+  private String typeToString(Type type) {
+    if (type == null) {
+      return "pair";
+    } else if (type.getType() == EType.PAIR) {
+      return "pair";
+    } else if (type.getType() == EType.ARRAY) {
+      return String.format("array_%s", typeToString(type.getArrayType()));
+    } else {
+      return type.getType().toString().toLowerCase();
+    }
+  }
+
   public String getIdentWithParams(AssignRHS rhs) {
     StringBuilder ident = new StringBuilder();
     ident.append(rhs.getFunctionIdent());
 
     for (Expression expression : rhs.getArgList()) {
-      ident.append("_").append(getExpressionType(expression));
+      ident.append("_").append(typeToString(getExpressionType(expression)));
     }
 
     return ident.toString();
@@ -244,6 +256,16 @@ public class SemanticAnalysis {
   public void traverse(Program program) {
 
     for (Function function : program.getFunctions()) {
+
+      StringBuilder ident = new StringBuilder().append(function.getIdent());
+      for (Param param : function.getParams()) {
+        System.out.println(typeToString(param.getType()));
+        ident.append("_").append(typeToString(param.getType()));
+      }
+
+      function.setIdent(ident.toString());
+      System.out.println(ident);
+
       if (functionParams.containsKey(function.getIdent())) {
         errorMsgs.add("Second Declaration of function " + function.getIdent());
         errors++;
@@ -533,19 +555,19 @@ public class SemanticAnalysis {
 
     if (rhs.getAssignType() == RHSType.CALL) {
 
-      rhs.setFunctionIdent(getIdentWithParams(rhs));
+      System.out.println("CALL: " + getIdentWithParams(rhs));
 
-      if (rhs.getArgList().size() != functionParams.get(rhs.getFunctionIdent()).size()) {
+      if (rhs.getArgList().size() != functionParams.get(getIdentWithParams(rhs)).size()) {
         errorMsgs.add("Wrong number of arguments in call to function: " + rhs);
         errors++;
         return;
       }
       for (int i = 0; i < rhs.getArgList().size(); i++) {
         if (!Objects.equals(getExpressionType(rhs.getArgList().get(i)),
-                functionParams.get(rhs.getFunctionIdent()).get(i).getType()) &&
+                functionParams.get(getIdentWithParams(rhs)).get(i).getType()) &&
                 rhs.getArgList().get(i) != null) {
           errorMsgs.add("Type mismatch in call to function!" +
-                  "\n - Expected: " + functionParams.get(rhs.getFunctionIdent()).get(i).getType() +
+                  "\n - Expected: " + functionParams.get(getIdentWithParams(rhs)).get(i).getType() +
                   "\n - Actual: " + rhs.getArgList().get(i) + ":" + getExpressionType(rhs.getArgList().get(i)) +
                   "\n - In expression: " + rhs);
           errors++;
