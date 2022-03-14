@@ -87,6 +87,17 @@ public class SemanticAnalysis {
     return errorMsgs;
   }
 
+  public String getIdentWithParams(AssignRHS rhs) {
+    StringBuilder ident = new StringBuilder();
+    ident.append(rhs.getFunctionIdent());
+
+    for (Expression expression : rhs.getArgList()) {
+      ident.append("_").append(getExpressionType(expression));
+    }
+
+    return ident.toString();
+  }
+
   public Type getExpressionType(Expression expr) {
 
     if (expr == null) {
@@ -175,13 +186,7 @@ public class SemanticAnalysis {
         }
 
       case CALL:
-        StringBuilder ident = new StringBuilder();
-        ident.append(rhs.getFunctionIdent());
-
-        for (Expression expression : rhs.getArgList()) {
-          ident.append("_").append(getExpressionType(expression));
-        }
-        return functionReturnTypes.get(ident.toString());
+        return functionReturnTypes.get(getIdentWithParams(rhs));
     }
     return null;
   }
@@ -528,13 +533,7 @@ public class SemanticAnalysis {
 
     if (rhs.getAssignType() == RHSType.CALL) {
 
-      StringBuilder ident = new StringBuilder();
-      ident.append(rhs.getFunctionIdent());
-
-      for (Expression expression : rhs.getArgList()) {
-        ident.append("_").append(getExpressionType(expression));
-      }
-      rhs.setFunctionIdent(ident.toString());
+      rhs.setFunctionIdent(getIdentWithParams(rhs));
 
       if (rhs.getArgList().size() != functionParams.get(rhs.getFunctionIdent()).size()) {
         errorMsgs.add("Wrong number of arguments in call to function: " + rhs);
