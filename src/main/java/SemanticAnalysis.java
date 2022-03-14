@@ -175,7 +175,14 @@ public class SemanticAnalysis {
         }
 
       case CALL:
-        return functionReturnTypes.get(rhs.getFunctionIdent());
+        StringBuilder ident = new StringBuilder();
+        ident.append(rhs.getFunctionIdent());
+
+        for (Expression expression : rhs.getArgList()) {
+          ident.append("_").append(getExpressionType(expression));
+        }
+        rhs.setFunctionIdent(ident.toString());
+        return functionReturnTypes.get(ident.toString());
     }
     return null;
   }
@@ -228,30 +235,6 @@ public class SemanticAnalysis {
   private boolean bothBooleans(Type t1, Type t2) {
     return Objects.equals(t1, new Type(EType.BOOL)) &&
            Objects.equals(t2, new Type(EType.BOOL));
-  }
-
-  private String getParamTypes(List<Param> params) {
-    StringBuilder result = new StringBuilder();
-    for (int i = 0; i < params.size(); i++) {
-      String functionParam = params.get(i).toString();
-      result.append(functionParam, 0, functionParam.indexOf(','));
-      if (i != params.size() - 1) {
-        result.append("_");
-      }
-    }
-    return result.toString();
-  }
-
-  private String getParamTypesFromFunction(Function function) {
-    StringBuilder result = new StringBuilder();
-    for (int i = 0; i < function.getParams().size(); i++) {
-      String functionParam = function.getParams().get(i).toString();
-      result.append(functionParam, 0, functionParam.indexOf(','));
-      if (i != function.getParams().size() - 1) {
-        result.append("_");
-      }
-    }
-    return result.toString();
   }
 
   public void traverse(Program program) {
@@ -376,6 +359,7 @@ public class SemanticAnalysis {
     if (lhs == null) {
       return true;
     }
+
 
     boolean sameType = lhs.equals(getRHSType(rhs));
 
@@ -525,6 +509,18 @@ public class SemanticAnalysis {
 
   }
 
+  private String getParamTypes(List<Param> params) {
+    StringBuilder result = new StringBuilder();
+    for (int i = 0; i < params.size(); i++) {
+      String functionParam = params.get(i).toString();
+      result.append(functionParam, 0, functionParam.indexOf(','));
+      if (i != params.size() - 1) {
+        result.append("_");
+      }
+    }
+    return result.toString();
+  }
+
   private void traverse(AssignRHS rhs) {
 
     if (rhs.getAssignType() == RHSType.EXPR) {
@@ -532,6 +528,9 @@ public class SemanticAnalysis {
     }
 
     if (rhs.getAssignType() == RHSType.CALL) {
+
+//      System.out.println("here?");
+
       if (rhs.getArgList().size() != functionParams.get(rhs.getFunctionIdent()).size()) {
         errorMsgs.add("Wrong number of arguments in call to function: " + rhs);
         errors++;

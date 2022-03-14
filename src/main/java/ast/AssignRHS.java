@@ -47,6 +47,10 @@ public class AssignRHS {
     return functionIdent;
   }
 
+  public void setFunctionIdent(String functionIdent) {
+    this.functionIdent = functionIdent;
+  }
+
   public List<Expression> getArgList() {
     return argList;
   }

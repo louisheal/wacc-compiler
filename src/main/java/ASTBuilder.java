@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ASTBuilder extends BasicParserBaseVisitor<Object> {
-  private final SymbolTable currentST = new SymbolTable(null);
 
   //PROGRAM
 
@@ -51,8 +50,6 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     Type type = (Type) this.visit(ctx.type());
     String ident = ctx.IDENT().getText();
     AssignRHS rhs = (AssignRHS) this.visit(ctx.assignRHS());
-    currentST.newVariable(ident, type);
-
     return new StatementBuilder().buildDeclaration(type, ident, rhs);
   }
 
@@ -300,27 +297,13 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
   public AssignRHS visitCallRHS(BasicParser.CallRHSContext ctx) {
 
     List<Expression> expressions = new ArrayList<>();
-    StringBuilder functionIdent = new StringBuilder();
-    functionIdent.append(ctx.IDENT().getText()).append("_");
+    String functionIdent = ctx.IDENT().getText();
 
     for (int i = 0; i < ctx.argList().expr().size(); i++) {
-      Expression expression = (Expression) this.visit(ctx.argList().expr(i));
-      expressions.add(expression);
-      SemanticAnalysis semanticAnalysis = new SemanticAnalysis();
-      //Appends types onto the function name to match with Function class
-      if (expression.getIdent() == null) {
-        functionIdent.append(semanticAnalysis.getExpressionType(expression));
-//        System.out.println("just a var: " + expression);
-      } else {
-        functionIdent.append(currentST.getType(expression.getIdent()));
-//        System.out.println("in currentST: " + currentST.getType(expression.getIdent()));
-      }
-      functionIdent.append("_");
-
-//      functionIdent.append(this.visit(ctx.argList().expr(i))).append("_");
+      expressions.add((Expression) this.visit(ctx.argList().expr(i)));
     }
 
-    return new AssignRHSBuilder().buildCallRHS(functionIdent.substring(0, functionIdent.lastIndexOf("_")), expressions);
+    return new AssignRHSBuilder().buildCallRHS(functionIdent, expressions);
   }
 
   //EXPRESSIONS
