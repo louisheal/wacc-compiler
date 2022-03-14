@@ -101,11 +101,11 @@ public class SemanticAnalysis {
 
   public String getIdentWithParams(AssignRHS rhs) {
     StringBuilder ident = new StringBuilder();
-    ident.append(rhs.getFunctionIdent());
 
     for (Expression expression : rhs.getArgList()) {
-      ident.append("_").append(typeToString(getExpressionType(expression)));
+      ident.append(typeToString(getExpressionType(expression))).append("_");
     }
+    ident.append("f_").append(rhs.getFunctionIdent());
 
     return ident.toString();
   }
@@ -257,14 +257,13 @@ public class SemanticAnalysis {
 
     for (Function function : program.getFunctions()) {
 
-      StringBuilder ident = new StringBuilder().append(function.getIdent());
+      StringBuilder ident = new StringBuilder();
       for (Param param : function.getParams()) {
-        System.out.println(typeToString(param.getType()));
-        ident.append("_").append(typeToString(param.getType()));
+        ident.append(typeToString(param.getType())).append("_");
       }
+      ident.append("f_").append(function.getIdent());
 
       function.setIdent(ident.toString());
-      System.out.println(ident);
 
       if (functionParams.containsKey(function.getIdent())) {
         errorMsgs.add("Second Declaration of function " + function.getIdent());
@@ -554,9 +553,6 @@ public class SemanticAnalysis {
     }
 
     if (rhs.getAssignType() == RHSType.CALL) {
-
-      System.out.println("CALL: " + getIdentWithParams(rhs));
-
       if (rhs.getArgList().size() != functionParams.get(getIdentWithParams(rhs)).size()) {
         errorMsgs.add("Wrong number of arguments in call to function: " + rhs);
         errors++;
@@ -573,6 +569,7 @@ public class SemanticAnalysis {
           errors++;
         }
       }
+      rhs.setFunctionIdent(getIdentWithParams(rhs));
     }
   }
 

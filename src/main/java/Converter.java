@@ -368,7 +368,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     currentST = new SymbolTable(null);
 
     /* Function wrapper instructions. */
-    instructions.add(new Instruction(LABEL, "f_" + function.getIdent() + ":"));
+    instructions.add(new Instruction(LABEL, function.getIdent() + ":"));
     instructions.add(new Instruction(LABEL, "PUSH {lr}"));
 
     /* Move stack pointer to allocate space on the stack for the function to use. */
@@ -1669,7 +1669,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     currentST.resetOffset();
 
     // BL f_functionIdentity
-    instructions.add(new Instruction(BL, "f_" + rhs.getFunctionIdent()));
+    instructions.add(new Instruction(BL, rhs.getFunctionIdent()));
 
     // ADD sp, sp, #totalSize
     instructions.add(new Instruction(LABEL, "ADD sp, sp, #" + totalSize));
