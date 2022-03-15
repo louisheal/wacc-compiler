@@ -1,9 +1,9 @@
 package assembly;
 
+import assembly.instructions.Instruction;
+import assembly.instructions.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import static assembly.Instruction.InstrType.*;
 
 public class PredefinedFunctions {
 
@@ -91,39 +91,39 @@ public class PredefinedFunctions {
     List<Instruction> instructions = new ArrayList<>();
 
     // p_print_int:
-    instructions.add(new Instruction(LABEL, "p_print_int:"));
+    instructions.add(new LABEL("p_print_int:"));
 
     // PUSH {lr}
-    instructions.add(new Instruction(LABEL, "PUSH {lr}"));
+    instructions.add(new LABEL("PUSH {lr}"));
 
     // MOV r1, r0
-    instructions.add(new Instruction(MOV, r1, new Operand2(r0)));
+    instructions.add(new MOV(r1, new Operand2(r0)));
 
     /* msg_(number):
               .word 3
 		      .ascii	"%d\0" */
-    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
-    messages.add(new Instruction(WORD, 3));
-    messages.add(new Instruction(ASCII, "\"%d\\0\""));
+    messages.add(new LABEL("msg_" + msgCounter + ":"));
+    messages.add(new WORD(3));
+    messages.add(new ASCII("\"%d\\0\""));
 
     // LDR r0, =msg_0
-    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter));
+    instructions.add(new LDR(r0, "msg_" + msgCounter));
     msgCounter++;
 
     // ADD r0, r0, #4
-    instructions.add(new Instruction(ADD, r0, r0, new Operand2(4)));
+    instructions.add(new ADD(r0, r0, new Operand2(4)));
 
     // BL printf
-    instructions.add(new Instruction(BL, "printf"));
+    instructions.add(new BL("printf"));
 
     // MOV r0, #0
-    instructions.add(new Instruction(MOV, r0, new Operand2(0)));
+    instructions.add(new MOV(r0, new Operand2(0)));
 
     // BL fflush
-    instructions.add(new Instruction(BL, "fflush"));
+    instructions.add(new BL("fflush"));
 
     // POP {pc}
-    instructions.add(new Instruction(LABEL, "POP {pc}"));
+    instructions.add(new LABEL("POP {pc}"));
 
     return instructions;
   }
@@ -133,52 +133,52 @@ public class PredefinedFunctions {
     List<Instruction> instructions = new ArrayList<>();
 
     // p_print_bool:
-    instructions.add(new Instruction(LABEL, "p_print_bool:"));
+    instructions.add(new LABEL("p_print_bool:"));
 
     // PUSH {lr}
-    instructions.add(new Instruction(LABEL, "PUSH {lr}"));
+    instructions.add(new LABEL("PUSH {lr}"));
 
     // CMP r0, #0
-    instructions.add(new Instruction(CMP, r0, new Operand2(0)));
+    instructions.add(new CMP(r0, new Operand2(0)));
 
 
      /* msg_(number):
      	      .word 5
      	      .ascii	"true\0" */
-    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
-    messages.add(new Instruction(WORD, 5));
-    messages.add(new Instruction(ASCII, "\"true\\0\""));
+    messages.add(new LABEL("msg_" + msgCounter + ":"));
+    messages.add(new WORD(5));
+    messages.add(new ASCII( "\"true\\0\""));
 
     // LDRNE r0, =msg_n
-    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter, Conditionals.NE));
+    instructions.add(new LDR(r0, "msg_" + msgCounter, Conditionals.NE));
     msgCounter++;
 
     /* msg_(number + 1):
      	     .word 6
      	     .ascii	"false\0" */
 
-    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
-    messages.add(new Instruction(WORD, 6));
-    messages.add(new Instruction(ASCII, "\"false\\0\""));
+    messages.add(new LABEL("msg_" + msgCounter + ":"));
+    messages.add(new WORD(6));
+    messages.add(new ASCII("\"false\\0\""));
 
     // LDREQ r0, =msg_n
-    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter, Conditionals.EQ));
+    instructions.add(new LDR(r0, "msg_" + msgCounter, Conditionals.EQ));
     msgCounter++;
 
     // ADD r0, r0, #4
-    instructions.add(new Instruction(ADD, r0, r0, new Operand2(4)));
+    instructions.add(new ADD(r0, r0, new Operand2(4)));
 
     // BL printf
-    instructions.add(new Instruction(BL, "printf"));
+    instructions.add(new BL("printf"));
 
     // MOV r0, #0
-    instructions.add(new Instruction(MOV, r0, new Operand2(0)));
+    instructions.add(new MOV(r0, new Operand2(0)));
 
     // BL fflush
-    instructions.add(new Instruction(BL, "fflush"));
+    instructions.add(new BL("fflush"));
 
     // POP {pc}
-    instructions.add(new Instruction(LABEL, "POP {pc}"));
+    instructions.add(new LABEL("POP {pc}"));
 
     return instructions;
   }
@@ -188,16 +188,16 @@ public class PredefinedFunctions {
     List<Instruction> instructions = new ArrayList<>();
 
     // p_print_string:
-    instructions.add(new Instruction(LABEL, "p_print_string:"));
+    instructions.add(new LABEL("p_print_string:"));
 
     // PUSH {lr}
-    instructions.add(new Instruction(LABEL, "PUSH {lr}"));
+    instructions.add(new LABEL("PUSH {lr}"));
 
     // LDR r1, [r0]
-    instructions.add(new Instruction(LDR, r1, new Operand2(r0)));
+    instructions.add(new LDR(r1, new Operand2(r0)));
 
     // ADD r2, r0, #4
-    instructions.add(new Instruction(ADD, r2, r0, new Operand2(4)));
+    instructions.add(new ADD(r2, r0, new Operand2(4)));
 
      /* msg_n:
      	      .word 5
@@ -205,28 +205,28 @@ public class PredefinedFunctions {
 
     // The string is stored in visitStringLiter
 
-    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
-    messages.add(new Instruction(WORD, 5));
-    messages.add(new Instruction(ASCII, "\"%.*s\\0\""));
+    messages.add(new LABEL("msg_" + msgCounter + ":"));
+    messages.add(new WORD(5));
+    messages.add(new ASCII("\"%.*s\\0\""));
 
     // LDR r0, =msg_n
-    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter));
+    instructions.add(new LDR(r0, "msg_" + msgCounter));
     msgCounter++;
 
     // ADD r0, r0, #4
-    instructions.add(new Instruction(ADD, r0, r0, new Operand2(4)));
+    instructions.add(new ADD(r0, r0, new Operand2(4)));
 
     // BL printf
-    instructions.add(new Instruction(BL, "printf"));
+    instructions.add(new BL("printf"));
 
     // MOV r0, #0
-    instructions.add(new Instruction(MOV, r0, new Operand2(0)));
+    instructions.add(new MOV(r0, new Operand2(0)));
 
     //	BL fflush
-    instructions.add(new Instruction(BL, "fflush"));
+    instructions.add(new BL("fflush"));
 
     //	POP {pc}
-    instructions.add(new Instruction(LABEL, "POP {pc}"));
+    instructions.add(new LABEL("POP {pc}"));
 
     return instructions;
   }
@@ -236,40 +236,40 @@ public class PredefinedFunctions {
     List<Instruction> instructions = new ArrayList<>();
 
     // p_print_reference:
-    instructions.add(new Instruction(LABEL, "p_print_reference:"));
+    instructions.add(new LABEL("p_print_reference:"));
 
     // PUSH {lr}
-    instructions.add(new Instruction(LABEL, "PUSH {lr}"));
+    instructions.add(new LABEL("PUSH {lr}"));
 
     // MOV r1, r0
-    instructions.add(new Instruction(MOV, r1, new Operand2(r0)));
+    instructions.add(new MOV(r1, new Operand2(r0)));
 
    	/* msg_n:
    		    .word 3
    		    .ascii	"%p\0" */
 
-    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
-    messages.add(new Instruction(WORD, 3));
-    messages.add(new Instruction(ASCII, "\"%p\\0\""));
+    messages.add(new LABEL("msg_" + msgCounter + ":"));
+    messages.add(new WORD(3));
+    messages.add(new ASCII("\"%p\\0\""));
 
     // LDR r0, =msg_n
-    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter));
+    instructions.add(new LDR(r0, "msg_" + msgCounter));
     msgCounter++;
 
     // ADD r0, r0, #4
-    instructions.add(new Instruction(ADD, r0, r0, new Operand2(4)));
+    instructions.add(new ADD(r0, r0, new Operand2(4)));
 
     // BL printf
-    instructions.add(new Instruction(BL, "printf"));
+    instructions.add(new BL("printf"));
 
     // MOV r0, #0
-    instructions.add(new Instruction(MOV, r0, new Operand2(0)));
+    instructions.add(new MOV(r0, new Operand2(0)));
 
     // BL fflush
-    instructions.add(new Instruction(BL, "fflush"));
+    instructions.add(new BL( "fflush"));
 
     // POP {pc}
-    instructions.add(new Instruction(LABEL, "POP {pc}"));
+    instructions.add(new LABEL("POP {pc}"));
 
     return instructions;
   }
@@ -279,37 +279,37 @@ public class PredefinedFunctions {
     List<Instruction> instructions = new ArrayList<>();
 
     // p_print_ln:
-    instructions.add(new Instruction(LABEL, "p_print_ln:"));
+    instructions.add(new LABEL("p_print_ln:"));
 
     // PUSH {lr}
-    instructions.add(new Instruction(LABEL, "PUSH {lr}"));
+    instructions.add(new LABEL("PUSH {lr}"));
 
     /* msg_n:
             .word 1
             .ascii	"\0" */
 
-    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
-    messages.add(new Instruction(WORD, 1));
-    messages.add(new Instruction(ASCII, "\"\\0\""));
+    messages.add(new LABEL("msg_" + msgCounter + ":"));
+    messages.add(new WORD(1));
+    messages.add(new ASCII("\"\\0\""));
 
     // LDR r0, =msg_n
-    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter));
+    instructions.add(new LDR(r0, "msg_" + msgCounter));
     msgCounter++;
 
     // ADD r0, r0, #4
-    instructions.add(new Instruction(ADD, r0, r0, new Operand2(4)));
+    instructions.add(new ADD(r0, r0, new Operand2(4)));
 
     // BL puts
-    instructions.add(new Instruction(BL, "puts"));
+    instructions.add(new BL("puts"));
 
     // MOV r0, #0
-    instructions.add(new Instruction(MOV, r0, new Operand2(0)));
+    instructions.add(new MOV(r0, new Operand2(0)));
 
     // BL fflush
-    instructions.add(new Instruction(BL, "fflush"));
+    instructions.add(new BL("fflush"));
 
     // POP {pc}
-    instructions.add(new Instruction(LABEL, "POP {pc}"));
+    instructions.add(new LABEL("POP {pc}"));
 
     return instructions;
   }
@@ -319,31 +319,31 @@ public class PredefinedFunctions {
     List<Instruction> instructions = new ArrayList<>();
 
     // p_check_null_pointer:
-    instructions.add(new Instruction(LABEL, "p_check_null_pointer:"));
+    instructions.add(new LABEL("p_check_null_pointer:"));
 
     // PUSH {lr}
-    instructions.add(new Instruction(LABEL, "PUSH {lr}"));
+    instructions.add(new LABEL("PUSH {lr}"));
 
     // CMP r0, #0
-    instructions.add(new Instruction(CMP, r0, new Operand2(0)));
+    instructions.add(new CMP(r0, new Operand2(0)));
 
     /* msg_n:
     	      .word 50
     	      .ascii	"NullReferenceError: dereference a null reference\n\0" */
 
-    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
-    messages.add(new Instruction(WORD, 50));
-    messages.add(new Instruction(ASCII, "\"NullReferenceError: dereference a null reference\\n\\0\""));
+    messages.add(new LABEL("msg_" + msgCounter + ":"));
+    messages.add(new WORD(50));
+    messages.add(new ASCII("\"NullReferenceError: dereference a null reference\\n\\0\""));
 
     // LDREQ r0, =msg_n
-    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter, Conditionals.EQ));
+    instructions.add(new LDR(r0, "msg_" + msgCounter, Conditionals.EQ));
     msgCounter++;
 
     // BLEQ p_throw_runtime_error
-    instructions.add(new Instruction(BL, "p_throw_runtime_error", Conditionals.EQ));
+    instructions.add(new BL("p_throw_runtime_error", Conditionals.EQ));
 
     // POP {pc}
-    instructions.add(new Instruction(LABEL, "POP {pc}"));
+    instructions.add(new LABEL("POP {pc}"));
 
     return instructions;
   }
@@ -353,16 +353,16 @@ public class PredefinedFunctions {
     List<Instruction> instructions = new ArrayList<>();
 
     // p_throw_runtime_error:
-    instructions.add(new Instruction(LABEL, "p_throw_runtime_error:"));
+    instructions.add(new LABEL("p_throw_runtime_error:"));
 
     // BL p_print_string
-    instructions.add(new Instruction(BL, "p_print_string"));
+    instructions.add(new BL("p_print_string"));
 
     // MOV r0, #-1
-    instructions.add(new Instruction(MOV, r0, new Operand2(-1)));
+    instructions.add(new MOV(r0, new Operand2(-1)));
 
     // BL exit
-    instructions.add(new Instruction(BL, "exit"));
+    instructions.add(new BL("exit"));
 
     return instructions;
   }
@@ -372,21 +372,21 @@ public class PredefinedFunctions {
     List<Instruction> instructions = new ArrayList<>();
 
     // p_throw_overflow_error:
-    instructions.add(new Instruction(LABEL, "p_throw_overflow_error:"));
+    instructions.add(new LABEL("p_throw_overflow_error:"));
 
     /* message = .word 83
                  .ascii	"OverflowError: the result is too small/large to store in a 4-byte signed-integer.\n\0" */
 
-    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
-    messages.add(new Instruction(WORD, 83));
-    messages.add(new Instruction(ASCII, "\"OverflowError: the result is too small/large to store in a 4-byte signed-integer.\\n\\0\""));
+    messages.add(new LABEL("msg_" + msgCounter + ":"));
+    messages.add(new WORD(83));
+    messages.add(new ASCII("\"OverflowError: the result is too small/large to store in a 4-byte signed-integer.\\n\\0\""));
 
     // LDR r0, =msg_n
-    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter));
+    instructions.add(new LDR(r0, "msg_" + msgCounter));
     msgCounter++;
 
     // BL p_throw_runtime_error
-    instructions.add(new Instruction(BL, "p_throw_runtime_error"));
+    instructions.add(new BL("p_throw_runtime_error"));
 
     return instructions;
   }
@@ -396,30 +396,30 @@ public class PredefinedFunctions {
     List<Instruction> instructions = new ArrayList<>();
 
     // p_check_divide_by_zero:
-    instructions.add(new Instruction(LABEL, "p_check_divide_by_zero:"));
+    instructions.add(new LABEL("p_check_divide_by_zero:"));
 
     // PUSH {lr}
-    instructions.add(new Instruction(LABEL, "PUSH {lr}"));
+    instructions.add(new LABEL("PUSH {lr}"));
 
     // CMP r1, #0
-    instructions.add(new Instruction(CMP, r1, new Operand2(0)));
+    instructions.add(new CMP(r1, new Operand2(0)));
 
     /* message = .word 45
                  .ascii	"DivideByZeroError: divide or modulo by zero\n\0" */
 
-    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
-    messages.add(new Instruction(WORD, 45));
-    messages.add(new Instruction(ASCII, "\"DivideByZeroError: divide or modulo by zero\\n\\0\""));
+    messages.add(new LABEL( "msg_" + msgCounter + ":"));
+    messages.add(new WORD(45));
+    messages.add(new ASCII("\"DivideByZeroError: divide or modulo by zero\\n\\0\""));
 
     // LDREQ r0, =msg_0
-    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter, Conditionals.EQ));
+    instructions.add(new LDR(r0, "msg_" + msgCounter, Conditionals.EQ));
     msgCounter++;
 
     // BLEQ p_throw_runtime_error
-    instructions.add(new Instruction(BL, "p_throw_runtime_error", Conditionals.EQ));
+    instructions.add(new BL("p_throw_runtime_error", Conditionals.EQ));
 
     // POP {pc}
-    instructions.add(new Instruction(LABEL, "POP {pc}"));
+    instructions.add(new LABEL("POP {pc}"));
 
     return instructions;
   }
@@ -429,51 +429,51 @@ public class PredefinedFunctions {
     List<Instruction> instructions = new ArrayList<>();
 
     // p_check_array_bounds:
-    instructions.add(new Instruction(LABEL, "p_check_array_bounds:"));
+    instructions.add(new LABEL("p_check_array_bounds:"));
 
     // PUSH {lr}
-    instructions.add(new Instruction(LABEL, "PUSH {lr}"));
+    instructions.add(new LABEL("PUSH {lr}"));
 
     // CMP r0, #0
-    instructions.add(new Instruction(CMP, r0, new Operand2(0)));
+    instructions.add(new CMP(r0, new Operand2(0)));
 
     /* message = .word 44
            		 .ascii	"ArrayIndexOutOfBoundsError: negative index */
 
-    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
-    messages.add(new Instruction(WORD, 44));
-    messages.add(new Instruction(ASCII, "\"ArrayIndexOutOfBoundsError: negative index\\n\\0\""));
+    messages.add(new LABEL("msg_" + msgCounter + ":"));
+    messages.add(new WORD(44));
+    messages.add(new ASCII("\"ArrayIndexOutOfBoundsError: negative index\\n\\0\""));
 
     // LDRLT r0, =msg_0
-    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter, Conditionals.LT));
+    instructions.add(new LDR(r0, "msg_" + msgCounter, Conditionals.LT));
     msgCounter++;
 
     // BLLT p_throw_runtime_error
-    instructions.add(new Instruction(BL, "p_throw_runtime_error", Conditionals.LT));
+    instructions.add(new BL("p_throw_runtime_error", Conditionals.LT));
 
     // LDR r1, [r1]
-    instructions.add(new Instruction(LDR, r1, new Operand2(r1)));
+    instructions.add(new LDR(r1, new Operand2(r1)));
 
     // CMP r0, r1
-    instructions.add(new Instruction(CMP, r0, new Operand2(r1)));
+    instructions.add(new CMP(r0, new Operand2(r1)));
 
 
     /* msg_n:
          .word 45
          .ascii	"ArrayIndexOutOfBoundsError: index too large\n\0" */
-    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
-    messages.add(new Instruction(WORD, 45));
-    messages.add(new Instruction(ASCII, "\"ArrayIndexOutOfBoundsError: index too large\\n\\0\""));
+    messages.add(new LABEL("msg_" + msgCounter + ":"));
+    messages.add(new WORD(45));
+    messages.add(new ASCII("\"ArrayIndexOutOfBoundsError: index too large\\n\\0\""));
 
     // LDRCS r0, =msg_n
-    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter, Conditionals.CS));
+    instructions.add(new LDR(r0, "msg_" + msgCounter, Conditionals.CS));
     msgCounter++;
 
     // BLCS p_throw_runtime_error
-    instructions.add(new Instruction(BL, "p_throw_runtime_error", Conditionals.CS));
+    instructions.add(new BL("p_throw_runtime_error", Conditionals.CS));
 
     // POP {pc}
-    instructions.add(new Instruction(LABEL, "POP {pc}"));
+    instructions.add(new LABEL("POP {pc}"));
 
     return instructions;
   }
@@ -483,32 +483,32 @@ public class PredefinedFunctions {
     List<Instruction> instructions = new ArrayList<>();
 
     // p_read_int:
-    instructions.add(new Instruction(LABEL, "p_read_int:"));
+    instructions.add(new LABEL("p_read_int:"));
 
     // PUSH {lr}
-    instructions.add(new Instruction(LABEL, "PUSH {lr}"));
+    instructions.add(new LABEL("PUSH {lr}"));
 
     // MOV r1, r0
-    instructions.add(new Instruction(MOV, r1, new Operand2(r0)));
+    instructions.add(new MOV(r1, new Operand2(r0)));
 
     /* message = .word 3
       		     .ascii	"%d\0" */
-    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
-    messages.add(new Instruction(WORD, 3));
-    messages.add(new Instruction(ASCII, "\"%d\\0\""));
+    messages.add(new LABEL("msg_" + msgCounter + ":"));
+    messages.add(new WORD(3));
+    messages.add(new ASCII("\"%d\\0\""));
 
     // LDR r0, =msg_0
-    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter));
+    instructions.add(new LDR(r0, "msg_" + msgCounter));
     msgCounter++;
 
     // ADD r0, r0, #4
-    instructions.add(new Instruction(ADD, r0, r0, new Operand2(4)));
+    instructions.add(new ADD(r0, r0, new Operand2(4)));
 
     // BL scanf
-    instructions.add(new Instruction(BL, "scanf"));
+    instructions.add(new BL("scanf"));
 
     // POP {pc}
-    instructions.add(new Instruction(LABEL, "POP {pc}"));
+    instructions.add(new LABEL("POP {pc}"));
 
     return instructions;
   }
@@ -518,32 +518,32 @@ public class PredefinedFunctions {
     List<Instruction> instructions = new ArrayList<>();
 
     // p_read_char:
-    instructions.add(new Instruction(LABEL, "p_read_char:"));
+    instructions.add(new LABEL("p_read_char:"));
 
     //  PUSH {lr}
-    instructions.add(new Instruction(LABEL, "PUSH {lr}"));
+    instructions.add(new LABEL("PUSH {lr}"));
 
     //  MOV r1, r0
-    instructions.add(new Instruction(MOV, r1, new Operand2(r0)));
+    instructions.add(new MOV(r1, new Operand2(r0)));
 
     /* message = .word 4
       		     .ascii	" %c\0" */
-    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
-    messages.add(new Instruction(WORD, 4));
-    messages.add(new Instruction(ASCII, "\" %c\\0\""));
+    messages.add(new LABEL("msg_" + msgCounter + ":"));
+    messages.add(new WORD(4));
+    messages.add(new ASCII("\" %c\\0\""));
 
     //  LDR r0, =msg_0
-    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter));
+    instructions.add(new LDR(r0, "msg_" + msgCounter));
     msgCounter++;
 
     //  ADD r0, r0, #4
-    instructions.add(new Instruction(ADD, r0, r0, new Operand2(4)));
+    instructions.add(new ADD(r0, r0, new Operand2(4)));
 
     //  	BL scanf
-    instructions.add(new Instruction(BL, "scanf"));
+    instructions.add(new BL("scanf"));
 
     //	POP {pc}
-    instructions.add(new Instruction(LABEL, "POP {pc}"));
+    instructions.add(new LABEL("POP {pc}"));
 
     return instructions;
   }
@@ -553,53 +553,53 @@ public class PredefinedFunctions {
     List<Instruction> instructions = new ArrayList<>();
 
     // p_free_pair:
-    instructions.add(new Instruction(LABEL, "p_free_pair:"));
+    instructions.add(new LABEL("p_free_pair:"));
 
     // PUSH {lr}
-    instructions.add(new Instruction(LABEL, "PUSH {lr}"));
+    instructions.add(new LABEL("PUSH {lr}"));
 
     // CMP r0, #0
-    instructions.add(new Instruction(CMP, r0, new Operand2(0)));
+    instructions.add(new CMP(r0, new Operand2(0)));
 
     /* message = .word 50
 		         .ascii	"NullReferenceError: dereference a null reference\n\0" */
-    messages.add(new Instruction(LABEL, "msg_" + msgCounter + ":"));
-    messages.add(new Instruction(WORD, 50));
-    messages.add(new Instruction(ASCII, "\"NullReferenceError: dereference a null reference\\n\\0\""));
+    messages.add(new LABEL("msg_" + msgCounter + ":"));
+    messages.add(new WORD(50));
+    messages.add(new ASCII("\"NullReferenceError: dereference a null reference\\n\\0\""));
 
     // LDREQ r0, =msg_0
-    instructions.add(new Instruction(LDR, r0, "msg_" + msgCounter, Conditionals.EQ));
+    instructions.add(new LDR(r0, "msg_" + msgCounter, Conditionals.EQ));
     msgCounter++;
 
-    // BEQ p_throw_runtime_error
-    instructions.add(new Instruction(LABEL, "BEQ p_throw_runtime_error"));
+    // BEQ p_throw_runtim
+    instructions.add(new LABEL("BEQ p_throw_runtime_error"));
 
     // PUSH {r0}
-    instructions.add(new Instruction(PUSH, r0));
+    instructions.add(new PUSH(r0));
 
     // LDR r0, [r0]
-    instructions.add(new Instruction(LDR, r0, new Operand2(r0)));
+    instructions.add(new LDR(r0, new Operand2(r0)));
 
     // BL free
-    instructions.add(new Instruction(BL, "free"));
+    instructions.add(new BL("free"));
 
     // LDR r0, [sp]
-    instructions.add(new Instruction(LDR, r0, new Operand2(sp)));
+    instructions.add(new LDR(r0, new Operand2(sp)));
 
     // LDR r0, [r0, #4]
-    instructions.add(new Instruction(LDR, r0, new Operand2(r0, 4)));
+    instructions.add(new LDR(r0, new Operand2(r0, 4)));
 
     // BL free
-    instructions.add(new Instruction(BL, "free"));
+    instructions.add(new BL("free"));
 
     // POP {r0}
-    instructions.add(new Instruction(POP, r0));
+    instructions.add(new POP(r0));
 
     // BL free
-    instructions.add(new Instruction(BL, "free"));
+    instructions.add(new BL("free"));
 
     // POP {pc}
-    instructions.add(new Instruction(LABEL, "POP {pc}"));
+    instructions.add(new LABEL("POP {pc}"));
 
     return instructions;
   }

@@ -1,5 +1,5 @@
 import antlr.*;
-import assembly.Instruction;
+import assembly.instructions.Instruction;
 import ast.Program;
 import java.io.FileWriter;
 import java.util.List;
