@@ -407,6 +407,7 @@ public class SemanticAnalysis {
 
         if(statement.getLhsType().getType() == EType.PAIR && expression == null) {
           currentST.newVariable(statement.getLhsIdent(), statement.getLhsType());
+          traverse(statement.getRHS());
           break;
         }
 
