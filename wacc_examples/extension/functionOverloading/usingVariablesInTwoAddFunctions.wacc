@@ -1,0 +1,27 @@
+# Tests whether variables can be called in two functions with the same name (add)
+# but with different parameters
+
+# Expected output:
+# 3
+# 6
+
+begin
+    int add(int x, int y) is
+      return x + y
+    end
+
+    int add(int x, int y, int z) is
+      return x + y + z
+    end
+
+   int a = 1;
+   int b = 2;
+   int c = 3;
+
+    int x = call add(a,b) ;
+    int y = call add(a,b,c) ;
+
+    println x;
+    println y
+end
+

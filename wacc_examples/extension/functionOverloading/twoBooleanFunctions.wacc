@@ -1,0 +1,22 @@
+# Tests if 2 functions that take and returns booleans with the same function name
+# but different parameters works
+
+# Expected output:
+# false
+# true
+
+begin
+    bool isTrue(bool x, bool y) is
+      return x && y
+    end
+
+    bool isTrue(bool x, bool y, bool z) is
+      return x && y && z
+    end
+
+    bool x = call isTrue(true,false) ;
+    bool y = call isTrue(true,true,true) ;
+
+    println x;
+    println y
+end

@@ -1,0 +1,21 @@
+# Tests whether 2 functions with the same name (add) but different parameters work
+
+# Expected output:
+# 3
+# 6
+
+begin
+    int add(int x, int y) is
+      return x + y
+    end
+
+    int add(int x, int y, int z) is
+      return x + y + z
+    end
+
+    int x = call add(1,2) ;
+    int y = call add(1,2,3) ;
+
+    println x;
+    println y
+end
