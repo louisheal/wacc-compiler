@@ -1,19 +1,23 @@
 import assembly.Conditionals;
 import assembly.Flags;
+import assembly.instructions.GLOBALMAIN;
 import assembly.instructions.Instruction;
 import assembly.Operand2;
 import assembly.Register;
+import assembly.instructions.LABEL;
+import assembly.instructions.LDR;
+import assembly.instructions.LTORG;
+import assembly.instructions.TEXT;
 import ast.*;
 
 import ast.Type.EType;
 import java.util.*;
 
-import static assembly.instructions.Instruction.InstrType.*;
 import static assembly.PredefinedFunctions.*;
 import static assembly.PredefinedFunctions.Functions.*;
 import static ast.Type.EType.*;
 
-public class Converter extends ASTVisitor<List<Instruction>> {
+public class ConverterWithInstructionSubclasses extends ASTVisitor<List<Instruction>> {
 
   /* A list of general purpose registers: r4, r5, r6, r7, r8, r9, r10 and r11. */
   List<Register> unusedRegisters = initialiseGeneralRegisters();
@@ -225,30 +229,30 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     List<Instruction> instructions = new ArrayList<>();
 
-    instructions.add(new Instruction(TEXT, ""));
-    instructions.add(new Instruction(LABEL, "")); // Leave gap in lines
+    instructions.add(new TEXT(""));
+    instructions.add(new LABEL("")); // Leave gap in lines
 
-    instructions.add(new Instruction(GLOBAL_MAIN, ""));
+    instructions.add(new GLOBALMAIN(""));
 
     /* Generate the assembly instructions for each function. */
     for (Function function : program.getFunctions()) {
       instructions.addAll(visitFunction(function));
     }
 
-    instructions.add(new Instruction(LABEL, "main:"));
+    instructions.add(new LABEL("main:"));
 
     //TODO: ADD LR
-    instructions.add(new Instruction(LABEL, "PUSH {lr}"));
+    instructions.add(new LABEL("PUSH {lr}"));
 
     int totalBytes = totalBytesInScope(program.getStatement());
     spLocation = totalBytes;
 
     while (totalBytes > 1024) {
-      instructions.add(new Instruction(LABEL, "SUB sp, sp, #1024"));
+      instructions.add(new LABEL("SUB sp, sp, #1024"));
       totalBytes -= 1024;
     }
     if (totalBytes > 0) {
-      instructions.add(new Instruction(LABEL, "SUB sp, sp, #" + totalBytes));
+      instructions.add(new LABEL("SUB sp, sp, #" + totalBytes));
     }
 
     totalBytes = spLocation;
@@ -259,16 +263,16 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.addAll(visitStatement(program.getStatement()));
 
     while (totalBytes > 1024) {
-      instructions.add(new Instruction(LABEL, "ADD sp, sp, #1024"));
+      instructions.add(new LABEL("ADD sp, sp, #1024"));
       totalBytes -= 1024;
     }
     if (totalBytes > 0) {
-      instructions.add(new Instruction(LABEL, "ADD sp, sp, #" + totalBytes));
+      instructions.add(new LABEL("ADD sp, sp, #" + totalBytes));
     }
 
-    instructions.add(new Instruction(LDR, r0, 0));
-    instructions.add(new Instruction(LABEL, "POP {pc}"));
-    instructions.add(new Instruction(LTORG, ""));
+    instructions.add(new LDR(r0, 0));
+    instructions.add(new LABEL("POP {pc}"));
+    instructions.add(new LTORG(""));
 
     //TODO: Add instructions as args
 
@@ -911,7 +915,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     switch (lhs.getAssignType()) {
       case ARRAYELEM:
         return lhs.getArrayElem().getIdent();
-        //TODO Check PAIRELEM ident is correct
+      //TODO Check PAIRELEM ident is correct
       case PAIRELEM:
         return lhs.getPairElem().getExpression().getIdent();
       default:
@@ -949,7 +953,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     /* Allocate a register: rn for this function to use. */
     Register rn = popUnusedRegister();
-    
+
     // RSBS rn, rn, #0
     instructions.add(new Instruction(RSB, rn, rn, new Operand2(0), Flags.S));
 

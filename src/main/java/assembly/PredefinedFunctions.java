@@ -1,9 +1,10 @@
 package assembly;
 
+import assembly.instructions.Instruction;
 import java.util.ArrayList;
 import java.util.List;
 
-import static assembly.Instruction.InstrType.*;
+import static assembly.instructions.Instruction.InstrType.*;
 
 public class PredefinedFunctions {
 

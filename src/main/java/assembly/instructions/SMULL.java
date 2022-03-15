@@ -5,7 +5,7 @@ import assembly.Register;
 public class SMULL extends Instruction{
 
   //SMULL{S}{cond} RdLo, RdHi, Rn, Rm
-  public SMULL(assembly.Instruction.InstrType type, Register rdLo, Register rdHi, Register rn, Register rm) {
+  public SMULL(Register rdLo, Register rdHi, Register rn, Register rm) {
     this.rdLo = rdLo;
     this.rdHi = rdHi;
     this.rn = rn;
