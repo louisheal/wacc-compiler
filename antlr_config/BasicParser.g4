@@ -85,6 +85,8 @@ pairElem: FST expr      #fstElem
 type: baseType
     | arrayType
     | pairType
+    | type MULTIPLY
+    | type DEREFERENCE
     ;
 
 baseType: INT       #intType
