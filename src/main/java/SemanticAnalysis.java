@@ -157,6 +157,12 @@ public class SemanticAnalysis {
       case BRACKETS:
         return getExpressionType(expr.getExpression1());
 
+      case REFERENCE:
+        return new Type(EType.REFERENCE, getExpressionType(expr.getExpression1()));
+
+      case DEREFERENCE:
+        return new Type(EType.DEREFERENCE, getExpressionType(expr.getExpression1()));
+
     }
     return null;
   }
