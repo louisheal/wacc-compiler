@@ -30,29 +30,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   private int functionByte = 0;
   SymbolTable currentST;
 
-  /* Print flags */
-  private boolean hasPrintInt = false;
-  private boolean hasPrintBool = false;
-  private boolean hasPrintString = false;
-  private boolean hasPrintReference = false;
-  private boolean hasPrintLn = false;
-
-  /* Read flags */
-  private boolean hasReadInt = false;
-  private boolean hasReadChar = false;
-
-  /* Free flags */
-  private boolean hasFreePair = false;
-
-  /* Error flags */
-  private boolean checkNullPointer = false;
-  private boolean runtimeErr = false;
-  private boolean isDiv = false;
-  private boolean isCalc = false;
-  private boolean isArrayLookup = false;
-
-  /* Data flag */
-  private boolean hasData = false;
+  /* Pre-defined Functions List. */
+  private final Set<Functions> predefinedFunctions = new HashSet<>();
 
   private String getLabel() {
     int result = labelNum;
@@ -269,85 +248,13 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new LABEL("POP {pc}"));
     instructions.add(new LTORG(""));
 
-    //TODO: Add instructions as args
-
-    if (isArrayLookup) {
-      instructions.addAll(getFunctionInstructions(P_CHECK_ARRAY_BOUNDS));
-      runtimeErr = true;
-      hasData = true;
-    }
-
-    if (checkNullPointer) {
-      instructions.addAll(getFunctionInstructions(P_CHECK_NULL_POINTER));
-      runtimeErr = true;
-      hasData = true;
-    }
-
-    if (isDiv) {
-      instructions.addAll(getFunctionInstructions(P_CHECK_DIVIDE_BY_ZERO));
-      runtimeErr = true;
-      hasData = true;
-    }
-
-    if (isCalc) {
-      instructions.addAll(getFunctionInstructions(P_THROW_OVERFLOW_ERROR));
-      runtimeErr = true;
-      hasData = true;
-    }
-
-    if (hasFreePair) {
-      instructions.addAll(getFunctionInstructions(P_FREE_PAIR));
-      runtimeErr = true;
-      hasData = true;
-    }
-
-    if (hasPrintInt) {
-      instructions.addAll(getFunctionInstructions(P_PRINT_INT));
-      hasData = true;
-    }
-
-    if (runtimeErr) {
-      instructions.addAll(getFunctionInstructions(P_THROW_RUNTIME_ERROR));
-      hasPrintString = true;
-      hasData = true;
-    }
-
-    if (hasPrintBool) {
-      instructions.addAll(getFunctionInstructions(P_PRINT_BOOL));
-      hasData = true;
-    }
-
-    if (hasPrintString) {
-      instructions.addAll(getFunctionInstructions(P_PRINT_STRING));
-      hasData = true;
-    }
-
-    if (hasPrintLn) {
-      instructions.addAll(getFunctionInstructions(P_PRINT_LN));
-      hasData = true;
-    }
-
-    if (hasPrintReference) {
-      instructions.addAll(getFunctionInstructions(P_PRINT_REFERENCE));
-      hasData = true;
-    }
-
-    if (hasReadInt) {
-      instructions.addAll(getFunctionInstructions(P_READ_INT));
-      hasData = true;
-    }
-
-    if (hasReadChar) {
-      instructions.addAll(getFunctionInstructions(P_READ_CHAR));
-      hasData = true;
-    }
-
-    if (hasData) {
+    if (!predefinedFunctions.isEmpty()) {
+      instructions.addAll(getInstructions(predefinedFunctions));
       instructions.add(0, new DATA(""));
       instructions.add(1, new LABEL(""));
       instructions.add(2, new LABEL("")); // Leave gap in lines
-      instructions.addAll(2, getMessages());
     }
+    instructions.addAll(2, getMessages());
 
     return instructions;
   }
@@ -531,7 +438,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   public List<Instruction> visitArrayElemLHS(AssignLHS lhs) {
 
     /* Set ArrayLookup flag to true. */
-    isArrayLookup = true;
+    predefinedFunctions.add(P_CHECK_ARRAY_BOUNDS);
 
     ArrayElem arrayElem = lhs.getArrayElem();
     List<Instruction> instructions = new ArrayList<>();
@@ -826,9 +733,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Mark the register used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rn);
 
-    // To ensure the messages are added to the top of assembly code
-    hasData = true;
-
     return instructions;
   }
 
@@ -942,7 +846,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   @Override
   public List<Instruction> visitNegExp(Expression expression) {
 
-    isCalc = true;
+    predefinedFunctions.add(P_THROW_OVERFLOW_ERROR);
 
     List<Instruction> instructions = translateUnaryExpression(expression);
 
@@ -1045,7 +949,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   @Override
   public List<Instruction> visitPlusExp(Expression expression) {
 
-    isCalc = true;
+    predefinedFunctions.add(P_THROW_OVERFLOW_ERROR);
 
     /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
     List<Instruction> instructions = translateBinaryExpression(expression);
@@ -1070,7 +974,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   @Override
   public List<Instruction> visitMinusExp(Expression expression) {
 
-    isCalc = true;
+    predefinedFunctions.add(P_THROW_OVERFLOW_ERROR);
 
     /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
     List<Instruction> instructions = translateBinaryExpression(expression);
@@ -1102,7 +1006,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   @Override
   public List<Instruction> visitMulExp(Expression expression) {
 
-    isCalc = true;
+    predefinedFunctions.add(P_THROW_OVERFLOW_ERROR);
 
     /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
     List<Instruction> instructions = translateBinaryExpression(expression);
@@ -1131,7 +1035,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   public List<Instruction> visitDivExp(Expression expression) {
 
     //Set isDiv to True for visitProgram
-    isDiv = true;
+    predefinedFunctions.add(P_CHECK_DIVIDE_BY_ZERO);
 
     /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
     List<Instruction> instructions = translateBinaryExpression(expression);
@@ -1176,7 +1080,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   public List<Instruction> visitModExp(Expression expression) {
 
     //Set isDiv to True for visitProgram
-    isDiv = true;
+    predefinedFunctions.add(P_CHECK_DIVIDE_BY_ZERO);
 
     /* Generate assembly code to evaluate both expressions and store them in Rn, Rn+1. */
     List<Instruction> instructions = translateBinaryExpression(expression);
@@ -1517,7 +1421,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   @Override
   public List<Instruction> visitNewPairRHS(AssignRHS rhs) {
 
-    checkNullPointer = true;
+    predefinedFunctions.add(P_CHECK_NULL_POINTER);
 
     List<Instruction> instructions = new ArrayList<>();
     Register rn, rm;
@@ -1716,11 +1620,11 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     if (eType == INT) {
       // BL p_read_int
       instructions.add(new BL("p_read_int"));
-      hasReadInt = true;
+      predefinedFunctions.add(P_READ_INT);
     } else if (eType == CHAR) {
       // BL p_read_char
       instructions.add(new BL("p_read_char"));
-      hasReadChar = true;
+      predefinedFunctions.add(P_READ_CHAR);
     }
 
     /* Mark register rn as no longer in use. */
@@ -1731,6 +1635,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitFreeStatement(Statement statement) {
+
+    predefinedFunctions.add(P_FREE_PAIR);
 
     /* Evaluate the expression to be printed and store the result in the first unused register. */
     List<Instruction> instructions = new ArrayList<>(visitExpression(statement.getExpression()));
@@ -1745,8 +1651,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     /* Mark register rn as no longer in use. */
     pushUnusedRegister(rn);
-
-    hasFreePair = true;
 
     return instructions;
   }
@@ -1805,15 +1709,15 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     if (Objects.equals(type, new Type(INT))) {
       // BL p_print_int
       instructions.add(new BL("p_print_int"));
-      hasPrintInt = true;
+      predefinedFunctions.add(P_PRINT_INT);
     } else if (Objects.equals(type, new Type(STRING)) || Objects.equals(type, new Type(ARRAY, new Type(CHAR)))) {
       // BL p_print_string
       instructions.add(new BL("p_print_string"));
-      hasPrintString = true;
+      predefinedFunctions.add(P_PRINT_STRING);
     } else if (Objects.equals(type, new Type(BOOL))) {
       // BL p_print_bool
       instructions.add(new BL("p_print_bool"));
-      hasPrintBool = true;
+      predefinedFunctions.add(P_PRINT_BOOL);
     } else if (Objects.equals(type, new Type(CHAR))) {
       // BL putchar
       instructions.add(new BL("putchar"));
@@ -1821,7 +1725,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       // For printing arrays and pairs
       // BL p_print_reference
       instructions.add(new BL("p_print_reference"));
-      hasPrintReference = true;
+      predefinedFunctions.add(P_PRINT_REFERENCE);
     }
 
     //TODO: check how much to add to rn after each branch link (happens when multiple print statements)
@@ -1835,11 +1739,12 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   @Override
   public List<Instruction> visitPrintlnStatement(Statement statement) {
 
+    predefinedFunctions.add(P_PRINT_LN);
+
     List<Instruction> instructions = new ArrayList<>(visitPrintStatement(statement));
 
     // BL p_print_ln
     instructions.add(new BL("p_print_ln"));
-    hasPrintLn = true;
 
     return instructions;
   }
@@ -1847,7 +1752,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   @Override
   public List<Instruction> visitPairElemLHS(AssignLHS lhs) {
 
-    checkNullPointer = true;
+    predefinedFunctions.add(P_CHECK_NULL_POINTER);
 
     PairElem pairElem = lhs.getPairElem();
 

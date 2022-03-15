@@ -4,6 +4,7 @@ import assembly.instructions.Instruction;
 import assembly.instructions.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class PredefinedFunctions {
 
@@ -24,52 +25,63 @@ public class PredefinedFunctions {
     P_FREE_PAIR
   }
 
-  public static List<Instruction> getFunctionInstructions(Functions function) {
+  public static List<Instruction> getInstructions(Set<Functions> functions) {
+
+    /* Add dependencies to the set. */
+
+    if (functions.contains(Functions.P_CHECK_ARRAY_BOUNDS) ||
+        functions.contains(Functions.P_CHECK_NULL_POINTER) ||
+        functions.contains(Functions.P_CHECK_DIVIDE_BY_ZERO) ||
+        functions.contains(Functions.P_THROW_OVERFLOW_ERROR) ||
+        functions.contains(Functions.P_FREE_PAIR)) {
+      functions.add(Functions.P_THROW_RUNTIME_ERROR);
+    }
+
+    if (functions.contains(Functions.P_THROW_RUNTIME_ERROR)) {
+      functions.add(Functions.P_PRINT_STRING);
+    }
+
+    /* Load the list of instructions. */
+
     List<Instruction> instructions = new ArrayList<>();
 
-    switch (function) {
-      case P_PRINT_INT:
-        instructions.addAll(pPrintIntInstruction());
-        break;
-      case P_PRINT_BOOL:
-        instructions.addAll(pPrintBoolInstruction());
-        break;
-      case P_PRINT_STRING:
-        instructions.addAll(pPrintStringInstruction());
-        break;
-      case P_PRINT_REFERENCE:
-        instructions.addAll(pPrintReferenceInstruction());
-        break;
-      case P_PRINT_LN:
-        instructions.addAll(pPrintLn());
-        break;
-      case P_CHECK_NULL_POINTER:
-        instructions.addAll(pCheckNullPointer());
-        break;
-      case P_THROW_RUNTIME_ERROR:
-        instructions.addAll(pThrowRuntimeError());
-        break;
-      case P_THROW_OVERFLOW_ERROR:
-        instructions.addAll(pThrowOverflowError());
-        break;
-      case P_CHECK_DIVIDE_BY_ZERO:
-        instructions.addAll(pCheckDivideByZero());
-        break;
-      case P_CHECK_ARRAY_BOUNDS:
-        instructions.addAll(pCheckArrayBounds());
-        break;
-      case P_READ_INT:
-        instructions.addAll(pReadInt());
-        break;
-      case P_READ_CHAR:
-        instructions.addAll(pReadChar());
-        break;
-      case P_FREE_PAIR:
-        instructions.addAll(pFreePair());
-        break;
+    for (Functions function : functions) {
+      instructions.addAll(getFunctionInstructions(function));
     }
 
     return instructions;
+  }
+
+  private static List<Instruction> getFunctionInstructions(Functions function) {
+    switch (function) {
+      case P_PRINT_INT:
+        return pPrintIntInstruction();
+      case P_PRINT_BOOL:
+        return pPrintBoolInstruction();
+      case P_PRINT_STRING:
+        return pPrintStringInstruction();
+      case P_PRINT_REFERENCE:
+        return pPrintReferenceInstruction();
+      case P_PRINT_LN:
+        return pPrintLn();
+      case P_CHECK_NULL_POINTER:
+        return pCheckNullPointer();
+      case P_THROW_RUNTIME_ERROR:
+        return pThrowRuntimeError();
+      case P_THROW_OVERFLOW_ERROR:
+        return pThrowOverflowError();
+      case P_CHECK_DIVIDE_BY_ZERO:
+        return pCheckDivideByZero();
+      case P_CHECK_ARRAY_BOUNDS:
+        return pCheckArrayBounds();
+      case P_READ_INT:
+        return pReadInt();
+      case P_READ_CHAR:
+        return pReadChar();
+      case P_FREE_PAIR:
+        return pFreePair();
+    }
+    return List.of();
   }
 
   public static void addMessage(Instruction instruction) {
