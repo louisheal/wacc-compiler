@@ -111,7 +111,7 @@ unaryOper: NOT      #not
          | ORD      #ord
          | CHR      #chr
          | MULTIPLY #reference
-         | DERFERENCE #dereference
+         | DEREFERENCE #dereference
          ;
 
 arrayElem: IDENT (SB_OPEN expr SB_CLOSE)+ ;
