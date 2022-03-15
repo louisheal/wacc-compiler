@@ -7,20 +7,20 @@ import assembly.Register;
 public class STR extends Instruction {
 
   //STR src, dest
-  public STR(assembly.Instruction.InstrType type, Register dest, Operand2 operand2) {
+  public STR(Register dest, Operand2 operand2) {
     this.dest = dest;
     this.operand2 = operand2;
   }
 
   //STR{cond} src, dest
-  public STR(assembly.Instruction.InstrType type, Register dest, Operand2 operand2, Conditionals conditionals) {
+  public STR(Register dest, Operand2 operand2, Conditionals conditionals) {
     this.dest = dest;
     this.operand2 = operand2;
     this.extraInformation += conditionals;
   }
 
   //STR{B} dest, operand
-  public STR(assembly.Instruction.InstrType type, Register dest, Operand2 operand2, String suffix) {
+  public STR(Register dest, Operand2 operand2, String suffix) {
     this.dest = dest;
     this.operand2 = operand2;
     this.extraInformation += suffix;
