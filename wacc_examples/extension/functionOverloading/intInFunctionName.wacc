@@ -1,0 +1,30 @@
+# Tests whether 2 functions with the same name but different parameters work
+# Tests if function can include type strings in the function name
+
+# Expected output:
+# 2
+# 0
+# 3
+
+begin
+    int foo(int x) is
+      return x + 1
+    end
+
+    int foo(int x, int y) is
+      return x + y
+    end
+
+    int foo_int() is
+      return 0
+    end
+
+    int x = call foo(1);
+    int y = call foo_int();
+    int z = call foo(1,2);
+
+
+    println x;
+    println y;
+    println z
+end
