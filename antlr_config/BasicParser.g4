@@ -110,6 +110,8 @@ unaryOper: NOT      #not
          | LEN      #len
          | ORD      #ord
          | CHR      #chr
+         | MULTIPLY #reference
+         | DERFERENCE #dereference
          ;
 
 arrayElem: IDENT (SB_OPEN expr SB_CLOSE)+ ;
