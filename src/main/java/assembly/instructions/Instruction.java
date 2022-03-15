@@ -5,7 +5,7 @@ import assembly.Flags;
 import assembly.Operand2;
 import assembly.Register;
 
-public class Instruction {
+public abstract class Instruction {
   Register dest;
   long immValue;
   Register operand1;
