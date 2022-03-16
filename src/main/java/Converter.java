@@ -216,18 +216,14 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     instructions.add(new LABEL("main:"));
 
-    //TODO: ADD LR
     instructions.add(new LABEL("PUSH {lr}"));
 
     int totalBytes = totalBytesInScope(program.getStatement());
     spLocation = totalBytes;
 
-    while (totalBytes > 1024) {
-      instructions.add(new LABEL("SUB sp, sp, #1024"));
+    while (totalBytes > 0) {
+      instructions.add(new SUB(sp, sp, new Operand2(Math.min(1024, totalBytes))));
       totalBytes -= 1024;
-    }
-    if (totalBytes > 0) {
-      instructions.add(new LABEL("SUB sp, sp, #" + totalBytes));
     }
 
     totalBytes = spLocation;
@@ -237,12 +233,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Generate the assembly instructions for the program body. */
     instructions.addAll(visitStatement(program.getStatement()));
 
-    while (totalBytes > 1024) {
-      instructions.add(new LABEL("ADD sp, sp, #1024"));
+    while (totalBytes > 0) {
+      instructions.add(new ADD(sp, sp, new Operand2(Math.min(1024, totalBytes))));
       totalBytes -= 1024;
-    }
-    if (totalBytes > 0) {
-      instructions.add(new LABEL("ADD sp, sp, #" + totalBytes));
     }
 
     instructions.add(new LDR(r0, 0));
@@ -280,11 +273,11 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     spLocation = totalBytes;
 
     while (totalBytes > 1024) {
-      instructions.add(new LABEL ("SUB sp, sp, #1024"));
+      instructions.add(new SUB(sp, sp, new Operand2(1024)));
       totalBytes -= 1024;
     }
     if (totalBytes > 0) {
-      instructions.add(new LABEL (String.format("SUB sp, sp, #%d", totalBytes)));
+      instructions.add(new SUB(sp, sp, new Operand2(totalBytes)));
     }
 
     totalBytes = spLocation;
@@ -443,7 +436,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     ArrayElem arrayElem = lhs.getArrayElem();
     List<Instruction> instructions = new ArrayList<>();
-    String instruction;
 
     /* Find where the array address is stored on the stack. */
     int stackOffset = currentST.getSPMapping(arrayElem.getIdent());
@@ -452,7 +444,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     Register rn = popUnusedRegister();
 
     // ADD rn, sp, #offset
-    instructions.add(new LABEL(String.format("ADD %s, sp, #%d", rn, stackOffset)));
+    instructions.add(new ADD(rn, sp, new Operand2(stackOffset)));
 
     for (Expression expression : arrayElem.getExpression()) {
 
@@ -477,14 +469,14 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       // ADD rn, rn, #4
       instructions.add(new ADD(rn, rn, new Operand2(4)));
 
+      //TODO: CLEAN UP LINE
       if (sizeOfTypeOnStack(getExpressionType(new ExpressionBuilder().buildArrayExpr(arrayElem))) == 1) {
         // ADD rn, rn, rm
-        instruction = String.format("ADD %s, %s, %s", rn, rn, rm);
+        instructions.add(new ADD(rn, rn, new Operand2(rm)));
       } else {
         // ADD rn, rn, rm, LSL #2
-        instruction = String.format("ADD %s, %s, %s, LSL #2", rn, rn, rm);
+        instructions.add(new LABEL(String.format("ADD %s, %s, %s, LSL #2", rn, rn, rm)));
       }
-      instructions.add(new LABEL(instruction));
 
       pushUnusedRegister(rm);
     }
@@ -677,30 +669,28 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     List<Instruction> instructions = new ArrayList<>();
 
     // MOV rn, #charVal
-    String instruction = String.format("MOV %s, #'%s'", rn, expression.getCharLiter());
-
     switch (expression.getCharLiter()) {
       case '\0':
-        instruction = String.format("MOV %s, #0", rn);
+        instructions.add(new MOV(rn, 0));
         break;
       case '\b':
-        instruction = String.format("MOV %s, #8", rn);
+        instructions.add(new MOV(rn, 8));
         break;
       case '\t':
-        instruction = String.format("MOV %s, #9", rn);
+        instructions.add(new MOV(rn, 9));
         break;
       case '\n':
-        instruction = String.format("MOV %s, #10", rn);
+        instructions.add(new MOV(rn, 10));
         break;
       case '\f':
-        instruction = String.format("MOV %s, #12", rn);
+        instructions.add(new MOV(rn, 12));
         break;
       case '\r':
-        instruction = String.format("MOV %s, #13", rn);
+        instructions.add(new MOV(rn, 13));
         break;
+      default:
+        instructions.add(new LABEL(String.format("MOV %s, #'%s'", rn, expression.getCharLiter())));
     }
-
-    instructions.add(new LABEL(instruction));
 
     /* Mark the register used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rn);
@@ -762,18 +752,17 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Allocate a register: rn for this function to use. */
     Register rn = popUnusedRegister();
 
-    String instruction = "LDR";
+    String suffix = "";
 
     if (sizeOfTypeOnStack(getExpressionType(expression)) == 1){
-      instruction += "SB";
+      suffix = "SB";
     }
 
     if (stackOffset != 0) {
-      instruction += String.format(" %s, [sp, #%d]", rn, stackOffset);
+      instructions.add(new LDR(rn, new Operand2(sp, stackOffset), suffix));
     } else {
-      instruction += String.format(" %s, [sp]", rn);
+      instructions.add(new LDR(rn, new Operand2(sp), suffix));
     }
-    instructions.add(new LABEL(instruction));
 
     /* Mark the register used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rn);
@@ -794,16 +783,12 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Retrieve the register rn, which contains the address of the array elem. */
     Register rn = popUnusedRegister();
 
-    String instruction = "LDR";
-
+    // LDR(SB) rn, [rn]
     if (sizeOfTypeOnStack(type.getArrayType()) == 1) {
-      instruction += "SB";
+      instructions.add(new LDR(rn, new Operand2(rn), "SB"));
+    } else {
+      instructions.add(new LDR(rn, new Operand2(rn)));
     }
-
-    instruction += String.format(" %s, [%s]", rn, rn);
-
-    // LDR rn, [rn]
-    instructions.add(new LABEL(instruction));
 
     /* Mark the register used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rn);
@@ -1392,9 +1377,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
       /* Store the evaluated expression into the malloc location at an offset. */
       if (typeSize == 1) {
-        instructions.add(new LABEL(String.format("STRB %s, [%s, #%d]", rm, rn, offset)));
+        instructions.add(new STR(rm, new Operand2(rn, offset), "B"));
       } else {
-        instructions.add(new LABEL(String.format("STR %s, [%s, #%d]", rm, rn, offset)));
+        instructions.add(new STR(rm, new Operand2(rn, offset)));
       }
 
       /* Mark register rm as no longer in use. */
@@ -1409,8 +1394,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     // LDR rm, =array.size()
     instructions.add(new LDR(rm, array.size()));
 
-    // STR r5, [r4]
-    instructions.add(new STR(rn, new Operand2(rm)));
+    // STR rm, [rn]
+    instructions.add(new STR(rm, new Operand2(rn)));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rm);
@@ -1458,14 +1443,14 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     if (sizeOfExp1 == 1) {
       // STRB rm, [r0]
-      instructions.add(new STR(r0, new Operand2(rm), "B"));
+      instructions.add(new STR(rm, new Operand2(r0), "B"));
     } else {
       // STR rm, [r0]
-      instructions.add(new STR(r0, new Operand2(rm)));
+      instructions.add(new STR(rm, new Operand2(r0)));
     }
 
     // STR r0, [rn]
-    instructions.add(new STR(rn, new Operand2(r0)));
+    instructions.add(new STR(r0, new Operand2(rn)));
 
     /* Mark the register rm as no longer in use. */
     pushUnusedRegister(rm);
@@ -1484,14 +1469,14 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     if (sizeOfExp2 == 1) {
       // STRB rm, [r0]
-      instructions.add(new STR(r0, new Operand2(rm), "B"));
+      instructions.add(new STR(rm, new Operand2(r0), "B"));
     } else {
       // STR rm, [r0]
-      instructions.add(new STR(r0, new Operand2(rm)));
+      instructions.add(new STR(rm, new Operand2(r0)));
     }
 
     // STR r0, [rn, #4]
-    instructions.add(new LABEL(String.format("STR r0, [%s, #4]", rn)));
+    instructions.add(new STR(r0, new Operand2(rn, 4)));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rm);
@@ -1525,7 +1510,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     if (sizeOfTypeOnStack(type) == 1) {
       // LDRSB rn, [rn]
-      instructions.add(new LABEL(String.format("LDRSB %s, [%s]", rn, rn)));
+      instructions.add(new LDR(rn, new Operand2(rn), "SB"));
     } else {
       // LDR rn, [rn]
       instructions.add(new LDR(rn, new Operand2(rn)));
@@ -1553,10 +1538,12 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       Register rn = popUnusedRegister();
 
       int expSize = sizeOfTypeOnStack(getExpressionType(expression));
-      if (expSize > 1) {
-        instructions.add(new LABEL(String.format("STR %s, [sp, #-%d]!", rn, expSize)));
+
+      // STR(B) rn, [sp]
+      if (expSize == 1) {
+        instructions.add(new STR(rn, new Operand2(sp, expSize), "B"));
       } else {
-        instructions.add(new LABEL(String.format("STRB %s, [sp, #-%d]!", rn, expSize)));
+        instructions.add(new STR(rn, new Operand2(sp, expSize)));
       }
 
       totalSize += expSize;
@@ -1774,7 +1761,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       instructions.add(new LDR(rn, new Operand2(rn)));
     } else {
       // LDR rn, [rn, #4]
-      instructions.add(new LABEL(String.format("LDR %s, [%s, #4]", rn, rn)));
+      instructions.add(new LDR(rn, new Operand2(rn, 4)));
     }
 
     pushUnusedRegister(rn);
