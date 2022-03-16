@@ -132,11 +132,11 @@ public class Expression {
     }
 
     if (exprType == ExprType.REFERENCE) {
-      result.append("*").append(expression1);
+      result.append("&").append(expression1);
     }
 
     if (exprType == ExprType.DEREFERENCE) {
-      result.append("&").append(expression1);
+      result.append("*").append(expression1);
     }
 
     return result.toString();

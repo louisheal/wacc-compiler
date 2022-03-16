@@ -119,4 +119,4 @@ NULL: 'null' ;
 IDENT: [_a-zA-Z] [_a-zA-Z0-9]* ;
 
 //pointer-types
-DEREFERENCE: '&' ;
+REFERENCE: '&' ;
