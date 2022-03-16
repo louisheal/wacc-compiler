@@ -7,7 +7,7 @@ import assembly.Register;
 
 public abstract class Instruction {
   Register dest;
-  long immValue;
+  Long immValue;
   Register operand1;
   Operand2 operand2;
   String extraInformation = "";

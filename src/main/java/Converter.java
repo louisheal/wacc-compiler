@@ -435,6 +435,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     ArrayElem arrayElem = lhs.getArrayElem();
     List<Instruction> instructions = new ArrayList<>();
+    int size = sizeOfTypeOnStack(currentST.getType(arrayElem.getIdent()).getArrayType());
 
     /* Find where the array address is stored on the stack. */
     int stackOffset = currentST.getSPMapping(arrayElem.getIdent());
@@ -468,13 +469,12 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       // ADD rn, rn, #4
       instructions.add(new ADD(rn, rn, new Operand2(4)));
 
-      //TODO: CLEAN UP LINE
-      if (sizeOfTypeOnStack(getExpressionType(new ExpressionBuilder().buildArrayExpr(arrayElem))) == 1) {
+      if (size == 1) {
         // ADD rn, rn, rm
         instructions.add(new ADD(rn, rn, new Operand2(rm)));
       } else {
         // ADD rn, rn, rm, LSL #2
-        instructions.add(new LABEL(String.format("ADD %s, %s, %s, LSL #2", rn, rn, rm)));
+        instructions.add(new ADD(rn, rn, new Operand2(rm), 2));
       }
 
       pushUnusedRegister(rm);

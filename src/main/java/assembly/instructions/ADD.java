@@ -6,11 +6,19 @@ import assembly.Register;
 
 public class ADD extends Instruction {
 
-  //ADD{cond} dest, operand1, operand2
+  //ADD dest, operand1, operand2
   public ADD(Register dest, Register operand1, Operand2 operand2) {
     this.dest = dest;
     this.operand1 = operand1;
     this.operand2 = operand2;
+  }
+
+  //ADD dest, operand1, operand2, LSL #2
+  public ADD(Register dest, Register operand1, Operand2 operand2, long val) {
+    this.dest = dest;
+    this.operand1 = operand1;
+    this.operand2 = operand2;
+    this.immValue = val;
   }
 
   //ADD{S}{cond} dest, operand1, operand2
@@ -23,6 +31,9 @@ public class ADD extends Instruction {
 
   @Override
   public String toString() {
-    return "ADD" + extraInformation + " " + dest + ", " + operand1 + ", " + operand2;
+    if (immValue != null) {
+      return String.format("ADD%s %s, %s, %s, LSL #%d", extraInformation, dest, operand1, operand2, immValue);
+    }
+    return String.format("ADD%s %s, %s, %s", extraInformation, dest, operand1, operand2);
   }
 }
