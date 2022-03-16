@@ -21,8 +21,8 @@ public class SUB extends Instruction {
     this.extraInformation += flag.toString();
   }
 
+  @Override
   public String toString() {
     return "SUB" + extraInformation + " " + dest + ", " + operand1 + ", " + operand2;
   }
-
 }
