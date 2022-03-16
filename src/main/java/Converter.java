@@ -1301,7 +1301,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     Register rm = popUnusedRegister();
 
     // AND r4, r4, r5
-    instructions.add(new LABEL(String.format("AND %s, %s, %s", rn, rn, rm)));
+    instructions.add(new BoolOp(BoolOp.BoolOpType.AND, rn, rn, rm));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rm);
@@ -1320,8 +1320,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     Register rn = popUnusedRegister();
     Register rm = popUnusedRegister();
 
-    // AND r4, r4, r5
-    instructions.add(new LABEL(String.format("ORR %s, %s, %s", rn, rn, rm)));
+    // ORR r4, r4, r5
+    instructions.add(new BoolOp(BoolOp.BoolOpType.ORR, rn, rn, rm));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rm);
