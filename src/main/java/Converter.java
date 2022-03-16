@@ -464,7 +464,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       instructions.add(new MOV(r1, new Operand2(rn)));
 
       // BL p_check_array_bounds
-      instructions.add(new BL("p_check_array_bounds"));
+      instructions.add(new Branch("p_check_array_bounds").setSuffix("L"));
 
       // ADD rn, rn, #4
       instructions.add(new ADD(rn, rn, new Operand2(4)));
@@ -503,7 +503,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new CMP(rn, new Operand2(0)));
 
     // BEQ Lx
-    instructions.add(new LABEL("BEQ " + label1));
+    instructions.add(new Branch(label1, Conditionals.EQ));
 
     /* Mark the register rn as no longer in use. */
     pushUnusedRegister(rn);
@@ -516,9 +516,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     currentST = currentST.getParent();
 
     // BL Lx+1
-    instructions.add(new BL(label2));
+    instructions.add(new Branch(label2).setSuffix("L"));
 
-    //Lx:
+    // Lx:
     instructions.add(new LABEL(label1 + ":"));
 
     /* Generate instructions for the 'else' clause of the statement and change scope. */
@@ -544,7 +544,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     String label2 = getLabel();
 
     // B Lx
-    instructions.add(new LABEL("B " + label1));
+    instructions.add(new Branch(label1));
 
     // Lx+1:
     instructions.add(new LABEL(label2 + ":"));
@@ -688,7 +688,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
         instructions.add(new MOV(rn, 13));
         break;
       default:
-        instructions.add(new MOV(rn, expression.getCharLiter()));
+        instructions.add(new MOV(rn, (Character) expression.getCharLiter()));
     }
 
     /* Mark the register used in the evaluation of this function as no longer in use. */
@@ -842,7 +842,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new RSB(rn, rn, new Operand2(0), Flags.S));
 
     // BLVS p_throw_overflow_error
-    instructions.add(new BL("p_throw_overflow_error", Conditionals.VS));
+    instructions.add(new Branch("p_throw_overflow_error", Conditionals.VS).setSuffix("L"));
 
     /* Mark the register used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rn);
@@ -947,7 +947,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new ADD(rn, rn, new Operand2(rm), Flags.S));
 
     // BLVS p_throw_overflow_error
-    instructions.add(new BL("p_throw_overflow_error", Conditionals.VS));
+    instructions.add(new Branch("p_throw_overflow_error", Conditionals.VS).setSuffix("L"));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rm);
@@ -979,7 +979,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     }
 
     // BLVS p_throw_overflow_error
-    instructions.add(new BL("p_throw_overflow_error", Conditionals.VS));
+    instructions.add(new Branch("p_throw_overflow_error", Conditionals.VS).setSuffix("L"));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rm);
@@ -1007,7 +1007,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new LABEL("CMP " + rm + ", " + rn + ", ASR #31"));
 
     // BLNE p_throw_overflow_error
-    instructions.add(new BL("p_throw_overflow_error", Conditionals.NE));
+    instructions.add(new Branch("p_throw_overflow_error", Conditionals.NE).setSuffix("L"));
 
     /* Mark the two registers used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rm);
@@ -1046,10 +1046,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new MOV(r1, new Operand2(rm)));
 
     // BL p_check_divide_by_zero
-    instructions.add(new BL("p_check_divide_by_zero"));
+    instructions.add(new Branch("p_check_divide_by_zero").setSuffix("L"));
 
     // BL __aeabi_idiv
-    instructions.add(new BL("__aeabi_idiv"));
+    instructions.add(new Branch("__aeabi_idiv").setSuffix("L"));
 
     // MOV Rn, R0
     instructions.add(new MOV(rn, new Operand2(r0)));
@@ -1091,10 +1091,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     }
 
     // BL p_check_divide_by_zero
-    instructions.add(new BL("p_check_divide_by_zero"));
+    instructions.add(new Branch("p_check_divide_by_zero").setSuffix("L"));
 
     // BL __aeabi_idiv
-    instructions.add(new BL("__aeabi_idivmod"));
+    instructions.add(new Branch("__aeabi_idivmod").setSuffix("L"));
 
     // MOV Rn, R1
     instructions.add(new MOV(rn, new Operand2(r1)));
@@ -1357,7 +1357,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new LDR(r0, mallocSize));
 
     // BL malloc
-    instructions.add(new BL("malloc"));
+    instructions.add(new Branch("malloc").setSuffix("L"));
 
     /* Allocate one register: rn for this function to use. */
     Register rn = popUnusedRegister();
@@ -1416,7 +1416,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new LDR(r0, 8));
 
     // BL malloc
-    instructions.add(new BL("malloc"));
+    instructions.add(new Branch("malloc").setSuffix("L"));
 
     /* Allocate one register: rn for this function to use. */
     rn = popUnusedRegister();
@@ -1438,7 +1438,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new LDR(r0, sizeOfExp1));
 
     // BL malloc
-    instructions.add(new BL("malloc"));
+    instructions.add(new Branch("malloc").setSuffix("L"));
 
     if (sizeOfExp1 == 1) {
       // STRB rm, [r0]
@@ -1464,7 +1464,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new LDR(r0, sizeOfTypeOnStack(getExpressionType(rhs.getExpression2()))));
 
     // BL malloc
-    instructions.add(new BL("malloc"));
+    instructions.add(new Branch("malloc").setSuffix("L"));
 
     if (sizeOfExp2 == 1) {
       // STRB rm, [r0]
@@ -1555,7 +1555,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     currentST.resetOffset();
 
     // BL f_functionIdentity
-    instructions.add(new BL(rhs.getFunctionIdent()));
+    instructions.add(new Branch(rhs.getFunctionIdent()).setSuffix("L"));
 
     // ADD sp, sp, #totalSize
     instructions.add(new LABEL("ADD sp, sp, #" + totalSize));
@@ -1606,11 +1606,11 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Use int/char instruction depending on the type of the LHS. */
     if (eType == INT) {
       // BL p_read_int
-      instructions.add(new BL("p_read_int"));
+      instructions.add(new Branch("p_read_int").setSuffix("L"));
       predefinedFunctions.add(P_READ_INT);
     } else if (eType == CHAR) {
       // BL p_read_char
-      instructions.add(new BL("p_read_char"));
+      instructions.add(new Branch("p_read_char").setSuffix("L"));
       predefinedFunctions.add(P_READ_CHAR);
     }
 
@@ -1634,7 +1634,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     // MOV r0, rn
     instructions.add(new MOV(r0, new Operand2(rn)));
     // BL p_free_pair
-    instructions.add(new BL("p_free_pair"));
+    instructions.add(new Branch("p_free_pair").setSuffix("L"));
 
     /* Mark register rn as no longer in use. */
     pushUnusedRegister(rn);
@@ -1670,7 +1670,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       instructions.add(new MOV(r0, new Operand2(rn)));
     }
     // BL exit
-    instructions.add(new BL("exit"));
+    instructions.add(new Branch("exit").setSuffix("L"));
 
     /* Mark register rn as no longer in use. */
     pushUnusedRegister(rn);
@@ -1695,23 +1695,23 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     if (Objects.equals(type, new Type(INT))) {
       // BL p_print_int
-      instructions.add(new BL("p_print_int"));
+      instructions.add(new Branch("p_print_int").setSuffix("L"));
       predefinedFunctions.add(P_PRINT_INT);
     } else if (Objects.equals(type, new Type(STRING)) || Objects.equals(type, new Type(ARRAY, new Type(CHAR)))) {
       // BL p_print_string
-      instructions.add(new BL("p_print_string"));
+      instructions.add(new Branch("p_print_string").setSuffix("L"));
       predefinedFunctions.add(P_PRINT_STRING);
     } else if (Objects.equals(type, new Type(BOOL))) {
       // BL p_print_bool
-      instructions.add(new BL("p_print_bool"));
+      instructions.add(new Branch("p_print_bool").setSuffix("L"));
       predefinedFunctions.add(P_PRINT_BOOL);
     } else if (Objects.equals(type, new Type(CHAR))) {
       // BL putchar
-      instructions.add(new BL("putchar"));
+      instructions.add(new Branch("putchar").setSuffix("L"));
     } else {
       // For printing arrays and pairs
       // BL p_print_reference
-      instructions.add(new BL("p_print_reference"));
+      instructions.add(new Branch("p_print_reference").setSuffix("L"));
       predefinedFunctions.add(P_PRINT_REFERENCE);
     }
 
@@ -1731,7 +1731,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     List<Instruction> instructions = new ArrayList<>(visitPrintStatement(statement));
 
     // BL p_print_ln
-    instructions.add(new BL("p_print_ln"));
+    instructions.add(new Branch("p_print_ln").setSuffix("L"));
 
     return instructions;
   }
@@ -1753,7 +1753,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new MOV(r0, new Operand2(rn)));
 
     // BL p_check_null_pointer
-    instructions.add(new BL("p_check_null_pointer"));
+    instructions.add(new Branch("p_check_null_pointer").setSuffix("L"));
 
     if (pairElem.getType() == PairElem.PairElemType.FST) {
       // LDR rn, [rn]

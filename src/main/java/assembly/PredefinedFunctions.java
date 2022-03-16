@@ -126,13 +126,13 @@ public class PredefinedFunctions {
     instructions.add(new ADD(r0, r0, new Operand2(4)));
 
     // BL printf
-    instructions.add(new BL("printf"));
+    instructions.add(new Branch("printf").setSuffix("L"));
 
     // MOV r0, #0
     instructions.add(new MOV(r0, new Operand2(0)));
 
     // BL fflush
-    instructions.add(new BL("fflush"));
+    instructions.add(new Branch("fflush").setSuffix("L"));
 
     // POP {pc}
     instructions.add(new LABEL("POP {pc}"));
@@ -181,13 +181,13 @@ public class PredefinedFunctions {
     instructions.add(new ADD(r0, r0, new Operand2(4)));
 
     // BL printf
-    instructions.add(new BL("printf"));
+    instructions.add(new Branch("printf").setSuffix("L"));
 
     // MOV r0, #0
     instructions.add(new MOV(r0, new Operand2(0)));
 
     // BL fflush
-    instructions.add(new BL("fflush"));
+    instructions.add(new Branch("fflush").setSuffix("L"));
 
     // POP {pc}
     instructions.add(new LABEL("POP {pc}"));
@@ -229,13 +229,13 @@ public class PredefinedFunctions {
     instructions.add(new ADD(r0, r0, new Operand2(4)));
 
     // BL printf
-    instructions.add(new BL("printf"));
+    instructions.add(new Branch("printf").setSuffix("L"));
 
     // MOV r0, #0
     instructions.add(new MOV(r0, new Operand2(0)));
 
     //	BL fflush
-    instructions.add(new BL("fflush"));
+    instructions.add(new Branch("fflush").setSuffix("L"));
 
     //	POP {pc}
     instructions.add(new LABEL("POP {pc}"));
@@ -272,13 +272,13 @@ public class PredefinedFunctions {
     instructions.add(new ADD(r0, r0, new Operand2(4)));
 
     // BL printf
-    instructions.add(new BL("printf"));
+    instructions.add(new Branch("printf").setSuffix("L"));
 
     // MOV r0, #0
     instructions.add(new MOV(r0, new Operand2(0)));
 
     // BL fflush
-    instructions.add(new BL( "fflush"));
+    instructions.add(new Branch( "fflush").setSuffix("L"));
 
     // POP {pc}
     instructions.add(new LABEL("POP {pc}"));
@@ -312,13 +312,13 @@ public class PredefinedFunctions {
     instructions.add(new ADD(r0, r0, new Operand2(4)));
 
     // BL puts
-    instructions.add(new BL("puts"));
+    instructions.add(new Branch("puts").setSuffix("L"));
 
     // MOV r0, #0
     instructions.add(new MOV(r0, new Operand2(0)));
 
     // BL fflush
-    instructions.add(new BL("fflush"));
+    instructions.add(new Branch("fflush").setSuffix("L"));
 
     // POP {pc}
     instructions.add(new LABEL("POP {pc}"));
@@ -352,7 +352,7 @@ public class PredefinedFunctions {
     msgCounter++;
 
     // BLEQ p_throw_runtime_error
-    instructions.add(new BL("p_throw_runtime_error", Conditionals.EQ));
+    instructions.add(new Branch("p_throw_runtime_error", Conditionals.EQ).setSuffix("L"));
 
     // POP {pc}
     instructions.add(new LABEL("POP {pc}"));
@@ -368,13 +368,13 @@ public class PredefinedFunctions {
     instructions.add(new LABEL("p_throw_runtime_error:"));
 
     // BL p_print_string
-    instructions.add(new BL("p_print_string"));
+    instructions.add(new Branch("p_print_string").setSuffix("L"));
 
     // MOV r0, #-1
     instructions.add(new MOV(r0, new Operand2(-1)));
 
     // BL exit
-    instructions.add(new BL("exit"));
+    instructions.add(new Branch("exit").setSuffix("L"));
 
     return instructions;
   }
@@ -398,7 +398,7 @@ public class PredefinedFunctions {
     msgCounter++;
 
     // BL p_throw_runtime_error
-    instructions.add(new BL("p_throw_runtime_error"));
+    instructions.add(new Branch("p_throw_runtime_error").setSuffix("L"));
 
     return instructions;
   }
@@ -428,7 +428,7 @@ public class PredefinedFunctions {
     msgCounter++;
 
     // BLEQ p_throw_runtime_error
-    instructions.add(new BL("p_throw_runtime_error", Conditionals.EQ));
+    instructions.add(new Branch("p_throw_runtime_error", Conditionals.EQ).setSuffix("L"));
 
     // POP {pc}
     instructions.add(new LABEL("POP {pc}"));
@@ -461,7 +461,7 @@ public class PredefinedFunctions {
     msgCounter++;
 
     // BLLT p_throw_runtime_error
-    instructions.add(new BL("p_throw_runtime_error", Conditionals.LT));
+    instructions.add(new Branch("p_throw_runtime_error", Conditionals.LT).setSuffix("L"));
 
     // LDR r1, [r1]
     instructions.add(new LDR(r1, new Operand2(r1)));
@@ -482,7 +482,7 @@ public class PredefinedFunctions {
     msgCounter++;
 
     // BLCS p_throw_runtime_error
-    instructions.add(new BL("p_throw_runtime_error", Conditionals.CS));
+    instructions.add(new Branch("p_throw_runtime_error", Conditionals.CS).setSuffix("L"));
 
     // POP {pc}
     instructions.add(new LABEL("POP {pc}"));
@@ -517,7 +517,7 @@ public class PredefinedFunctions {
     instructions.add(new ADD(r0, r0, new Operand2(4)));
 
     // BL scanf
-    instructions.add(new BL("scanf"));
+    instructions.add(new Branch("scanf").setSuffix("L"));
 
     // POP {pc}
     instructions.add(new LABEL("POP {pc}"));
@@ -552,7 +552,7 @@ public class PredefinedFunctions {
     instructions.add(new ADD(r0, r0, new Operand2(4)));
 
     //  	BL scanf
-    instructions.add(new BL("scanf"));
+    instructions.add(new Branch("scanf").setSuffix("L"));
 
     //	POP {pc}
     instructions.add(new LABEL("POP {pc}"));
@@ -593,7 +593,7 @@ public class PredefinedFunctions {
     instructions.add(new LDR(r0, new Operand2(r0)));
 
     // BL free
-    instructions.add(new BL("free"));
+    instructions.add(new Branch("free").setSuffix("L"));
 
     // LDR r0, [sp]
     instructions.add(new LDR(r0, new Operand2(sp)));
@@ -602,13 +602,13 @@ public class PredefinedFunctions {
     instructions.add(new LDR(r0, new Operand2(r0, 4)));
 
     // BL free
-    instructions.add(new BL("free"));
+    instructions.add(new Branch("free").setSuffix("L"));
 
     // POP {r0}
     instructions.add(new POP(r0));
 
     // BL free
-    instructions.add(new BL("free"));
+    instructions.add(new Branch("free").setSuffix("L"));
 
     // POP {pc}
     instructions.add(new LABEL("POP {pc}"));

@@ -44,7 +44,7 @@ public class MOV extends Instruction {
   public String toString() {
 
     if (immChar != null) {
-      return String.format("MOV %s, #'%c'", rn, immChar);
+      return String.format("MOV %s, #'%s'", dest, immChar);
     }
 
     if (operand2 == null) {
