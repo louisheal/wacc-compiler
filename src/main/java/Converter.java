@@ -315,20 +315,19 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     int stackOffset = spLocation - sizeOfTypeOnStack(statement.getLhsType());
 
-    String instruction = "STR";
+    String suffix = "";
 
     if (sizeOfTypeOnStack(statement.getLhsType()) == 1) {
-      instruction += "B";
+      suffix = "B";
     }
 
     if (stackOffset > 0) {
-      // STR rn, [sp]
-      instruction += String.format(" %s, [sp, #%d]", rn, stackOffset);
-    } else {
       // STR rn, [sp, #i]
-      instruction += String.format(" %s, [sp]", rn);
+      instructions.add(new STR(rn, new Operand2(sp, stackOffset), suffix));
+    } else {
+      // STR rn, [sp]
+      instructions.add(new STR(rn, new Operand2(sp), suffix));
     }
-    instructions.add(new LABEL(instruction));
 
     /* Add the variable to the symbol table. */
     currentST.setSPMapping(statement.getLhsIdent(), stackOffset);
@@ -358,19 +357,19 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
       Expression expression = new ExpressionBuilder().buildIdentExpr(statement.getLHS().getIdent());
 
-      String instruction = "STR";
+      String suffix = "";
 
       if (sizeOfTypeOnStack(getExpressionType(expression)) == 1) {
-        instruction += "B";
+        suffix = "B";
       }
 
       if (stackOffset > 0) {
-        instruction += String.format(" %s, [sp, #%d]", rn, stackOffset);
+        // STR rn, [sp, #i]
+        instructions.add(new STR(rn, new Operand2(sp, stackOffset), suffix));
       } else {
-        instruction += String.format(" %s, [sp]", rn);
+        // STR rn, [sp]
+        instructions.add(new STR(rn, new Operand2(sp), suffix));
       }
-
-      instructions.add(new LABEL(instruction));
 
       pushUnusedRegister(rn);
 
@@ -689,7 +688,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
         instructions.add(new MOV(rn, 13));
         break;
       default:
-        instructions.add(new LABEL(String.format("MOV %s, #'%s'", rn, expression.getCharLiter())));
+        instructions.add(new MOV(rn, expression.getCharLiter()));
     }
 
     /* Mark the register used in the evaluation of this function as no longer in use. */
