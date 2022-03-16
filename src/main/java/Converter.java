@@ -1,8 +1,5 @@
-import assembly.Conditionals;
-import assembly.Flags;
+import assembly.*;
 import assembly.instructions.*;
-import assembly.Operand2;
-import assembly.Register;
 import ast.*;
 
 import ast.Type.EType;
@@ -10,6 +7,7 @@ import java.util.*;
 
 import static assembly.PredefinedFunctions.*;
 import static assembly.PredefinedFunctions.Functions.*;
+import static assembly.LibraryFunctions.*;
 import static assembly.instructions.Directive.DirectiveType;
 import static ast.Type.EType.*;
 
@@ -33,6 +31,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   /* Pre-defined Functions List. */
   private final Set<Functions> predefinedFunctions = new HashSet<>();
+  private final Set<LFunctions> libraryFunctions = new HashSet<>();
 
   private String getLabel() {
     int result = labelNum;
@@ -241,6 +240,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new LDR(r0, 0));
     instructions.add(new LABEL("POP {pc}"));
     instructions.add(new Directive(DirectiveType.LTORG));
+
+    if (!libraryFunctions.isEmpty()) {
+      instructions.addAll(getInstructions(libraryFunctions));
+    }
 
     if (!predefinedFunctions.isEmpty()) {
       instructions.addAll(getInstructions(predefinedFunctions));
@@ -1568,6 +1571,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     /* Mark register rn as no longer in use. */
     pushUnusedRegister(rn);
+
+    if (isLibraryFunction(rhs.getFunctionIdent())) {
+      libraryFunctions.add(getLibraryFunction(rhs.getFunctionIdent()));
+    }
 
     return instructions;
   }

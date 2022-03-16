@@ -1,3 +1,4 @@
+import assembly.LibraryFunctions;
 import ast.*;
 import ast.AssignRHS.RHSType;
 import ast.Type.EType;
@@ -254,6 +255,11 @@ public class SemanticAnalysis {
   }
 
   public void traverse(Program program) {
+
+    for (LibraryFunctions.LFunctions function : LibraryFunctions.LFunctions.values()) {
+      functionParams.put(function.getIdent(), function.getParams());
+      functionReturnTypes.put(function.getIdent(), function.getReturnType());
+    }
 
     for (Function function : program.getFunctions()) {
 

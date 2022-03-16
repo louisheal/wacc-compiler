@@ -1,6 +1,8 @@
 package assembly;
 
 import assembly.instructions.*;
+import ast.Param;
+import ast.Type;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +31,47 @@ public class LibraryFunctions {
     private final static Register pc = new Register(15);
 
     public enum LFunctions {
-        ONE
+        ONE("f_one", new ArrayList<>(), new Type(Type.EType.INT));
+
+        private final String ident;
+        private final List<Param> params;
+        private final Type returnType;
+
+        LFunctions(String ident, List<Param> params, Type returnType) {
+            this.ident = ident;
+            this.params = params;
+            this.returnType = returnType;
+        }
+
+        public String getIdent() {
+            return ident;
+        }
+
+        public List<Param> getParams() {
+            return params;
+        }
+
+        public Type getReturnType() {
+            return returnType;
+        }
+    }
+
+    public static Boolean isLibraryFunction(String ident) {
+        for (LFunctions function : LFunctions.values()) {
+            if (function.ident.equals(ident)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static LFunctions getLibraryFunction(String ident) {
+        for (LFunctions function : LFunctions.values()) {
+            if (function.ident.equals(ident)) {
+                return function;
+            }
+        }
+        return null;
     }
 
     public static List<Instruction> getInstructions(Set<LFunctions> functions) {
@@ -46,6 +88,7 @@ public class LibraryFunctions {
     private static List<Instruction> getFunctionInstructions(LFunctions function) {
         switch (function) {
             case ONE:
+                return oneInstructions();
         }
         return List.of();
     }
