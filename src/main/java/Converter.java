@@ -203,10 +203,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     List<Instruction> instructions = new ArrayList<>();
 
-    instructions.add(new TEXT(""));
+    instructions.add(new Directive(Directive.DirectiveType.TEXT));
     instructions.add(new LABEL("")); // Leave gap in lines
 
-    instructions.add(new GLOBALMAIN(""));
+    instructions.add(new Directive(Directive.DirectiveType.GLOBAL));
 
     /* Generate the assembly instructions for each function. */
     for (Function function : program.getFunctions()) {
@@ -246,11 +246,11 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     instructions.add(new LDR(r0, 0));
     instructions.add(new LABEL("POP {pc}"));
-    instructions.add(new LTORG(""));
+    instructions.add(new Directive(Directive.DirectiveType.LTORG));
 
     if (!predefinedFunctions.isEmpty()) {
       instructions.addAll(getInstructions(predefinedFunctions));
-      instructions.add(0, new DATA(""));
+      instructions.add(0, new Directive(Directive.DirectiveType.DATA));
       instructions.add(1, new LABEL(""));
       instructions.add(2, new LABEL("")); // Leave gap in lines
     }
@@ -299,7 +299,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Evaluate function body. */
     instructions.addAll(visitStatement(function.getStatement()));
 
-    instructions.add(new LTORG( ""));
+    instructions.add(new Directive(Directive.DirectiveType.LTORG));
 
     return instructions;
   }
