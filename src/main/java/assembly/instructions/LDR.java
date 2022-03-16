@@ -55,11 +55,11 @@ public class LDR extends Instruction {
   @Override
   public String toString() {
     if(label != null) {
-      return "LDR" + extraInformation + " " + dest + ", =" + label;
+      return String.format("LDR%s %s, =%s", extraInformation, dest, label);
     } else if (operand2 == null) {
-      return "LDR" + " " + dest + ", =" + immValue;
+      return String.format("LDR%s %s, =%d", extraInformation, dest, immValue);
     } else {
-      return  "LDR" + " " + dest + ", [" + operand2 + "]";
+      return String.format("LDR%s %s, [%s]", extraInformation, dest, operand2);
     }
   }
 }
