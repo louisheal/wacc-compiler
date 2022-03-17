@@ -1,8 +1,5 @@
-import assembly.Conditionals;
-import assembly.Flags;
+import assembly.*;
 import assembly.instructions.*;
-import assembly.Operand2;
-import assembly.Register;
 import ast.*;
 
 import ast.Type.EType;
@@ -10,6 +7,7 @@ import java.util.*;
 
 import static assembly.PredefinedFunctions.*;
 import static assembly.PredefinedFunctions.Functions.*;
+import static assembly.LibraryFunctions.*;
 import static assembly.instructions.Directive.DirectiveType;
 import static ast.Type.EType.*;
 
@@ -33,6 +31,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   /* Pre-defined Functions List. */
   private final Set<Functions> predefinedFunctions = new HashSet<>();
+  private final Set<LFunctions> libraryFunctions = new HashSet<>();
 
   private String getLabel() {
     int result = labelNum;
@@ -204,11 +203,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     List<Instruction> instructions = new ArrayList<>();
 
-    instructions.add(new Directive(DirectiveType.TEXT));
-    instructions.add(new LABEL("")); // Leave gap in lines
-
-    instructions.add(new Directive(DirectiveType.GLOBAL));
-
     /* Generate the assembly instructions for each function. */
     for (Function function : program.getFunctions()) {
       instructions.addAll(visitFunction(function));
@@ -242,11 +236,20 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new LABEL("POP {pc}"));
     instructions.add(new Directive(DirectiveType.LTORG));
 
+    if (!libraryFunctions.isEmpty()) {
+      instructions.addAll(0, getInstructions(libraryFunctions, predefinedFunctions));
+    }
+
+    instructions.add(0, new Directive(DirectiveType.TEXT));
+    instructions.add(1, new LABEL(""));
+
+    instructions.add(2, new Directive(DirectiveType.GLOBAL));
+
     if (!predefinedFunctions.isEmpty()) {
       instructions.addAll(getInstructions(predefinedFunctions));
       instructions.add(0, new Directive(DirectiveType.DATA));
       instructions.add(1, new LABEL(""));
-      instructions.add(2, new LABEL("")); // Leave gap in lines
+      instructions.add(2, new LABEL(""));
     }
     instructions.addAll(2, getMessages());
 
@@ -1540,9 +1543,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
       // STR(B) rn, [sp]
       if (expSize == 1) {
-        instructions.add(new STR(rn, new Operand2(sp, expSize), "B"));
+        instructions.add(new STR(rn, new Operand2(sp, -expSize), "B").setExclaim());
       } else {
-        instructions.add(new STR(rn, new Operand2(sp, expSize)));
+        instructions.add(new STR(rn, new Operand2(sp, -expSize)).setExclaim());
       }
 
       totalSize += expSize;
@@ -1568,6 +1571,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     /* Mark register rn as no longer in use. */
     pushUnusedRegister(rn);
+
+    if (isLibraryFunction(rhs.getFunctionIdent())) {
+      libraryFunctions.add(getLibraryFunction(rhs.getFunctionIdent()));
+    }
 
     return instructions;
   }
