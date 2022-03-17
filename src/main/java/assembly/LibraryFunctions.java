@@ -168,7 +168,7 @@ public class LibraryFunctions {
       instructions.add(new CMP(r4, 0));
 
       // BEQ L0
-      instructions.add(new Branch("L0", Conditionals.EQ));
+      instructions.add(new Branch("absL0", Conditionals.EQ));
 
       // LDR r4, [sp, #4]
       instructions.add(new LDR(r4, new Operand2(sp, 4)));
@@ -180,10 +180,10 @@ public class LibraryFunctions {
       instructions.add(new POP(pc));
 
       // B L1
-      instructions.add(new Branch("L1"));
+      instructions.add(new Branch("absL1"));
 
       // L0:
-      instructions.add(new LABEL("L0:"));
+      instructions.add(new LABEL("absL0:"));
 
       // SUB sp, sp, #4
       instructions.add(new SUB(sp, sp, new Operand2(4)));
@@ -231,7 +231,7 @@ public class LibraryFunctions {
       instructions.add(new ADD(sp, sp, new Operand2(4)));
 
       //L1:
-      instructions.add(new LABEL("L1:"));
+      instructions.add(new LABEL("absL1:"));
 
       //POP {pc}
       instructions.add(new POP(pc));
@@ -286,18 +286,18 @@ public class LibraryFunctions {
       instructions.add(new BoolOp(BoolOpType.AND, r5, r5, r6));
       instructions.add(new BoolOp(BoolOpType.ORR, r4, r4 ,r5));
       instructions.add(new CMP(r4, 0));
-      instructions.add(new Branch("L0", Conditionals.EQ));
+      instructions.add(new Branch("isAlnumL0", Conditionals.EQ));
       instructions.add(new MOV(r4, 1));
       instructions.add(new MOV(r0, new Operand2(r4)));
       instructions.add(new ADD(sp, sp, new Operand2(4)));
       instructions.add(new POP(pc));
-      instructions.add(new Branch("L1"));
-      instructions.add(new LABEL("L0:"));
+      instructions.add(new Branch("isAlnumL1"));
+      instructions.add(new LABEL("isAlnumL0:"));
       instructions.add(new MOV(r4, 0));
       instructions.add(new MOV(r0, new Operand2(r4)));
       instructions.add(new ADD(sp, sp ,new Operand2(4)));
       instructions.add(new POP(pc));
-      instructions.add(new LABEL("L1:"));
+      instructions.add(new LABEL("isAlnumL1:"));
       instructions.add(new POP(pc));
       instructions.add(new Directive(LTORG));
 
@@ -322,9 +322,9 @@ public class LibraryFunctions {
         instructions.add(new ADD(r4, r4, new Operand2(r5), 2));
         instructions.add(new LDR(r4, new Operand2(r4)));
         instructions.add(new STR(r4, new Operand2(sp)));
-        instructions.add(new Branch("L0_" + MAX.getIdent()));
+        instructions.add(new Branch("maxL0_" + MAX.getIdent()));
 
-        instructions.add(new LABEL("L1_" + MAX.getIdent() + ":"));
+        instructions.add(new LABEL("maxL1_" + MAX.getIdent() + ":"));
         instructions.add(new ADD(r4, sp, new Operand2(12)));
         instructions.add(new LDR(r5, new Operand2(sp, 4)));
         instructions.add(new LDR(r4, new Operand2(r4)));
@@ -339,7 +339,7 @@ public class LibraryFunctions {
         instructions.add(new MOV(r4, 1, Conditionals.GT));
         instructions.add(new MOV(r4, 0, Conditionals.LE));
         instructions.add(new CMP(r4, 0));
-        instructions.add(new Branch("L2_" + MAX.getIdent(), Conditionals.EQ));
+        instructions.add(new Branch("maxL2_" + MAX.getIdent(), Conditionals.EQ));
         instructions.add(new ADD(r4, sp, new Operand2(12)));
         instructions.add(new LDR(r5, new Operand2(sp, 4)));
         instructions.add(new LDR(r4, new Operand2(r4)));
@@ -350,18 +350,18 @@ public class LibraryFunctions {
         instructions.add(new ADD(r4, r4, new Operand2(r5), 2));
         instructions.add(new LDR(r4, new Operand2(r4)));
         instructions.add(new STR(r4, new Operand2(sp)));
-        instructions.add(new Branch("L3_" + MAX.getIdent()));
+        instructions.add(new Branch("maxL3_" + MAX.getIdent()));
 
-        instructions.add(new LABEL("L2_" + MAX.getIdent() + ":"));
+        instructions.add(new LABEL("maxL2_" + MAX.getIdent() + ":"));
 
-        instructions.add(new LABEL("L3_" + MAX.getIdent() + ":"));
+        instructions.add(new LABEL("maxL3_" + MAX.getIdent() + ":"));
         instructions.add(new LDR(r4, new Operand2(sp, 4)));
         instructions.add(new LDR(r5, 1));
         instructions.add(new ADD(r4, r4, new Operand2(r5), Flags.S));
         instructions.add(new Branch("p_throw_overflow_error", Conditionals.VS).setSuffix("L"));
         instructions.add(new STR(r4, new Operand2(sp, 4)));
 
-        instructions.add(new LABEL("L0_" + MAX.getIdent() + ":"));
+        instructions.add(new LABEL("maxL0_" + MAX.getIdent() + ":"));
         instructions.add(new LDR(r4, new Operand2(sp, 4)));
         instructions.add(new LDR(r5, new Operand2(sp, 12)));
         instructions.add(new LDR(r5, new Operand2(r5)));
@@ -369,7 +369,7 @@ public class LibraryFunctions {
         instructions.add(new MOV(r4, 1, Conditionals.LT));
         instructions.add(new MOV(r4, 0, Conditionals.GE));
         instructions.add(new CMP(r4, 1));
-        instructions.add(new Branch("L1_" + MAX.getIdent(), Conditionals.EQ));
+        instructions.add(new Branch("maxL1_" + MAX.getIdent(), Conditionals.EQ));
         instructions.add(new LDR(r4, new Operand2(sp)));
         instructions.add(new MOV(r0, new Operand2(r4)));
         instructions.add(new ADD(sp, sp, new Operand2(8)));
@@ -399,9 +399,9 @@ public class LibraryFunctions {
         instructions.add(new ADD(r4, r4, new Operand2(r5), 2));
         instructions.add(new LDR(r4, new Operand2(r4)));
         instructions.add(new STR(r4, new Operand2(sp)));
-        instructions.add(new Branch("L0_" + MIN.getIdent()));
+        instructions.add(new Branch("minL0_" + MIN.getIdent()));
 
-        instructions.add(new LABEL("L1_" + MIN.getIdent() + ":"));
+        instructions.add(new LABEL("minL1_" + MIN.getIdent() + ":"));
         instructions.add(new ADD(r4, sp, new Operand2(12)));
         instructions.add(new LDR(r5, new Operand2(sp, 4)));
         instructions.add(new LDR(r4, new Operand2(r4)));
@@ -416,7 +416,7 @@ public class LibraryFunctions {
         instructions.add(new MOV(r4, 1, Conditionals.LE));
         instructions.add(new MOV(r4, 0, Conditionals.GT));
         instructions.add(new CMP(r4, 0));
-        instructions.add(new Branch("L2_" + MIN.getIdent(), Conditionals.EQ));
+        instructions.add(new Branch("minL2_" + MIN.getIdent(), Conditionals.EQ));
         instructions.add(new ADD(r4, sp, new Operand2(12)));
         instructions.add(new LDR(r5, new Operand2(sp, 4)));
         instructions.add(new LDR(r4, new Operand2(r4)));
@@ -427,18 +427,18 @@ public class LibraryFunctions {
         instructions.add(new ADD(r4, r4, new Operand2(r5), 2));
         instructions.add(new LDR(r4, new Operand2(r4)));
         instructions.add(new STR(r4, new Operand2(sp)));
-        instructions.add(new Branch("L3_" + MIN.getIdent()));
+        instructions.add(new Branch("minL3_" + MIN.getIdent()));
 
-        instructions.add(new LABEL("L2_" + MIN.getIdent() + ":"));
+        instructions.add(new LABEL("minL2_" + MIN.getIdent() + ":"));
 
-        instructions.add(new LABEL("L3_" + MIN.getIdent() + ":"));
+        instructions.add(new LABEL("minL3_" + MIN.getIdent() + ":"));
         instructions.add(new LDR(r4, new Operand2(sp, 4)));
         instructions.add(new LDR(r5, 1));
         instructions.add(new ADD(r4, r4, new Operand2(r5), Flags.S));
         instructions.add(new Branch("p_throw_overflow_error", Conditionals.VS).setSuffix("L"));
         instructions.add(new STR(r4, new Operand2(sp, 4)));
 
-        instructions.add(new LABEL("L0_" + MIN.getIdent() + ":"));
+        instructions.add(new LABEL("minL0_" + MIN.getIdent() + ":"));
         instructions.add(new LDR(r4, new Operand2(sp, 4)));
         instructions.add(new LDR(r5, new Operand2(sp, 12)));
         instructions.add(new LDR(r5, new Operand2(r5)));
@@ -446,7 +446,7 @@ public class LibraryFunctions {
         instructions.add(new MOV(r4, 1, Conditionals.LT));
         instructions.add(new MOV(r4, 0, Conditionals.GE));
         instructions.add(new CMP(r4, 1));
-        instructions.add(new Branch("L1_" + MIN.getIdent(), Conditionals.EQ));
+        instructions.add(new Branch("minL1_" + MIN.getIdent(), Conditionals.EQ));
         instructions.add(new LDR(r4, new Operand2(sp)));
         instructions.add(new MOV(r0, new Operand2(r4)));
         instructions.add(new ADD(sp, sp, new Operand2(8)));
