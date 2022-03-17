@@ -51,6 +51,12 @@ public class LibraryFunctions {
       return params;
     }
 
+    private static List<Param> getIsAlphaParams(){
+      List<Param> params = new ArrayList<>();
+      params.add(new Param(new Type(CHAR), "c"));
+      return params;
+    }
+
 
     private static List<Param> getMinParams() {
         List<Param> params = new ArrayList<>();
@@ -64,6 +70,8 @@ public class LibraryFunctions {
         ABS("int_f_abs", getAbsParams(), new Type(INT)),
 
         ISALNUM("char_f_isAlnum", getIsAlNumParams(), new Type(BOOL)),
+
+        ISALPHA("char_f_isAlpha", getIsAlphaParams(), new Type(BOOL)),
 
         MIN("array_int_f_min", getMinParams(), new Type(INT));
 
@@ -136,6 +144,8 @@ public class LibraryFunctions {
                 return minInstructions();
           case ISALNUM:
                 return isAlnumInstructions();
+          case ISALPHA:
+                return isAlphaInstructions();
             default:
                 return new ArrayList<>();
         }
@@ -303,6 +313,57 @@ public class LibraryFunctions {
 
       return instructions;
     }
+
+  private static List<Instruction> isAlphaInstructions(){
+    List<Instruction> instructions = new ArrayList<>();
+
+    instructions.add(new LABEL("char_f_isAlpha:"));
+    instructions.add(new PUSH(lr));
+    instructions.add(new SUB(sp, sp ,new Operand2(4)));
+    instructions.add(new LDR(r4, new Operand2(sp, 8), "SB"));
+    instructions.add(new STR(r4, new Operand2(sp)));
+    instructions.add(new LDR(r4, new Operand2(sp)));
+    instructions.add(new LDR(r5, 65));
+    instructions.add(new CMP(r4, new Operand2(r5)));
+    instructions.add(new MOV(r4, 1, Conditionals.GE));
+    instructions.add(new MOV(r4, 0, Conditionals.LT));
+    instructions.add(new LDR(r5, new Operand2(sp)));
+    instructions.add(new LDR(r6, 90));
+    instructions.add(new CMP(r5, new Operand2(r6)));
+    instructions.add(new MOV(r5, 1, Conditionals.LE));
+    instructions.add(new MOV(r5, 0, Conditionals.GT));
+    instructions.add(new BoolOp(BoolOpType.AND, r4, r4, r5));
+    instructions.add(new LDR(r5, new Operand2(sp)));
+    instructions.add(new LDR(r6, 97));
+    instructions.add(new CMP(r5, new Operand2(r6)));
+    instructions.add(new MOV(r5,1,Conditionals.GE));
+    instructions.add(new MOV(r5, 0, Conditionals.LT));
+    instructions.add(new LDR(r6, new Operand2(sp)));
+    instructions.add(new LDR(r7, 122));
+    instructions.add(new CMP(r6, new Operand2(r7)));
+    instructions.add(new MOV(r6,1,Conditionals.LE));
+    instructions.add(new MOV(r6,0,Conditionals.GT));
+    instructions.add(new BoolOp(BoolOpType.AND, r5, r5, r6));
+    instructions.add(new BoolOp(BoolOpType.ORR, r4, r4 ,r5));
+    instructions.add(new CMP(r4, 0));
+    instructions.add(new Branch("isAlphaL0", Conditionals.EQ));
+    instructions.add(new MOV(r4, 1));
+    instructions.add(new MOV(r0, new Operand2(r4)));
+    instructions.add(new ADD(sp, sp, new Operand2(4)));
+    instructions.add(new POP(pc));
+    instructions.add(new Branch("isAlphaL1"));
+    instructions.add(new LABEL("isAlphaL0:"));
+    instructions.add(new MOV(r4, 0));
+    instructions.add(new MOV(r0, new Operand2(r4)));
+    instructions.add(new ADD(sp, sp ,new Operand2(4)));
+    instructions.add(new POP(pc));
+    instructions.add(new LABEL("isAlphaL1:"));
+    instructions.add(new POP(pc));
+    instructions.add(new Directive(LTORG));
+
+
+    return instructions;
+  }
 
     private static List<Instruction> maxInstructions() {
         List<Instruction> instructions = new ArrayList<>();
