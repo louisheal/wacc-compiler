@@ -135,7 +135,7 @@ public class LibraryFunctions {
       instructions.add(new CMP(r4, new Operand2(r5)));
 
       // MOVGE r4, #1
-      instructions.add(new MOV(r4, 1, Conditionals.GT));
+      instructions.add(new MOV(r4, 1, Conditionals.GE));
 
       // MOVLT r4, #0
       instructions.add(new MOV(r4, 0, Conditionals.LT));
