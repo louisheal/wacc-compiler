@@ -119,6 +119,8 @@ public class SemanticAnalysis {
       return null;
     }
 
+    Type nextType;
+
     switch (expr.getExprType()) {
 
       case INTLITER:
@@ -161,16 +163,18 @@ public class SemanticAnalysis {
         return getExpressionType(expr.getExpression1());
 
       case REFERENCE:
-        if(expr.getExpression1().getExprType() == Expression.ExprType.DEREFERENCE) {
-          return getExpressionType(expr.getExpression1().getExpression1());
+        nextType = getExpressionType(expr.getExpression1());
+        if(nextType.getType() == EType.DEREFERENCE) {
+          return nextType.getArrayType();
         }
-        return new Type(EType.REFERENCE, getExpressionType(expr.getExpression1()));
+        return new Type(EType.REFERENCE, nextType);
 
       case DEREFERENCE:
-        if(expr.getExpression1().getExprType() == Expression.ExprType.REFERENCE) {
-          return getExpressionType(expr.getExpression1().getExpression1());
+        nextType = getExpressionType(expr.getExpression1());
+        if(nextType.getType() == EType.REFERENCE) {
+          return nextType.getArrayType();
         }
-        return new Type(EType.DEREFERENCE, getExpressionType(expr.getExpression1()));
+        return new Type(EType.DEREFERENCE, nextType);
 
     }
     return null;
@@ -610,7 +614,6 @@ public class SemanticAnalysis {
     NOT_FREEABLE,
     WHILE_NOT_BOOL,
     FUNCTION_NO_RETURN,
-    NOT_READABLE,
-    NOT_REFERENCEABLE
+    NOT_READABLE
   }
 }
