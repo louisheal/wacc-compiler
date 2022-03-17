@@ -75,6 +75,9 @@ public class SemanticAnalysis {
       case NEQ:
         errorMsgs.add(e + " operator can only be used on expressions with the same type");
         break;
+      case REFERENCE:
+        errorMsgs.add(e + " operator can only be used on ident expressions");
+        break;
     }
     errors++;
   }
@@ -328,8 +331,10 @@ public class SemanticAnalysis {
                        !getExpressionType(expression.getExpression1()).equals(new Type(EType.INT));
     boolean validOrd = expression.getExprType() == Expression.ExprType.ORD &&
                        !getExpressionType(expression.getExpression1()).equals(new Type(EType.CHAR));
+    boolean validDereference = expression.getExprType() == Expression.ExprType.DEREFERENCE &&
+                       !getExpressionType(expression.getExpression1()).equals(new Type(EType.INT));
 
-    if (validNot || validNeg || validLen || validChr || validOrd) {
+    if (validNot || validNeg || validLen || validChr || validOrd || validDereference) {
       printSemanticError(expression.getExprType());
     }
 
@@ -384,12 +389,16 @@ public class SemanticAnalysis {
       errors++;
     }
 
-    //Only reference existing variables
-    if (expression.getExprType() == Expression.ExprType.REFERENCE &&
-            currentST.getType(expression.getExpression1().getIdent()) == null) {
-      errorMsgs.add("Variable not defined: " + expression.getExpression1().getIdent() + "\n In expression: " + expression);
-      errors++;
+    if (expression.getExprType() == Expression.ExprType.REFERENCE) {
+      if(expression.getExpression1().getExprType() != Expression.ExprType.IDENT) {
+        printSemanticError(expression.getExprType());
+      } else if (currentST.getType(expression.getExpression1().getIdent()) == null) {
+        errorMsgs.add("Variable not defined: " + expression.getExpression1().getIdent() +
+                "\n In expression: " + expression);
+        errors++;
+      }
     }
+
   }
 
   private boolean invalidAssignment(Type lhs, AssignRHS rhs) {
@@ -595,6 +604,7 @@ public class SemanticAnalysis {
     NOT_FREEABLE,
     WHILE_NOT_BOOL,
     FUNCTION_NO_RETURN,
-    NOT_READABLE
+    NOT_READABLE,
+    NOT_REFERENCEABLE
   }
 }
