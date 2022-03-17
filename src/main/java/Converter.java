@@ -509,11 +509,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     currentST = currentST.getParent();
 
     if (statement.getExpression().toString().equals("false")) {
-      instructions.addAll(statementTwoInstructions);
-      return instructions;
+      return statementTwoInstructions;
     } else if (statement.getExpression().toString().equals("true")) {
-      instructions.addAll(statementOneInstructions);
-      return instructions;
+      return statementOneInstructions;
     }
 
     /* Generate Labels. */
