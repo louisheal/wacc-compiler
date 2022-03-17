@@ -4,15 +4,15 @@ import java.util.Objects;
 
 public class Expression {
 
-  private final ExprType exprType;
-  private final long intLiter;
-  private final boolean boolLiter;
-  private final char charLiter;
-  private final String stringLiter;
-  private final String ident;
-  private final ArrayElem arrayElem;
-  private final Expression expression1;
-  private final Expression expression2;
+  private ExprType exprType;
+  private long intLiter;
+  private boolean boolLiter;
+  private char charLiter;
+  private String stringLiter;
+  private String ident;
+  private ArrayElem arrayElem;
+  private Expression expression1;
+  private Expression expression2;
 
   public Expression(ExprType exprType, long intLiter, boolean boolLiter, char charLiter, String stringLiter
                     ,String ident, ArrayElem arrayElem, Expression expression1,
@@ -170,6 +170,18 @@ public class Expression {
 
   public String getIdent() {
     return ident;
+  }
+
+  public void setExpression(Expression expression) {
+    this.exprType = expression.exprType;
+    this.intLiter = expression.intLiter;
+    this.boolLiter = expression.boolLiter;
+    this.charLiter = expression.charLiter;
+    this.stringLiter = expression.stringLiter;
+    this.ident = expression.ident;
+    this.arrayElem = expression.arrayElem;
+    this.expression1 = expression.expression1;
+    this.expression2 = expression.expression2;
   }
 
   @Override

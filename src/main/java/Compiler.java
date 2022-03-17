@@ -94,6 +94,9 @@ public class Compiler {
 
     Program ast = compile(new String(args[0]));
 
+    Evaluator evaluator = new Evaluator();
+    evaluator.visitProgram(ast);
+
     Converter converter = new Converter();
     List<Instruction> instructions = converter.visitProgram(ast);
 
