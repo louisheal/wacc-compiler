@@ -185,6 +185,9 @@ public class LibraryFunctions {
       //SUBS r4, r4, r5
       instructions.add(new SUB(r4, r4, new Operand2(r5)));
 
+      //BLVS p_throw_overflow_error
+      instructions.add(new Branch("p_throw_overflow_error", Conditionals.VS).setSuffix("L"));
+
       //STR r4, [sp]
       instructions.add(new STR(r4, new Operand2(sp)));
 
