@@ -105,6 +105,101 @@ public class LibraryFunctions {
         return List.of();
     }
 
+    private static List<Instruction> abs() {
+      List<Instruction> instructions = new ArrayList<>();
+      //int_f_abs:
+      instructions.add(new LABEL("int_f_abs:"));
+
+      // PUSH {lr}
+      instructions.add(new PUSH(lr));
+
+      // LDR r4, [sp, #4]
+      instructions.add(new LDR(r4, new Operand2(sp, 4)));
+
+      // LDR r5, #0
+      instructions.add(new LDR( r5, 0));
+
+      // CMP r4, r5
+      instructions.add(new CMP(r4, new Operand2(r5)));
+
+      // MOVGE r4, #1
+      instructions.add(new MOV(r4, 1, Conditionals.GT));
+
+      // MOVLT r4, #0
+      instructions.add(new MOV(r4, 0, Conditionals.LT));
+
+      // CMP r4, #0
+      instructions.add(new CMP(r4, 0));
+
+      // BEQ L0
+      instructions.add(new Branch("L0", Conditionals.EQ));
+
+      // LDR r4, [sp, #4]
+      instructions.add(new LDR(r4, new Operand2(sp, 4)));
+
+      // MOV r0, r4
+      instructions.add(new MOV(r0, new Operand2(r4)));
+
+      // POP{PC}
+      instructions.add(new POP(pc));
+
+      // B L1
+      instructions.add(new Branch("L1"));
+
+      // L0:
+      instructions.add(new LABEL("L0"));
+
+      // SUB sp, sp, #4
+      instructions.add(new SUB(sp, sp, new Operand2(4)));
+
+      //LDR r4, [sp, #8]
+      instructions.add(new LDR(r4, new Operand2(sp,8)));
+
+      //LDR r5, [sp, #8]
+      instructions.add(new LDR(r5, new Operand2(sp,8)));
+
+      //LDR r6, =2
+      instructions.add(new LDR(r6, 2));
+
+      //SMULL r5, r6, r5, r6
+      instructions.add(new SMULL(r5,r6,r5,r6));
+
+      //CMP r6, r5, ASR #31
+      instructions.add(new CMP(r6,r5, new Operand2(31)));
+
+      //BLNE p_throw_overflow_error
+      instructions.add(new Branch(("p_throw_overflow_error"), Conditionals.NE).setSuffix("L"));
+
+      //SUBS r4, r4, r5
+      instructions.add(new SUB(r4, r4, new Operand2(r5)));
+
+      //STR r4, [sp]
+      instructions.add(new STR(r4, new Operand2(sp)));
+
+      //LDR r4, [sp]
+      instructions.add(new LDR(r4, new Operand2(sp)));
+
+      //ADD sp, sp, #4
+      instructions.add(new ADD(sp, sp, new Operand2(4)));
+
+      //POP {pc}
+      instructions.add(new POP(pc));
+
+      //ADD sp, sp, #4
+      instructions.add(new ADD(sp, sp, new Operand2(4)));
+
+      //L1:
+      instructions.add(new LABEL("L1"));
+
+      //POP {pc}
+      instructions.add(new POP(pc));
+
+      //.ltorg
+      instructions.add(new Directive(LTORG));
+
+      return instructions;
+    }
+
     private static List<Instruction> maxInstructions() {
         List<Instruction> instructions = new ArrayList<>();
 
