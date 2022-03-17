@@ -550,6 +550,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     List<Instruction> instructions = new ArrayList<>();
 
+    if (statement.getExpression().toString().equals("false")) {
+      return instructions;
+    }
+
     /* Generate Labels. */
     String label1 = getLabel();
     String label2 = getLabel();
