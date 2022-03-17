@@ -54,9 +54,9 @@ public class Type {
     } else if (type == EType.PAIR) {
       result = "(" + fstType + ", " + sndType + ")";
     } else if (type == EType.REFERENCE) {
-      result = arrayType + "*";
-    } else if (type == EType.DEREFERENCE) {
       result = arrayType + "&";
+    } else if (type == EType.DEREFERENCE) {
+      result = arrayType + "*";
     } else {
       result = type.toString();
     }

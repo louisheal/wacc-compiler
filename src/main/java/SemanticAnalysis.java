@@ -383,6 +383,13 @@ public class SemanticAnalysis {
       errorMsgs.add("Variable not defined: " + expression.getIdent() + "\n In expression: " + expression);
       errors++;
     }
+
+    //Only reference existing variables
+    if (expression.getExprType() == Expression.ExprType.REFERENCE &&
+            currentST.getType(expression.getExpression1().getIdent()) == null) {
+      errorMsgs.add("Variable not defined: " + expression.getExpression1().getIdent() + "\n In expression: " + expression);
+      errors++;
+    }
   }
 
   private boolean invalidAssignment(Type lhs, AssignRHS rhs) {
