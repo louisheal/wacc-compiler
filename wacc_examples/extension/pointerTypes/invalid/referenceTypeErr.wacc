@@ -1,0 +1,14 @@
+# expression type mismatch pointer->int
+
+# Output:
+# #semantic_error#
+
+# Exit:
+# 200
+
+# Program:
+
+begin
+  int a = 1
+  int b = &a
+end

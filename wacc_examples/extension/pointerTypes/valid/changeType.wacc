@@ -1,0 +1,12 @@
+# evaluating pointers
+
+# Output:
+# 1
+
+# Program:
+
+begin
+  int a = 1 ;
+  int* b = &a ;
+  println *b
+end
