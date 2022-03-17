@@ -159,7 +159,7 @@ public class LibraryFunctions {
       instructions.add(new Branch("L1"));
 
       // L0:
-      instructions.add(new LABEL("L0"));
+      instructions.add(new LABEL("L0:"));
 
       // SUB sp, sp, #4
       instructions.add(new SUB(sp, sp, new Operand2(4)));
@@ -201,7 +201,7 @@ public class LibraryFunctions {
       instructions.add(new ADD(sp, sp, new Operand2(4)));
 
       //L1:
-      instructions.add(new LABEL("L1"));
+      instructions.add(new LABEL("L1:"));
 
       //POP {pc}
       instructions.add(new POP(pc));
