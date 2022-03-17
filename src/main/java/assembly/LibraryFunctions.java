@@ -183,7 +183,7 @@ public class LibraryFunctions {
       instructions.add(new Branch(("p_throw_overflow_error"), Conditionals.NE).setSuffix("L"));
 
       //SUBS r4, r4, r5
-      instructions.add(new SUB(r4, r4, new Operand2(r5)));
+      instructions.add(new SUB(r4, r4, new Operand2(r5), Flags.S));
 
       //BLVS p_throw_overflow_error
       instructions.add(new Branch("p_throw_overflow_error", Conditionals.VS).setSuffix("L"));
@@ -193,6 +193,9 @@ public class LibraryFunctions {
 
       //LDR r4, [sp]
       instructions.add(new LDR(r4, new Operand2(sp)));
+
+      //MOV r0, r4
+      instructions.add(new MOV(r0, new Operand2(r4)));
 
       //ADD sp, sp, #4
       instructions.add(new ADD(sp, sp, new Operand2(4)));
