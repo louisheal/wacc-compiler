@@ -492,6 +492,17 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Evaluate the condition expression. */
     List<Instruction> instructions = new ArrayList<>(visitExpression(statement.getExpression()));
 
+    if (statement.getExpression().toString().equals("false")) {
+      /* Generate instructions for the 'else' clause of the statement and change scope. */
+      currentST = new SymbolTable(currentST);
+      int temp = spLocation;
+      instructions.addAll(visitStatement(statement.getStatement2()));
+      spLocation = temp;
+      currentST = currentST.getParent();
+
+      return instructions;
+    }
+
     /* Generate Labels. */
     String label1 = getLabel();
     String label2 = getLabel();
