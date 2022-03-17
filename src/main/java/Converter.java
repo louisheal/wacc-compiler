@@ -512,10 +512,12 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     spLocation = temp;
     currentST = currentST.getParent();
 
-    if (statement.getExpression().toString().equals("false")) {
-      return statementTwoInstructions;
-    } else if (statement.getExpression().toString().equals("true")) {
-      return statementOneInstructions;
+    if (!expressionContainsIdent(statement.getExpression())) {
+      if (evaluateExpression(statement.getExpression()).getBoolLiter()) {
+        return statementOneInstructions;
+      } else {
+        return statementTwoInstructions;
+      }
     }
 
     /* Generate Labels. */
@@ -549,23 +551,35 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
-  private Boolean evaluateBooleanExpression(Expression expression){
+  private Boolean expressionContainsIdent(Expression expression){
     switch (expression.getExprType()) {
-      case EQ:
-        return Objects.equals(evaluateExpression(expression.getExpression1()),
-            evaluateExpression(expression.getExpression2()));
-      case NOT:
-        return !evaluateBooleanExpression(expression.getExpression1());
-      case BRACKETS:
-        return evaluateBooleanExpression(expression.getExpression1());
-      case AND:
-        return evaluateBooleanExpression(expression.getExpression1()) && evaluateBooleanExpression(expression.getExpression2());
-      case OR:
-        return evaluateBooleanExpression(expression.getExpression1()) || evaluateBooleanExpression(expression.getExpression2());
-      case BOOLLITER:
-        return expression.getBoolLiter();
-      default:
+      case IDENT:
+      case ARRAYELEM:
         return true;
+      case NOT:
+      case BRACKETS:
+      case NEG:
+      case LEN:
+      case ORD:
+      case CHR:
+        return expressionContainsIdent(expression.getExpression1());
+      case DIVIDE:
+      case MULTIPLY:
+      case MODULO:
+      case PLUS:
+      case MINUS:
+      case GT:
+      case GTE:
+      case LT:
+      case LTE:
+      case EQ:
+      case NEQ:
+      case AND:
+      case OR:
+        return expressionContainsIdent(expression.getExpression1())
+            || expressionContainsIdent(expression.getExpression2());
+      default:
+        return false;
     }
   }
 
@@ -652,9 +666,10 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     List<Instruction> instructions = new ArrayList<>();
 
-    System.out.println(evaluateBooleanExpression(statement.getExpression()));
-    if (!evaluateBooleanExpression(statement.getExpression())) {
-      return instructions;
+    if (!expressionContainsIdent(statement.getExpression())) {
+      if (!evaluateExpression(statement.getExpression()).getBoolLiter()) {
+        return instructions;
+      }
     }
 
     /* Generate Labels. */
