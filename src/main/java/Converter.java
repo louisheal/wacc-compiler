@@ -203,11 +203,6 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     List<Instruction> instructions = new ArrayList<>();
 
-    instructions.add(new Directive(DirectiveType.TEXT));
-    instructions.add(new LABEL("")); // Leave gap in lines
-
-    instructions.add(new Directive(DirectiveType.GLOBAL));
-
     /* Generate the assembly instructions for each function. */
     for (Function function : program.getFunctions()) {
       instructions.addAll(visitFunction(function));
@@ -242,14 +237,19 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Directive(DirectiveType.LTORG));
 
     if (!libraryFunctions.isEmpty()) {
-      instructions.addAll(getInstructions(libraryFunctions));
+      instructions.addAll(0, getInstructions(libraryFunctions, predefinedFunctions));
     }
+
+    instructions.add(0, new Directive(DirectiveType.TEXT));
+    instructions.add(1, new LABEL(""));
+
+    instructions.add(2, new Directive(DirectiveType.GLOBAL));
 
     if (!predefinedFunctions.isEmpty()) {
       instructions.addAll(getInstructions(predefinedFunctions));
       instructions.add(0, new Directive(DirectiveType.DATA));
       instructions.add(1, new LABEL(""));
-      instructions.add(2, new LABEL("")); // Leave gap in lines
+      instructions.add(2, new LABEL(""));
     }
     instructions.addAll(2, getMessages());
 
@@ -1543,9 +1543,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
       // STR(B) rn, [sp]
       if (expSize == 1) {
-        instructions.add(new STR(rn, new Operand2(sp, expSize), "B"));
+        instructions.add(new STR(rn, new Operand2(sp, -expSize), "B").setExclaim());
       } else {
-        instructions.add(new STR(rn, new Operand2(sp, expSize)));
+        instructions.add(new STR(rn, new Operand2(sp, -expSize)).setExclaim());
       }
 
       totalSize += expSize;

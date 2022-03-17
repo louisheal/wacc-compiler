@@ -8,7 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static assembly.LibraryFunctions.LFunctions.*;
+import static assembly.PredefinedFunctions.Functions;
 import static assembly.instructions.Directive.DirectiveType.*;
+import static ast.Type.EType.*;
 
 public class LibraryFunctions {
 
@@ -30,8 +33,14 @@ public class LibraryFunctions {
     private final static Register sp = new Register(13);
     private final static Register pc = new Register(15);
 
+    private static List<Param> getMaxParams() {
+        List<Param> params = new ArrayList<>();
+        params.add(new Param(new Type(ARRAY, new Type(INT)), "a"));
+        return params;
+    }
+
     public enum LFunctions {
-        ONE("f_one", new ArrayList<>(), new Type(Type.EType.INT));
+        MAX("array_int_f_max", getMaxParams(), new Type(INT));
 
         private final String ident;
         private final List<Param> params;
@@ -74,32 +83,97 @@ public class LibraryFunctions {
         return null;
     }
 
-    public static List<Instruction> getInstructions(Set<LFunctions> functions) {
+    public static List<Instruction> getInstructions(Set<LFunctions> functions, Set<Functions> preFunctions) {
 
         List<Instruction> instructions = new ArrayList<>();
 
         for (LFunctions function : functions) {
-            instructions.addAll(getFunctionInstructions(function));
+            instructions.addAll(getFunctionInstructions(function, preFunctions));
         }
 
         return instructions;
     }
 
-    private static List<Instruction> getFunctionInstructions(LFunctions function) {
+    private static List<Instruction> getFunctionInstructions(LFunctions function, Set<Functions> preFunctions) {
         switch (function) {
-            case ONE:
-                return oneInstructions();
+            case MAX:
+                preFunctions.add(Functions.P_CHECK_ARRAY_BOUNDS);
+                preFunctions.add(Functions.P_THROW_OVERFLOW_ERROR);
+                return maxInstructions();
         }
         return List.of();
     }
 
-    private static List<Instruction> oneInstructions() {
+    private static List<Instruction> maxInstructions() {
         List<Instruction> instructions = new ArrayList<>();
 
-        instructions.add(new LABEL("f_one:"));
+        instructions.add(new LABEL(MAX.getIdent() + ":"));
         instructions.add(new LABEL("PUSH {lr}"));
+        instructions.add(new SUB(sp, sp, new Operand2(8)));
         instructions.add(new LDR(r4, 1));
+        instructions.add(new STR(r4, new Operand2(sp, 4)));
+        instructions.add(new ADD(r4, sp, new Operand2(12)));
+        instructions.add(new LDR(r5, 0));
+        instructions.add(new LDR(r4, new Operand2(r4)));
+        instructions.add(new MOV(r0, new Operand2(r5)));
+        instructions.add(new MOV(r1, new Operand2(r4)));
+        instructions.add(new Branch("p_check_array_bounds").setSuffix("L"));
+        instructions.add(new ADD(r4, r4, new Operand2(4)));
+        instructions.add(new ADD(r4, r4, new Operand2(r5), 2));
+        instructions.add(new LDR(r4, new Operand2(r4)));
+        instructions.add(new STR(r4, new Operand2(sp)));
+        instructions.add(new Branch("L0_" + MAX.getIdent()));
+
+        instructions.add(new LABEL("L1_" + MAX.getIdent() + ":"));
+        instructions.add(new ADD(r4, sp, new Operand2(12)));
+        instructions.add(new LDR(r5, new Operand2(sp, 4)));
+        instructions.add(new LDR(r4, new Operand2(r4)));
+        instructions.add(new MOV(r0, new Operand2(r5)));
+        instructions.add(new MOV(r1, new Operand2(r4)));
+        instructions.add(new Branch("p_check_array_bounds").setSuffix("L"));
+        instructions.add(new ADD(r4, r4, new Operand2(4)));
+        instructions.add(new ADD(r4, r4, new Operand2(r5), 2));
+        instructions.add(new LDR(r4, new Operand2(r4)));
+        instructions.add(new LDR(r5, new Operand2(sp)));
+        instructions.add(new CMP(r4, new Operand2(r5)));
+        instructions.add(new MOV(r4, 1, Conditionals.GT));
+        instructions.add(new MOV(r4, 0, Conditionals.LE));
+        instructions.add(new CMP(r4, 0));
+        instructions.add(new Branch("L2_" + MAX.getIdent(), Conditionals.EQ));
+        instructions.add(new ADD(r4, sp, new Operand2(12)));
+        instructions.add(new LDR(r5, new Operand2(sp, 4)));
+        instructions.add(new LDR(r4, new Operand2(r4)));
+        instructions.add(new MOV(r0, new Operand2(r5)));
+        instructions.add(new MOV(r1, new Operand2(r4)));
+        instructions.add(new Branch("p_check_array_bounds").setSuffix("L"));
+        instructions.add(new ADD(r4, r4, new Operand2(4)));
+        instructions.add(new ADD(r4, r4, new Operand2(r5), 2));
+        instructions.add(new LDR(r4, new Operand2(r4)));
+        instructions.add(new STR(r4, new Operand2(sp)));
+        instructions.add(new Branch("L3_" + MAX.getIdent()));
+
+        instructions.add(new LABEL("L2_" + MAX.getIdent() + ":"));
+
+        instructions.add(new LABEL("L3_" + MAX.getIdent() + ":"));
+        instructions.add(new LDR(r4, new Operand2(sp, 4)));
+        instructions.add(new LDR(r5, 1));
+        instructions.add(new ADD(r4, r4, new Operand2(r5), Flags.S));
+        instructions.add(new Branch("p_throw_overflow_error", Conditionals.VS).setSuffix("L"));
+        instructions.add(new STR(r4, new Operand2(sp, 4)));
+
+        instructions.add(new LABEL("L0_" + MAX.getIdent() + ":"));
+        instructions.add(new LDR(r4, new Operand2(sp, 4)));
+        instructions.add(new LDR(r5, new Operand2(sp, 12)));
+        instructions.add(new LDR(r5, new Operand2(r5)));
+        instructions.add(new CMP(r4, new Operand2(r5)));
+        instructions.add(new MOV(r4, 1, Conditionals.LT));
+        instructions.add(new MOV(r4, 0, Conditionals.GE));
+        instructions.add(new CMP(r4, 1));
+        instructions.add(new Branch("L1_" + MAX.getIdent(), Conditionals.EQ));
+        instructions.add(new LDR(r4, new Operand2(sp)));
         instructions.add(new MOV(r0, new Operand2(r4)));
+        instructions.add(new ADD(sp, sp, new Operand2(8)));
+
         instructions.add(new LABEL("POP {pc}"));
         instructions.add(new LABEL("POP {pc}"));
         instructions.add(new Directive(LTORG));
