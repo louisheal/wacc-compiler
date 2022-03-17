@@ -9,5 +9,5 @@
 # Program:
 
 begin
-  int b = * 6
+  int b = + 6
 end
