@@ -76,7 +76,7 @@ public class SemanticAnalysis {
         errorMsgs.add(e + " operator can only be used on expressions with the same type");
         break;
       case REFERENCE:
-        errorMsgs.add(e + " operator can only be used on ident expressions");
+        errorMsgs.add(e + " operator can only be used on variables (ident expressions)");
         break;
     }
     errors++;
@@ -161,9 +161,15 @@ public class SemanticAnalysis {
         return getExpressionType(expr.getExpression1());
 
       case REFERENCE:
+        if(expr.getExpression1().getExprType() == Expression.ExprType.DEREFERENCE) {
+          return getExpressionType(expr.getExpression1().getExpression1());
+        }
         return new Type(EType.REFERENCE, getExpressionType(expr.getExpression1()));
 
       case DEREFERENCE:
+        if(expr.getExpression1().getExprType() == Expression.ExprType.REFERENCE) {
+          return getExpressionType(expr.getExpression1().getExpression1());
+        }
         return new Type(EType.DEREFERENCE, getExpressionType(expr.getExpression1()));
 
     }
