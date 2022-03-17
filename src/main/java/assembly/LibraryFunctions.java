@@ -39,9 +39,17 @@ public class LibraryFunctions {
         params.add(new Param(new Type(ARRAY, new Type(INT)), "a"));
         return params;
     }
+    private static List<Param> getAbsParams() {
+      List<Param> params = new ArrayList<>();
+      params.add(new Param(new Type(INT), "x"));
+      return params;
+  }
+
 
     public enum LFunctions {
-        MAX("array_int_f_max", getMaxParams(), new Type(INT));
+        MAX("array_int_f_max", getMaxParams(), new Type(INT)),
+
+        ABS("int_f_abs", getAbsParams(), new Type(INT));
 
         private final String ident;
         private final List<Param> params;
@@ -101,11 +109,15 @@ public class LibraryFunctions {
                 preFunctions.add(Functions.P_CHECK_ARRAY_BOUNDS);
                 preFunctions.add(Functions.P_THROW_OVERFLOW_ERROR);
                 return maxInstructions();
+            case ABS:
+                preFunctions.add(Functions.P_THROW_OVERFLOW_ERROR);
+                return absInstructions();
+
         }
         return List.of();
     }
 
-    private static List<Instruction> abs() {
+    private static List<Instruction> absInstructions() {
       List<Instruction> instructions = new ArrayList<>();
       //int_f_abs:
       instructions.add(new LABEL("int_f_abs:"));
