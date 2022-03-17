@@ -492,14 +492,27 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Evaluate the condition expression. */
     List<Instruction> instructions = new ArrayList<>(visitExpression(statement.getExpression()));
 
-    if (statement.getExpression().toString().equals("false")) {
-      /* Generate instructions for the 'else' clause of the statement and change scope. */
-      currentST = new SymbolTable(currentST);
-      int temp = spLocation;
-      instructions.addAll(visitStatement(statement.getStatement2()));
-      spLocation = temp;
-      currentST = currentST.getParent();
+    /* Generate instructions for the 'if' clause of the statement and change scope. */
+    currentST = new SymbolTable(currentST);
+    int temp = spLocation;
+    List<Instruction> statementOneInstructions =
+        new ArrayList<>(visitStatement(statement.getStatement1()));
+    spLocation = temp;
+    currentST = currentST.getParent();
 
+    /* Generate instructions for the 'else' clause of the statement and change scope. */
+    currentST = new SymbolTable(currentST);
+    temp = spLocation;
+    List<Instruction> statementTwoInstructions =
+        new ArrayList<>(visitStatement(statement.getStatement2()));
+    spLocation = temp;
+    currentST = currentST.getParent();
+
+    if (statement.getExpression().toString().equals("false")) {
+      instructions.addAll(statementTwoInstructions);
+      return instructions;
+    } else if (statement.getExpression().toString().equals("true")) {
+      instructions.addAll(statementOneInstructions);
       return instructions;
     }
 
@@ -518,13 +531,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     /* Mark the register rn as no longer in use. */
     pushUnusedRegister(rn);
-
-    /* Generate instructions for the 'if' clause of the statement and change scope. */
-    currentST = new SymbolTable(currentST);
-    int temp = spLocation;
-    instructions.addAll(visitStatement(statement.getStatement1()));
-    spLocation = temp;
-    currentST = currentST.getParent();
+    instructions.addAll(statementOneInstructions);
 
     // BL Lx+1
     instructions.add(new Branch(label2).setSuffix("L"));
@@ -532,12 +539,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     // Lx:
     instructions.add(new LABEL(label1 + ":"));
 
-    /* Generate instructions for the 'else' clause of the statement and change scope. */
-    currentST = new SymbolTable(currentST);
-    temp = spLocation;
-    instructions.addAll(visitStatement(statement.getStatement2()));
-    spLocation = temp;
-    currentST = currentST.getParent();
+    instructions.addAll(statementTwoInstructions);
 
     //Lx+1:
     instructions.add(new LABEL(label2 + ":"));
