@@ -338,7 +338,7 @@ public class SemanticAnalysis {
     boolean validOrd = expression.getExprType() == Expression.ExprType.ORD &&
                        !getExpressionType(expression.getExpression1()).equals(new Type(EType.CHAR));
     boolean validDereference = expression.getExprType() == Expression.ExprType.DEREFERENCE &&
-                       !getExpressionType(expression.getExpression1()).equals(new Type(EType.INT));
+                       !getExpressionType(expression.getExpression1()).getType().equals(EType.REFERENCE);
 
     if (validNot || validNeg || validLen || validChr || validOrd || validDereference) {
       printSemanticError(expression.getExprType());
