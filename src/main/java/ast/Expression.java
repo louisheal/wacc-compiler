@@ -1,5 +1,7 @@
 package ast;
 
+import java.util.Objects;
+
 public class Expression {
 
   private final ExprType exprType;
@@ -169,6 +171,29 @@ public class Expression {
   public String getIdent() {
     return ident;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof Expression)) {
+      return false;
+    }
+    Expression that = (Expression) o;
+
+    return (exprType == ExprType.INTLITER && that.exprType == ExprType.INTLITER && intLiter == that.intLiter) ||
+        (exprType == ExprType.BOOLLITER && that.exprType == ExprType.BOOLLITER && boolLiter == that.boolLiter);
+
+//    return intLiter == that.intLiter && boolLiter == that.boolLiter &&
+//        charLiter == that.charLiter &&
+//        exprType == that.exprType && Objects.equals(stringLiter, that.stringLiter) &&
+//        Objects.equals(ident, that.ident) &&
+//        Objects.equals(arrayElem, that.arrayElem) &&
+//        Objects.equals(expression1, that.expression1) &&
+//        Objects.equals(expression2, that.expression2);
+  }
+
 
   public enum ExprType {
 

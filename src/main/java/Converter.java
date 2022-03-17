@@ -4,6 +4,10 @@ import ast.*;
 
 import ast.Type.EType;
 import java.util.*;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
 
 import static assembly.PredefinedFunctions.*;
 import static assembly.PredefinedFunctions.Functions.*;
@@ -495,6 +499,30 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Evaluate the condition expression. */
     List<Instruction> instructions = new ArrayList<>(visitExpression(statement.getExpression()));
 
+    /* Generate instructions for the 'if' clause of the statement and change scope. */
+    currentST = new SymbolTable(currentST);
+    int temp = spLocation;
+    List<Instruction> statementOneInstructions =
+        new ArrayList<>(visitStatement(statement.getStatement1()));
+    spLocation = temp;
+    currentST = currentST.getParent();
+
+    /* Generate instructions for the 'else' clause of the statement and change scope. */
+    currentST = new SymbolTable(currentST);
+    temp = spLocation;
+    List<Instruction> statementTwoInstructions =
+        new ArrayList<>(visitStatement(statement.getStatement2()));
+    spLocation = temp;
+    currentST = currentST.getParent();
+
+    if (!expressionContainsIdent(statement.getExpression())) {
+      if (evaluateExpression(statement.getExpression()).getBoolLiter()) {
+        return statementOneInstructions;
+      } else {
+        return statementTwoInstructions;
+      }
+    }
+
     /* Generate Labels. */
     String label1 = getLabel();
     String label2 = getLabel();
@@ -510,13 +538,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     /* Mark the register rn as no longer in use. */
     pushUnusedRegister(rn);
-
-    /* Generate instructions for the 'if' clause of the statement and change scope. */
-    currentST = new SymbolTable(currentST);
-    int temp = spLocation;
-    instructions.addAll(visitStatement(statement.getStatement1()));
-    spLocation = temp;
-    currentST = currentST.getParent();
+    instructions.addAll(statementOneInstructions);
 
     // BL Lx+1
     instructions.add(new Branch(label2).setSuffix("L"));
@@ -524,12 +546,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     // Lx:
     instructions.add(new LABEL(label1 + ":"));
 
-    /* Generate instructions for the 'else' clause of the statement and change scope. */
-    currentST = new SymbolTable(currentST);
-    temp = spLocation;
-    instructions.addAll(visitStatement(statement.getStatement2()));
-    spLocation = temp;
-    currentST = currentST.getParent();
+    instructions.addAll(statementTwoInstructions);
 
     //Lx+1:
     instructions.add(new LABEL(label2 + ":"));
@@ -537,10 +554,126 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
+  private Boolean expressionContainsIdent(Expression expression){
+    switch (expression.getExprType()) {
+      case IDENT:
+      case ARRAYELEM:
+        return true;
+      case NOT:
+      case BRACKETS:
+      case NEG:
+      case LEN:
+      case ORD:
+      case CHR:
+        return expressionContainsIdent(expression.getExpression1());
+      case DIVIDE:
+      case MULTIPLY:
+      case MODULO:
+      case PLUS:
+      case MINUS:
+      case GT:
+      case GTE:
+      case LT:
+      case LTE:
+      case EQ:
+      case NEQ:
+      case AND:
+      case OR:
+        return expressionContainsIdent(expression.getExpression1())
+            || expressionContainsIdent(expression.getExpression2());
+      default:
+        return false;
+    }
+  }
+
+  private Expression evaluateExpression(Expression expression) {
+    switch (expression.getExprType()) {
+      case INTLITER:
+      case BOOLLITER:
+      case CHARLITER:
+      case STRINGLITER:
+        return expression;
+      case NOT:
+        boolean bool = evaluateExpression(expression.getExpression1()).getBoolLiter();
+        return new ExpressionBuilder().buildBoolExpr(!bool);
+      case NEG:
+        long integer = evaluateExpression(expression.getExpression1()).getIntLiter();
+        return new ExpressionBuilder().buildIntExpr(-integer);
+      case ORD:
+        long ord = evaluateExpression(expression.getExpression1()).getCharLiter();
+        return new ExpressionBuilder().buildIntExpr(ord);
+      case CHR:
+        char chr = (char) evaluateExpression(expression.getExpression1()).getIntLiter();
+        return new ExpressionBuilder().buildCharExpr(chr);
+      case DIVIDE:
+        long arg1 = evaluateExpression(expression.getExpression1()).getIntLiter();
+        long arg2 = evaluateExpression(expression.getExpression2()).getIntLiter();
+        return new ExpressionBuilder().buildIntExpr(arg1 / arg2);
+      case MULTIPLY:
+        arg1 = evaluateExpression(expression.getExpression1()).getIntLiter();
+        arg2 = evaluateExpression(expression.getExpression2()).getIntLiter();
+        return new ExpressionBuilder().buildIntExpr(arg1 * arg2);
+      case MODULO:
+        arg1 = evaluateExpression(expression.getExpression1()).getIntLiter();
+        arg2 = evaluateExpression(expression.getExpression2()).getIntLiter();
+        return new ExpressionBuilder().buildIntExpr(arg1 % arg2);
+      case PLUS:
+        arg1 = evaluateExpression(expression.getExpression1()).getIntLiter();
+        arg2 = evaluateExpression(expression.getExpression2()).getIntLiter();
+        return new ExpressionBuilder().buildIntExpr(arg1 + arg2);
+      case MINUS:
+        arg1 = evaluateExpression(expression.getExpression1()).getIntLiter();
+        arg2 = evaluateExpression(expression.getExpression2()).getIntLiter();
+        return new ExpressionBuilder().buildIntExpr(arg1 - arg2);
+      case GT:
+        arg1 = evaluateExpression(expression.getExpression1()).getIntLiter();
+        arg2 = evaluateExpression(expression.getExpression2()).getIntLiter();
+        return new ExpressionBuilder().buildBoolExpr(arg1 > arg2);
+      case GTE:
+        arg1 = evaluateExpression(expression.getExpression1()).getIntLiter();
+        arg2 = evaluateExpression(expression.getExpression2()).getIntLiter();
+        return new ExpressionBuilder().buildBoolExpr(arg1 >= arg2);
+      case LT:
+        arg1 = evaluateExpression(expression.getExpression1()).getIntLiter();
+        arg2 = evaluateExpression(expression.getExpression2()).getIntLiter();
+        return new ExpressionBuilder().buildBoolExpr(arg1 < arg2);
+      case LTE:
+        arg1 = evaluateExpression(expression.getExpression1()).getIntLiter();
+        arg2 = evaluateExpression(expression.getExpression2()).getIntLiter();
+        return new ExpressionBuilder().buildBoolExpr(arg1 <= arg2);
+      case EQ:
+        boolean bool1 = evaluateExpression(expression.getExpression1()).getBoolLiter();
+        boolean bool2 = evaluateExpression(expression.getExpression2()).getBoolLiter();
+        return new ExpressionBuilder().buildBoolExpr(Objects.equals(bool1,bool2));
+      case NEQ:
+        bool1 = evaluateExpression(expression.getExpression1()).getBoolLiter();
+        bool2 = evaluateExpression(expression.getExpression2()).getBoolLiter();
+        return new ExpressionBuilder().buildBoolExpr(!Objects.equals(bool1,bool2));
+      case AND:
+        bool1 = evaluateExpression(expression.getExpression1()).getBoolLiter();
+        bool2 = evaluateExpression(expression.getExpression2()).getBoolLiter();
+        return new ExpressionBuilder().buildBoolExpr(bool1 && bool2);
+      case OR:
+        bool1 = evaluateExpression(expression.getExpression1()).getBoolLiter();
+        bool2 = evaluateExpression(expression.getExpression2()).getBoolLiter();
+        return new ExpressionBuilder().buildBoolExpr(bool1 || bool2);
+      case BRACKETS:
+        return evaluateExpression(expression.getExpression1());
+      default:
+        return null;
+    }
+  }
+
   @Override
   public List<Instruction> visitWhileStatement(Statement statement) {
 
     List<Instruction> instructions = new ArrayList<>();
+
+    if (!expressionContainsIdent(statement.getExpression())) {
+      if (!evaluateExpression(statement.getExpression()).getBoolLiter()) {
+        return instructions;
+      }
+    }
 
     /* Generate Labels. */
     String label1 = getLabel();
