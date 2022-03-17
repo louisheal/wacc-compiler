@@ -31,6 +31,7 @@ public class LibraryFunctions {
 
     /* Special registers. */
     private final static Register sp = new Register(13);
+    private final static Register lr = new Register(14);
     private final static Register pc = new Register(15);
 
     private static List<Param> getMaxParams() {
@@ -108,7 +109,7 @@ public class LibraryFunctions {
         List<Instruction> instructions = new ArrayList<>();
 
         instructions.add(new LABEL(MAX.getIdent() + ":"));
-        instructions.add(new LABEL("PUSH {lr}"));
+        instructions.add(new PUSH(lr));
         instructions.add(new SUB(sp, sp, new Operand2(8)));
         instructions.add(new LDR(r4, 1));
         instructions.add(new STR(r4, new Operand2(sp, 4)));
@@ -174,8 +175,8 @@ public class LibraryFunctions {
         instructions.add(new MOV(r0, new Operand2(r4)));
         instructions.add(new ADD(sp, sp, new Operand2(8)));
 
-        instructions.add(new LABEL("POP {pc}"));
-        instructions.add(new LABEL("POP {pc}"));
+        instructions.add(new POP(pc));
+        instructions.add(new POP(pc));
         instructions.add(new Directive(LTORG));
 
         return instructions;

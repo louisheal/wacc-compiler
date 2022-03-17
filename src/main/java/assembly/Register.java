@@ -18,8 +18,14 @@ public class Register {
 
   @Override
   public String toString() {
-    if (number == 13){
+    if (number == 13) {
       return "sp";
+    }
+    if (number == 14) {
+      return "lr";
+    }
+    if (number == 15) {
+      return "pc";
     }
     return "r" + number;
   }

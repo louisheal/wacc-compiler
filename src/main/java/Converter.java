@@ -22,6 +22,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   /* Special registers. */
   private final Register sp = new Register(13);
+  private final Register lr = new Register(14);
   private final Register pc = new Register(15);
 
   private int spLocation = 0;
@@ -210,7 +211,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     instructions.add(new LABEL("main:"));
 
-    instructions.add(new LABEL("PUSH {lr}"));
+    instructions.add(new PUSH(lr));
 
     int totalBytes = totalBytesInScope(program.getStatement());
     spLocation = totalBytes;
@@ -233,7 +234,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     }
 
     instructions.add(new LDR(r0, 0));
-    instructions.add(new LABEL("POP {pc}"));
+    instructions.add(new POP(pc));
     instructions.add(new Directive(DirectiveType.LTORG));
 
     if (!libraryFunctions.isEmpty()) {
@@ -268,8 +269,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     currentST = new SymbolTable(null);
 
     /* Function wrapper instructions. */
-    instructions.add(new LABEL (function.getIdent() + ":"));
-    instructions.add(new LABEL ("PUSH {lr}"));
+    instructions.add(new LABEL(function.getIdent() + ":"));
+    instructions.add(new PUSH(lr));
 
     /* Move stack pointer to allocate space on the stack for the function to use. */
     int totalBytes = totalBytesInScope(function.getStatement());
@@ -572,7 +573,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new CMP(rn, new Operand2(1)));
 
     // BEQ Lx+1
-    instructions.add(new LABEL("BEQ " + label2));
+    instructions.add(new Branch(label2, Conditionals.EQ));
 
     /* Mark the register rn as no longer in use. */
     pushUnusedRegister(rn);
@@ -1007,7 +1008,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new SMULL(rn, rm, rn, rm));
 
     // CMP Rn+1, Rn, ASR #31
-    instructions.add(new LABEL("CMP " + rm + ", " + rn + ", ASR #31"));
+    instructions.add(new CMP(rm, rn, new Operand2(31)));
 
     // BLNE p_throw_overflow_error
     instructions.add(new Branch("p_throw_overflow_error", Conditionals.NE).setSuffix("L"));
@@ -1561,7 +1562,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     instructions.add(new Branch(rhs.getFunctionIdent()).setSuffix("L"));
 
     // ADD sp, sp, #totalSize
-    instructions.add(new LABEL("ADD sp, sp, #" + totalSize));
+    instructions.add(new ADD(sp, sp, new Operand2(totalSize)));
 
     /* Retrieve the first unused register. */
     Register rn = popUnusedRegister();
