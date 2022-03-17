@@ -1,6 +1,7 @@
 package assembly;
 
 import assembly.instructions.*;
+import assembly.instructions.BoolOp.BoolOpType;
 import ast.Param;
 import ast.Type;
 
@@ -44,6 +45,11 @@ public class LibraryFunctions {
       params.add(new Param(new Type(INT), "x"));
       return params;
   }
+    private static List<Param> getIsAlNumParams(){
+      List<Param> params = new ArrayList<>();
+      params.add(new Param(new Type(CHAR), "c"));
+      return params;
+    }
 
 
     private static List<Param> getMinParams() {
@@ -57,7 +63,11 @@ public class LibraryFunctions {
 
         ABS("int_f_abs", getAbsParams(), new Type(INT)),
 
+        ISALNUM("char_f_isAlnum", getIsAlNumParams(), new Type(BOOL)),
+
         MIN("array_int_f_min", getMinParams(), new Type(INT));
+
+
 
         private final String ident;
         private final List<Param> params;
@@ -124,6 +134,8 @@ public class LibraryFunctions {
                 preFunctions.add(Functions.P_CHECK_ARRAY_BOUNDS);
                 preFunctions.add(Functions.P_THROW_OVERFLOW_ERROR);
                 return minInstructions();
+          case ISALNUM:
+                return isAlnumInstructions();
             default:
                 return new ArrayList<>();
         }
@@ -225,6 +237,68 @@ public class LibraryFunctions {
       instructions.add(new POP(pc));
 
       //.ltorg
+      instructions.add(new Directive(LTORG));
+
+      return instructions;
+    }
+
+    private static List<Instruction> isAlnumInstructions(){
+      List<Instruction> instructions = new ArrayList<>();
+
+      instructions.add(new LABEL("char_f_isAlnum:"));
+      instructions.add(new PUSH(lr));
+      instructions.add(new SUB(sp, sp ,new Operand2(4)));
+      instructions.add(new LDR(r4, new Operand2(sp, 8), "SB"));
+      instructions.add(new STR(r4, new Operand2(sp)));
+      instructions.add(new LDR(r4, new Operand2(sp)));
+      instructions.add(new LDR(r5, 65));
+      instructions.add(new CMP(r4, new Operand2(r5)));
+      instructions.add(new MOV(r4, 1, Conditionals.GE));
+      instructions.add(new MOV(r4, 0, Conditionals.LT));
+      instructions.add(new LDR(r5, new Operand2(sp)));
+      instructions.add(new LDR(r6, 90));
+      instructions.add(new CMP(r5, new Operand2(r6)));
+      instructions.add(new MOV(r5, 1, Conditionals.LE));
+      instructions.add(new MOV(r5, 0, Conditionals.GT));
+      instructions.add(new BoolOp(BoolOpType.AND, r4, r4, r5));
+      instructions.add(new LDR(r5, new Operand2(sp)));
+      instructions.add(new LDR(r6, 97));
+      instructions.add(new CMP(r5, new Operand2(r6)));
+      instructions.add(new MOV(r5,1,Conditionals.GE));
+      instructions.add(new MOV(r5, 0, Conditionals.LT));
+      instructions.add(new LDR(r6, new Operand2(sp)));
+      instructions.add(new LDR(r7, 122));
+      instructions.add(new CMP(r6, new Operand2(r7)));
+      instructions.add(new MOV(r6,1,Conditionals.LE));
+      instructions.add(new MOV(r6,0,Conditionals.GT));
+      instructions.add(new BoolOp(BoolOpType.AND, r5, r5, r6));
+      instructions.add(new BoolOp(BoolOpType.ORR, r4, r4 ,r5));
+      instructions.add(new LDR(r5, new Operand2(sp)));
+      instructions.add(new LDR(r6, 48));
+      instructions.add(new CMP(r5, new Operand2(r6)));
+      instructions.add(new MOV(r5, 1, Conditionals.GE));
+      instructions.add(new MOV(r5, 0, Conditionals.LT));
+      instructions.add(new LDR(r6, new Operand2(sp)));
+      instructions.add(new LDR(r7, 57));
+      instructions.add(new CMP(r6, new Operand2(r7)));
+      instructions.add(new MOV(r6, 1, Conditionals.LE));
+      instructions.add(new MOV(r6, 0, Conditionals.GT));
+      instructions.add(new BoolOp(BoolOpType.AND, r5, r5, r6));
+      instructions.add(new BoolOp(BoolOpType.ORR, r4, r4 ,r5));
+      instructions.add(new CMP(r4, 0));
+      instructions.add(new Branch("L0", Conditionals.EQ));
+      instructions.add(new MOV(r4, 1));
+      instructions.add(new MOV(r0, new Operand2(r4)));
+      instructions.add(new ADD(sp, sp, new Operand2(4)));
+      instructions.add(new POP(pc));
+      instructions.add(new Branch("L1"));
+      instructions.add(new LABEL("L0:"));
+      instructions.add(new MOV(r4, 0));
+      instructions.add(new MOV(r0, new Operand2(r4)));
+      instructions.add(new ADD(sp, sp ,new Operand2(4)));
+      instructions.add(new POP(pc));
+      instructions.add(new LABEL("L1:"));
+      instructions.add(new POP(pc));
       instructions.add(new Directive(LTORG));
 
       return instructions;
