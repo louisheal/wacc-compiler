@@ -7,6 +7,10 @@ import ast.*;
 
 import ast.Type.EType;
 import java.util.*;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
 
 import static assembly.PredefinedFunctions.*;
 import static assembly.PredefinedFunctions.Functions.*;
@@ -545,12 +549,111 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
+  private Boolean evaluateBooleanExpression(Expression expression){
+    switch (expression.getExprType()) {
+      case EQ:
+        return Objects.equals(evaluateExpression(expression.getExpression1()),
+            evaluateExpression(expression.getExpression2()));
+      case NOT:
+        return !evaluateBooleanExpression(expression.getExpression1());
+      case BRACKETS:
+        return evaluateBooleanExpression(expression.getExpression1());
+      case AND:
+        return evaluateBooleanExpression(expression.getExpression1()) && evaluateBooleanExpression(expression.getExpression2());
+      case OR:
+        return evaluateBooleanExpression(expression.getExpression1()) || evaluateBooleanExpression(expression.getExpression2());
+      case BOOLLITER:
+        return expression.getBoolLiter();
+      default:
+        return true;
+    }
+  }
+
+  private Expression evaluateExpression(Expression expression) {
+    switch (expression.getExprType()) {
+      case INTLITER:
+      case BOOLLITER:
+      case CHARLITER:
+      case STRINGLITER:
+        return expression;
+      case NOT:
+        boolean bool = evaluateExpression(expression.getExpression1()).getBoolLiter();
+        return new ExpressionBuilder().buildBoolExpr(!bool);
+      case NEG:
+        long integer = evaluateExpression(expression.getExpression1()).getIntLiter();
+        return new ExpressionBuilder().buildIntExpr(-integer);
+      case ORD:
+        long ord = evaluateExpression(expression.getExpression1()).getCharLiter();
+        return new ExpressionBuilder().buildIntExpr(ord);
+      case CHR:
+        char chr = (char) evaluateExpression(expression.getExpression1()).getIntLiter();
+        return new ExpressionBuilder().buildCharExpr(chr);
+      case DIVIDE:
+        long arg1 = evaluateExpression(expression.getExpression1()).getIntLiter();
+        long arg2 = evaluateExpression(expression.getExpression2()).getIntLiter();
+        return new ExpressionBuilder().buildIntExpr(arg1 / arg2);
+      case MULTIPLY:
+        arg1 = evaluateExpression(expression.getExpression1()).getIntLiter();
+        arg2 = evaluateExpression(expression.getExpression2()).getIntLiter();
+        return new ExpressionBuilder().buildIntExpr(arg1 * arg2);
+      case MODULO:
+        arg1 = evaluateExpression(expression.getExpression1()).getIntLiter();
+        arg2 = evaluateExpression(expression.getExpression2()).getIntLiter();
+        return new ExpressionBuilder().buildIntExpr(arg1 % arg2);
+      case PLUS:
+        arg1 = evaluateExpression(expression.getExpression1()).getIntLiter();
+        arg2 = evaluateExpression(expression.getExpression2()).getIntLiter();
+        return new ExpressionBuilder().buildIntExpr(arg1 + arg2);
+      case MINUS:
+        arg1 = evaluateExpression(expression.getExpression1()).getIntLiter();
+        arg2 = evaluateExpression(expression.getExpression2()).getIntLiter();
+        return new ExpressionBuilder().buildIntExpr(arg1 - arg2);
+      case GT:
+        arg1 = evaluateExpression(expression.getExpression1()).getIntLiter();
+        arg2 = evaluateExpression(expression.getExpression2()).getIntLiter();
+        return new ExpressionBuilder().buildBoolExpr(arg1 > arg2);
+      case GTE:
+        arg1 = evaluateExpression(expression.getExpression1()).getIntLiter();
+        arg2 = evaluateExpression(expression.getExpression2()).getIntLiter();
+        return new ExpressionBuilder().buildBoolExpr(arg1 >= arg2);
+      case LT:
+        arg1 = evaluateExpression(expression.getExpression1()).getIntLiter();
+        arg2 = evaluateExpression(expression.getExpression2()).getIntLiter();
+        return new ExpressionBuilder().buildBoolExpr(arg1 < arg2);
+      case LTE:
+        arg1 = evaluateExpression(expression.getExpression1()).getIntLiter();
+        arg2 = evaluateExpression(expression.getExpression2()).getIntLiter();
+        return new ExpressionBuilder().buildBoolExpr(arg1 <= arg2);
+      case EQ:
+        boolean bool1 = evaluateExpression(expression.getExpression1()).getBoolLiter();
+        boolean bool2 = evaluateExpression(expression.getExpression2()).getBoolLiter();
+        return new ExpressionBuilder().buildBoolExpr(Objects.equals(bool1,bool2));
+      case NEQ:
+        bool1 = evaluateExpression(expression.getExpression1()).getBoolLiter();
+        bool2 = evaluateExpression(expression.getExpression2()).getBoolLiter();
+        return new ExpressionBuilder().buildBoolExpr(!Objects.equals(bool1,bool2));
+      case AND:
+        bool1 = evaluateExpression(expression.getExpression1()).getBoolLiter();
+        bool2 = evaluateExpression(expression.getExpression2()).getBoolLiter();
+        return new ExpressionBuilder().buildBoolExpr(bool1 && bool2);
+      case OR:
+        bool1 = evaluateExpression(expression.getExpression1()).getBoolLiter();
+        bool2 = evaluateExpression(expression.getExpression2()).getBoolLiter();
+        return new ExpressionBuilder().buildBoolExpr(bool1 || bool2);
+      case BRACKETS:
+        return evaluateExpression(expression.getExpression1());
+      default:
+        return null;
+    }
+  }
+
   @Override
   public List<Instruction> visitWhileStatement(Statement statement) {
 
     List<Instruction> instructions = new ArrayList<>();
 
-    if (statement.getExpression().toString().equals("false")) {
+    System.out.println(evaluateBooleanExpression(statement.getExpression()));
+    if (!evaluateBooleanExpression(statement.getExpression())) {
       return instructions;
     }
 
