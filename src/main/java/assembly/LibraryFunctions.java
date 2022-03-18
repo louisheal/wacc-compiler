@@ -107,6 +107,13 @@ public class LibraryFunctions {
         return params;
     }
 
+  private static List<Param> getPowParams() {
+    List<Param> params = new ArrayList<>();
+    params.add(new Param(new Type(INT), "x"));
+    params.add(new Param(new Type(INT), "y"));
+    return params;
+  }
+
     public enum LFunctions {
         MAX("array_int_f_max", getMaxParams(), new Type(INT)),
 
@@ -130,7 +137,9 @@ public class LibraryFunctions {
 
         TOLOWER("char_f_toLower", getToLowerParams(), new Type(CHAR)),
 
-        MIN("array_int_f_min", getMinParams(), new Type(INT));
+        MIN("array_int_f_min", getMinParams(), new Type(INT)),
+
+        POW("int_int_f_pow", getPowParams(), new Type(INT));
 
 
 
@@ -219,10 +228,66 @@ public class LibraryFunctions {
           case TOLOWER:
             preFunctions.add(Functions.P_THROW_OVERFLOW_ERROR);
             return toLowerInstruction();
+          case POW:
+            preFunctions.add(Functions.P_THROW_OVERFLOW_ERROR);
+            return powInstruction();
             default:
                 return new ArrayList<>();
         }
     }
+  private static List<Instruction> powInstruction(){
+    List<Instruction> instructions = new ArrayList<>();
+    instructions.add(new LABEL("int_int_f_pow:"));
+    instructions.add(new PUSH(lr));
+    instructions.add(new LDR(r4, new Operand2(sp, 8)));
+    instructions.add(new LDR(r5, 0));
+    instructions.add(new CMP(r4, new Operand2(r5)));
+    instructions.add(new MOV(r4, 1, Conditionals.EQ));
+    instructions.add(new MOV(r4, 0, Conditionals.NE));
+    instructions.add(new CMP(r4, 0));
+    instructions.add(new Branch("powL0", Conditionals.EQ));
+    instructions.add(new LDR(r4, 1));
+    instructions.add(new MOV(r0, new Operand2(r4)));
+    instructions.add(new POP(pc));
+    instructions.add(new Branch("powL1"));
+    instructions.add(new LABEL("powL0:"));
+    instructions.add(new SUB(sp, sp, new Operand2(8)));
+    instructions.add(new LDR(r4, 1));
+    instructions.add(new STR(r4, new Operand2(sp, 4)));
+    instructions.add(new LDR(r4, new Operand2(sp, 12)));
+    instructions.add(new STR(r4, new Operand2(sp)));
+    instructions.add(new Branch("powL2"));
+    instructions.add(new LABEL("powL3:"));
+    instructions.add(new LDR(r4, new Operand2(sp, 4)));
+    instructions.add(new LDR(r5, 1));
+    instructions.add(new ADD(r4, r4, new Operand2(r5), Flags.S));
+    instructions.add(new Branch("p_throw_overflow_error",Conditionals.VS).setSuffix("L"));
+    instructions.add(new STR(r4, new Operand2(sp, 4)));
+    instructions.add(new LDR(r4, new Operand2(sp)));
+    instructions.add(new LDR(r5, new Operand2(sp, 12)));
+    instructions.add(new SMULL(r4, r5, r4, r5));
+    instructions.add(new CMP(r5, r4, new Operand2(31)));
+    instructions.add(new Branch("p_throw_overflow_error",Conditionals.NE).setSuffix("L"));
+    instructions.add(new STR(r4, new Operand2(sp)));
+    instructions.add(new LABEL("powL2:"));
+    instructions.add(new LDR(r4, new Operand2(sp, 4)));
+    instructions.add(new LDR(r5, new Operand2(sp, 16)));
+    instructions.add(new CMP(r5, new Operand2(r4)));
+    instructions.add(new MOV(r4, 1, Conditionals.NE));
+    instructions.add(new MOV(r4, 0, Conditionals.EQ));
+    instructions.add(new CMP(r4, 1));
+    instructions.add(new Branch("powL3", Conditionals.EQ));
+    instructions.add(new LDR(r4, new Operand2(sp)));
+    instructions.add(new MOV(r0, new Operand2(r4)));
+    instructions.add(new ADD(sp,sp,new Operand2(8)));
+    instructions.add(new POP(pc));
+    instructions.add(new ADD(sp,sp,new Operand2(8)));
+    instructions.add(new LABEL("powL1:"));
+    instructions.add(new POP(pc));
+    instructions.add(new Directive(LTORG));
+
+    return instructions;
+  }
 
   private static List<Instruction> toLowerInstruction() {
     List<Instruction> instructions = new ArrayList<>();
