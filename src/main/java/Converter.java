@@ -174,6 +174,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       case ARRAY:
       case STRING:
       case REFERENCE:
+        //TODO: unsure if dereference should also be of size 4
+      case DEREFERENCE:
         return 4;
       case CHAR:
       case BOOL:
@@ -1004,6 +1006,20 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   @Override
   public List<Instruction> visitChrExp(Expression expression) {
     // MOV r4, expr
+    return translateUnaryExpression(expression);
+  }
+
+  @Override
+  public List<Instruction> visitReferenceExp(Expression expression) {
+    // MOV r4, expr
+    //TODO: unfinished
+    return translateUnaryExpression(expression);
+  }
+
+  @Override
+  public List<Instruction> visitDereferenceExp(Expression expression) {
+    // MOV r4, expr
+    //TODO: unfinished
     return translateUnaryExpression(expression);
   }
 
