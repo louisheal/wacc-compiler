@@ -670,7 +670,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     List<Instruction> instructions = new ArrayList<>();
 
     if (!expressionContainsIdent(statement.getExpression())) {
-      if (!evaluateExpression(statement.getExpression()).getBoolLiter()) {
+      if (!statement.getExpression().getBoolLiter()) {
         return instructions;
       }
     }
