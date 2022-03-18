@@ -8,6 +8,7 @@ import ast.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import org.antlr.v4.runtime.atn.SemanticContext.OR;
 
 import static assembly.LibraryFunctions.LFunctions.*;
 import static assembly.PredefinedFunctions.Functions;
@@ -86,6 +87,13 @@ public class LibraryFunctions {
     return params;
   }
 
+  private static List<Param> getToUpperParams(){
+    List<Param> params = new ArrayList<>();
+    params.add(new Param(new Type(CHAR), "c"));
+    return params;
+  }
+
+
 
     private static List<Param> getMinParams() {
         List<Param> params = new ArrayList<>();
@@ -111,6 +119,8 @@ public class LibraryFunctions {
         ISLOWER("char_f_isLower", getIsLowerParams(), new Type(BOOL)),
 
         ISSPACE("char_f_isSpace", getIsSpaceParams(), new Type(BOOL)),
+
+        TOUPPER("char_f_toUpper", getToUpperParams(), new Type(CHAR)),
 
         MIN("array_int_f_min", getMinParams(), new Type(INT));
 
@@ -195,9 +205,75 @@ public class LibraryFunctions {
             return  isUpperInstructions();
           case ISSPACE:
             return isSpaceInstructions();
+          case TOUPPER:
+            preFunctions.add(Functions.P_THROW_OVERFLOW_ERROR);
+            return toUpperInstruction();
             default:
                 return new ArrayList<>();
         }
+    }
+
+    private static List<Instruction> toUpperInstruction(){
+      List<Instruction> instructions = new ArrayList<>();
+      instructions.add(new LABEL("char_f_toUpper:"));
+      instructions.add(new PUSH(lr));
+      instructions.add(new SUB(sp, sp ,new Operand2(5)));
+      instructions.add(new LDR(r4, new Operand2(sp, 9), "SB"));
+      instructions.add(new STR(r4, new Operand2(sp, 1)));
+      instructions.add(new LDR(r4, new Operand2(sp, 1)));
+      instructions.add(new LDR(r5, 91));
+      instructions.add(new CMP(r4, new Operand2(r5)));
+      instructions.add(new MOV(r4, 1, Conditionals.GE));
+      instructions.add(new MOV(r4, 0, Conditionals.LT));
+      instructions.add(new LDR(r5, new Operand2(sp,1)));
+      instructions.add(new LDR(r6, 98));
+      instructions.add(new CMP(r5, new Operand2(r6)));
+      instructions.add(new MOV(r5, 1, Conditionals.LE));
+      instructions.add(new MOV(r5, 0, Conditionals.GT));
+      instructions.add(new BoolOp(BoolOpType.AND, r4, r4, r5));
+      instructions.add(new LDR(r5, new Operand2(sp, 1)));
+      instructions.add(new LDR(r6, 123));
+      instructions.add(new CMP(r5, new Operand2(r6)));
+      instructions.add(new MOV(r5, 1,Conditionals.GE));
+      instructions.add(new MOV(r5, 0, Conditionals.LT));
+      instructions.add(new BoolOp(BoolOpType.ORR, r4 ,r4 ,r5));
+      instructions.add(new LDR(r5, new Operand2(sp, 1)));
+      instructions.add(new LDR(r6, 64));
+      instructions.add(new CMP(r5, new Operand2(r6)));
+      instructions.add(new MOV(r5, 1, Conditionals.LE));
+      instructions.add(new MOV(r5, 0, Conditionals.GT));
+      instructions.add(new BoolOp(BoolOpType.ORR, r4 ,r4 ,r5));
+      instructions.add(new CMP(r4, 0));
+      instructions.add(new Branch("toUpperL0", Conditionals.EQ));
+      instructions.add(new LDR(r4, new Operand2(sp, 9), "SB"));
+      instructions.add(new MOV(r0, new Operand2(r4)));
+      instructions.add(new ADD(sp, sp, new Operand2(5)));
+      instructions.add(new POP(pc));
+      instructions.add(new Branch("toUpperL1"));
+      instructions.add(new LABEL("toUpperL0:"));
+      instructions.add(new LDR(r4, new Operand2(sp, 1)));
+      instructions.add(new LDR(r5, 97));
+      instructions.add(new CMP(r4, new Operand2(r5)));
+      instructions.add(new MOV(r4, 1, Conditionals.GE));
+      instructions.add(new MOV(r4, 0, Conditionals.LT));
+      instructions.add(new CMP(r4, 0));
+      instructions.add(new Branch("toUpperL1"));
+      instructions.add(new LDR(r4, new Operand2(sp, 1)));
+      instructions.add(new LDR(r5, 32));
+      instructions.add(new SUB(r4, r4, new Operand2(r5), Flags.S));
+      instructions.add(new Branch("p_throw_overflow_error", Conditionals.VS).setSuffix("L"));
+      instructions.add(new STR(r4, new Operand2(sp, 1)));
+      instructions.add(new LABEL("toUpperL1:"));
+      instructions.add(new LDR(r4, new Operand2(sp, 1)));
+      instructions.add(new STR(r4, new Operand2(sp), "B"));
+      instructions.add(new LDR(r4, new Operand2(sp), "SB"));
+      instructions.add(new MOV(r0, new Operand2(r4)));
+      instructions.add(new ADD(sp, sp, new Operand2(5)));
+      instructions.add(new POP(pc));
+      instructions.add(new POP(pc));
+      instructions.add(new Directive(LTORG));
+
+      return instructions;
     }
 
     private static List<Instruction> absInstructions() {
