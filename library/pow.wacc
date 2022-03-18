@@ -15,10 +15,5 @@ begin
       return z
     fi
   end
-  int s = call pow(3, 3);
-  int t = call pow(2, 5);
-  int u = call pow(7,0);
-  println s;
-  println t;
-  println u
+  skip
 end
