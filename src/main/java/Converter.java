@@ -1011,9 +1011,18 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitReferenceExp(Expression expression) {
-    // MOV r4, expr
-    //TODO: unfinished
-    return translateUnaryExpression(expression);
+    /* Allocate a register: rn for this function to use. */
+    Register rn = popUnusedRegister();
+
+    List<Instruction> instructions = new ArrayList<>();
+
+    // LDR rn, =i
+    instructions.add(new Instruction(LDR, rn, currentST.getSPMapping(expression.getExpression1().getIdent())));
+
+    /* Mark the register used in the evaluation of this function as no longer in use. */
+    pushUnusedRegister(rn);
+
+    return instructions;
   }
 
   @Override
