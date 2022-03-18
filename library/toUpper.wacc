@@ -1,7 +1,7 @@
 #library function that takes a char c and returns the upper case version of it, or just c if its not alphabetic
 
 begin
-  char toLower(char c) is
+  char toUpper(char c) is
     int x = ord(c);
     if (x >= 91 && x <= 96 || x >= 123 || x <= 64)
     then

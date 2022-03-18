@@ -7,7 +7,7 @@ import assembly.Register;
 public class CMP extends Instruction {
 
   //CMP dest, immValue
-  public CMP( Register dest, long immValue) {
+  public CMP(Register dest, long immValue) {
     this.dest = dest;
     this.immValue = immValue;
   }
@@ -24,6 +24,14 @@ public class CMP extends Instruction {
     this.dest = dest;
     this.operand2 = operand2;
   }
+
+  //CMP dest, operand, operand
+  public CMP(Register dest, Register operand1, Operand2 operand2) {
+    this.dest = dest;
+    this.operand1 = operand1;
+    this.operand2 = operand2;
+  }
+
   //CMP{cond} dest, operand
   public CMP(Register dest, Operand2 operand2, Conditionals conditionals) {
     this.dest = dest;
@@ -33,6 +41,10 @@ public class CMP extends Instruction {
 
   @Override
   public String toString() {
+    if (operand1 != null) {
+      return "CMP" + extraInformation + " " + dest + ", " + operand1 + ", ASR " + operand2;
+    }
+
     if (operand2 == null) {
       return "CMP" + extraInformation + " " + dest + ", #" + immValue;
     }
