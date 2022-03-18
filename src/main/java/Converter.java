@@ -173,6 +173,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       case PAIR:
       case ARRAY:
       case STRING:
+      case REFERENCE:
         return 4;
       case CHAR:
       case BOOL:

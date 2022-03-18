@@ -4,6 +4,7 @@ import ast.Type.EType;
 
 import java.util.*;
 
+import static ast.Type.EType.*;
 import static java.lang.System.exit;
 
 public class SemanticAnalysis {
@@ -113,7 +114,7 @@ public class SemanticAnalysis {
     return ident.toString();
   }
 
-  public Type getExpressionType(Expression expr) {
+  private Type getExpressionType(Expression expr) {
 
     if (expr == null) {
       return null;
@@ -132,7 +133,7 @@ public class SemanticAnalysis {
       case MODULO:
       case PLUS:
       case MINUS:
-        return new Type(EType.INT);
+        return new Type(INT);
 
       case BOOLLITER:
       case NOT:
@@ -144,37 +145,42 @@ public class SemanticAnalysis {
       case NEQ:
       case AND:
       case OR:
-        return new Type(EType.BOOL);
+        return new Type(BOOL);
 
       case CHARLITER:
       case CHR:
-        return new Type(EType.CHAR);
+        return new Type(CHAR);
 
       case STRINGLITER:
-        return new Type(EType.STRING);
+        return new Type(STRING);
 
       case IDENT:
         return currentST.getType(expr.getIdent());
 
       case ARRAYELEM:
-        return currentST.getType(expr.getArrayElem().getIdent()).getArrayType();
+        ArrayElem arrayElem = expr.getArrayElem();
+        Type result = currentST.getType(arrayElem.getIdent());
+        for (int i = 0; i < arrayElem.getExpression().size(); i++) {
+          result = result.getArrayType();
+        }
+        return result;
 
       case BRACKETS:
         return getExpressionType(expr.getExpression1());
 
       case REFERENCE:
         nextType = getExpressionType(expr.getExpression1());
-        if(nextType.getType() == EType.DEREFERENCE) {
+        if(nextType.getType() == DEREFERENCE) {
           return nextType.getArrayType();
         }
-        return new Type(EType.REFERENCE, nextType);
+        return new Type(REFERENCE, nextType);
 
       case DEREFERENCE:
         nextType = getExpressionType(expr.getExpression1());
-        if(nextType.getType() == EType.REFERENCE) {
+        if(nextType.getType() == REFERENCE) {
           return nextType.getArrayType();
         }
-        return new Type(EType.DEREFERENCE, nextType);
+        return new Type(DEREFERENCE, nextType);
 
     }
     return null;
