@@ -90,9 +90,9 @@ public class Compiler {
 
   public static void main(String[] args) throws IOException {
 
-    Path filename = Path.of("wacc_examples/valid/expressions/andExpr.wacc");
+    Path filename = Path.of(args[0]);
 
-    Program ast = compile(new String("wacc_examples/valid/expressions/andExpr.wacc"));
+    Program ast = compile(new String(args[0]));
 
     Evaluator evaluator = new Evaluator();
     evaluator.visitProgram(ast);
