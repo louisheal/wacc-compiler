@@ -70,6 +70,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       return null;
     }
 
+    Type nextType;
+
     switch (expr.getExprType()) {
 
       case INTLITER:
@@ -115,6 +117,20 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
       case BRACKETS:
         return getExpressionType(expr.getExpression1());
+
+      case REFERENCE:
+        nextType = getExpressionType(expr.getExpression1());
+        if(nextType.getType() == DEREFERENCE) {
+          return nextType.getArrayType();
+        }
+        return new Type(REFERENCE, nextType);
+
+      case DEREFERENCE:
+        nextType = getExpressionType(expr.getExpression1());
+        if(nextType.getType() == REFERENCE) {
+          return nextType.getArrayType();
+        }
+        return new Type(DEREFERENCE, nextType);
 
     }
     return null;
