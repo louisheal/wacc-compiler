@@ -39,7 +39,18 @@ public class Evaluator extends ASTVisitor<Expression> {
   }
 
   private boolean isExpressionIdentOrArrayElem(Expression expression) {
-    return (expression.getIdent() != null) || (expression.getArrayElem() != null);
+    if (expression == null) {
+      return true;
+    } else if (expression.getExprType() == Expression.ExprType.CHARLITER ||
+        expression.getExprType() == Expression.ExprType.BOOLLITER ||
+        expression.getExprType() == Expression.ExprType.INTLITER ||
+        expression.getExprType() == Expression.ExprType.STRINGLITER) {
+      return false;
+    }
+
+    return ((expression.getIdent() != null) || (expression.getArrayElem() != null))
+        || (isExpressionIdentOrArrayElem(expression.getExpression1())
+            && isExpressionIdentOrArrayElem(expression.getExpression2()));
   }
 
   @Override
@@ -320,12 +331,22 @@ public class Evaluator extends ASTVisitor<Expression> {
     boolean bool1 = visitExpression(expression1).getBoolLiter();
     boolean bool2 = visitExpression(expression2).getBoolLiter();
 
-    if (bool2) {
+    if (isExpressionIdentOrArrayElem(expression1) && isExpressionIdentOrArrayElem(expression2)) {
+      return expression;
+    } else if (!bool1 || !bool2) {
+      Expression exp = new ExpressionBuilder().buildBoolExpr(false);
+      expression.setExpression(exp);
+      return exp;
+    } else if (isExpressionIdentOrArrayElem(expression1)) {
+      expression.setExpression(expression1);
       return expression1;
-    } else if (bool1) {
+    } else if (isExpressionIdentOrArrayElem(expression2)) {
+      expression.setExpression(expression2);
       return expression2;
     } else {
-      return expression;
+      Expression exp = new ExpressionBuilder().buildBoolExpr(true);
+      expression.setExpression(exp);
+      return exp;
     }
   }
 
@@ -336,10 +357,22 @@ public class Evaluator extends ASTVisitor<Expression> {
     boolean bool1 = visitExpression(expression1).getBoolLiter();
     boolean bool2 = visitExpression(expression2).getBoolLiter();
 
-    if (bool1 || bool2) {
-      return new ExpressionBuilder().buildBoolExpr(true);
-    } else {
+    if (isExpressionIdentOrArrayElem(expression1) && isExpressionIdentOrArrayElem(expression2)) {
       return expression;
+    } else if (bool1 || bool2) {
+      Expression exp = new ExpressionBuilder().buildBoolExpr(true);
+      expression.setExpression(exp);
+      return exp;
+    } else if (isExpressionIdentOrArrayElem(expression1)) {
+      expression.setExpression(expression1);
+      return expression1;
+    } else if (isExpressionIdentOrArrayElem(expression2)) {
+      expression.setExpression(expression2);
+      return expression2;
+    } else {
+      Expression exp = new ExpressionBuilder().buildBoolExpr(false);
+      expression.setExpression(exp);
+      return exp;
     }
   }
 
