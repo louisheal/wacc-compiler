@@ -988,10 +988,13 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   public List<Instruction> visitLenExp(Expression expression) {
     List<Instruction> instructions = translateUnaryExpression(expression);
 
+    /* Allocate a register: rn for this function to use. */
     Register rn = popUnusedRegister();
 
+    // LDR rn, [rn]
     instructions.add(new Instruction(LDR, rn, new Operand2(rn)));
 
+    /* Mark the register used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rn);
 
     return instructions;
@@ -1028,9 +1031,18 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   @Override
   public List<Instruction> visitDereferenceExp(Expression expression) {
-    // MOV r4, expr
-    //TODO: unfinished
-    return translateUnaryExpression(expression);
+    List<Instruction> instructions = translateUnaryExpression(expression);
+
+    /* Allocate a register: rn for this function to use. */
+    Register rn = popUnusedRegister();
+
+    //LDR rn, [rn]
+    instructions.add(new Instruction(LDR, rn, new Operand2(rn)));
+
+    /* Mark the register used in the evaluation of this function as no longer in use. */
+    pushUnusedRegister(rn);
+
+    return instructions;
   }
 
   @Override
