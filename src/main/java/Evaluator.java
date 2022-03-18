@@ -39,7 +39,6 @@ public class Evaluator extends ASTVisitor<Expression> {
   }
 
   private boolean isExpressionIdentOrArrayElem(Expression expression) {
-
     return (expression.getIdent() != null) || (expression.getArrayElem() != null);
   }
 
@@ -107,9 +106,11 @@ public class Evaluator extends ASTVisitor<Expression> {
   @Override
   public Expression visitWhileStatement(Statement statement) {
     Expression expression = statement.getExpression();
+    System.out.println(expression);
     if (!isExpressionIdentOrArrayElem(expression)) {
       expression.setExpression(visitExpression(expression));
     }
+    System.out.println(expression);
     visitStatement(statement.getStatement1());
     return null;
   }
@@ -316,22 +317,32 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitAndExp(Expression expression) {
-    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+    Expression expression1 = expression.getExpression1();
+    Expression expression2 = expression.getExpression2();
+    boolean bool1 = visitExpression(expression1).getBoolLiter();
+    boolean bool2 = visitExpression(expression2).getBoolLiter();
+
+    if (bool2) {
+      return expression1;
+    } else if (bool1) {
+      return expression2;
+    } else {
       return expression;
     }
-    boolean bool1 = visitExpression(expression.getExpression1()).getBoolLiter();
-    boolean bool2 = visitExpression(expression.getExpression2()).getBoolLiter();
-    return new ExpressionBuilder().buildBoolExpr(bool1 && bool2);
   }
 
   @Override
   public Expression visitOrExp(Expression expression) {
-    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+    Expression expression1 = expression.getExpression1();
+    Expression expression2 = expression.getExpression2();
+    boolean bool1 = visitExpression(expression1).getBoolLiter();
+    boolean bool2 = visitExpression(expression2).getBoolLiter();
+
+    if (bool1 || bool2) {
+      return new ExpressionBuilder().buildBoolExpr(true);
+    } else {
       return expression;
     }
-    boolean bool1 = visitExpression(expression.getExpression1()).getBoolLiter();
-    boolean bool2 = visitExpression(expression.getExpression2()).getBoolLiter();
-    return new ExpressionBuilder().buildBoolExpr(bool1 || bool2);
   }
 
   @Override
