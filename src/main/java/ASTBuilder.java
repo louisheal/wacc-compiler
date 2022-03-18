@@ -451,11 +451,11 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
 
   //REFERENCE
   @Override
-  public Expression.ExprType visitReference(BasicParser.ChrContext ctx) { return Expression.ExprType.REFERENCE; }
+  public Expression.ExprType visitReference(BasicParser.ReferenceContext ctx) { return Expression.ExprType.REFERENCE; }
 
   //DEREFERENCE
   @Override
-  public Expression.ExprType visitDereference(BasicParser.ChrContext ctx) { return Expression.ExprType.DEREFERENCE; }
+  public Expression.ExprType visitDereference(BasicParser.DereferenceContext ctx) { return Expression.ExprType.DEREFERENCE; }
 
   //BINARY-OP
 
