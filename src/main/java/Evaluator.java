@@ -16,7 +16,6 @@ public class Evaluator extends ASTVisitor<Expression> {
     for (Function function : program.getFunctions()) {
       visitFunction(function);
     }
-    System.out.println(program.getStatement());
     visitStatement(program.getStatement());
     return null;
   }
@@ -39,9 +38,17 @@ public class Evaluator extends ASTVisitor<Expression> {
     return null;
   }
 
+  private boolean isExpressionIdentOrArrayElem(Expression expression) {
+
+    return (expression.getIdent() != null) || (expression.getArrayElem() != null);
+  }
+
   @Override
   public Expression visitFreeStatement(Statement statement) {
     Expression expression = statement.getExpression();
+    if (isExpressionIdentOrArrayElem(expression)) {
+      return null;
+    }
     expression.setExpression(visitExpression(expression));
     return null;
   }
@@ -49,6 +56,9 @@ public class Evaluator extends ASTVisitor<Expression> {
   @Override
   public Expression visitReturnStatement(Statement statement) {
     Expression expression = statement.getExpression();
+    if (isExpressionIdentOrArrayElem(expression)) {
+      return null;
+    }
     expression.setExpression(visitExpression(expression));
     return null;
   }
@@ -56,6 +66,9 @@ public class Evaluator extends ASTVisitor<Expression> {
   @Override
   public Expression visitExitStatement(Statement statement) {
     Expression expression = statement.getExpression();
+    if (isExpressionIdentOrArrayElem(expression)) {
+      return null;
+    }
     expression.setExpression(visitExpression(expression));
     return null;
   }
@@ -63,6 +76,9 @@ public class Evaluator extends ASTVisitor<Expression> {
   @Override
   public Expression visitPrintStatement(Statement statement) {
     Expression expression = statement.getExpression();
+    if (isExpressionIdentOrArrayElem(expression)) {
+      return null;
+    }
     expression.setExpression(visitExpression(expression));
     return null;
   }
@@ -70,6 +86,9 @@ public class Evaluator extends ASTVisitor<Expression> {
   @Override
   public Expression visitPrintlnStatement(Statement statement) {
     Expression expression = statement.getExpression();
+    if (isExpressionIdentOrArrayElem(expression)) {
+      return null;
+    }
     expression.setExpression(visitExpression(expression));
     return null;
   }
@@ -77,7 +96,9 @@ public class Evaluator extends ASTVisitor<Expression> {
   @Override
   public Expression visitIfStatement(Statement statement) {
     Expression expression = statement.getExpression();
-    expression.setExpression(visitExpression(expression));
+    if (!isExpressionIdentOrArrayElem(expression)) {
+      expression.setExpression(visitExpression(expression));
+    }
     visitStatement(statement.getStatement1());
     visitStatement(statement.getStatement2());
     return null;
@@ -86,7 +107,9 @@ public class Evaluator extends ASTVisitor<Expression> {
   @Override
   public Expression visitWhileStatement(Statement statement) {
     Expression expression = statement.getExpression();
-    expression.setExpression(visitExpression(expression));
+    if (!isExpressionIdentOrArrayElem(expression)) {
+      expression.setExpression(visitExpression(expression));
+    }
     visitStatement(statement.getStatement1());
     return null;
   }
@@ -126,44 +149,66 @@ public class Evaluator extends ASTVisitor<Expression> {
   public Expression visitArrayElemExp(Expression expression) {
     ArrayElem arrayElem = expression.getArrayElem();
     for (Expression exp : arrayElem.getExpression()) {
-      exp.setExpression(visitExpression(exp));
+      if (!isExpressionIdentOrArrayElem(exp)) {
+        exp.setExpression(visitExpression(exp));
+      }
     }
     return null;
   }
 
   @Override
   public Expression visitNotExp(Expression expression) {
-    boolean bool = visitExpression(expression.getExpression1()).getBoolLiter();
+    Expression expression1 = expression.getExpression1();
+    if (isExpressionIdentOrArrayElem(expression1)) {
+      return expression1;
+    }
+    boolean bool = visitExpression(expression1).getBoolLiter();
     return new ExpressionBuilder().buildBoolExpr(!bool);
   }
 
   @Override
   public Expression visitNegExp(Expression expression) {
-    long integer = visitExpression(expression.getExpression1()).getIntLiter();
+    Expression expression1 = expression.getExpression1();
+    if (isExpressionIdentOrArrayElem(expression1)) {
+      return expression1;
+    }
+    long integer = visitExpression(expression1).getIntLiter();
     return new ExpressionBuilder().buildIntExpr(-integer);
   }
 
   @Override
   public Expression visitLenExp(Expression expression) {
     Expression exp = expression.getExpression1();
+    if (isExpressionIdentOrArrayElem(exp)) {
+      return exp;
+    }
     exp.setExpression(visitExpression(exp));
     return expression;
   }
 
   @Override
   public Expression visitOrdExp(Expression expression) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1())) {
+      return expression;
+    }
     long ord = visitExpression(expression.getExpression1()).getCharLiter();
     return new ExpressionBuilder().buildIntExpr(ord);
   }
 
   @Override
   public Expression visitChrExp(Expression expression) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1())) {
+      return expression;
+    }
     char chr = (char) visitExpression(expression.getExpression1()).getIntLiter();
     return new ExpressionBuilder().buildCharExpr(chr);
   }
 
   @Override
   public Expression visitDivExp(Expression expression) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+      return expression;
+    }
     long arg1 = visitExpression(expression.getExpression1()).getIntLiter();
     long arg2 = visitExpression(expression.getExpression2()).getIntLiter();
     return new ExpressionBuilder().buildIntExpr(arg1 / arg2);
@@ -171,6 +216,9 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitMulExp(Expression expression) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+      return expression;
+    }
     long arg1 = visitExpression(expression.getExpression1()).getIntLiter();
     long arg2 = visitExpression(expression.getExpression2()).getIntLiter();
     return new ExpressionBuilder().buildIntExpr(arg1 * arg2);
@@ -178,6 +226,9 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitModExp(Expression expression) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+      return expression;
+    }
     long arg1 = visitExpression(expression.getExpression1()).getIntLiter();
     long arg2 = visitExpression(expression.getExpression2()).getIntLiter();
     return new ExpressionBuilder().buildIntExpr(arg1 % arg2);
@@ -185,6 +236,9 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitPlusExp(Expression expression) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+      return expression;
+    }
     long arg1 = visitExpression(expression.getExpression1()).getIntLiter();
     long arg2 = visitExpression(expression.getExpression2()).getIntLiter();
     return new ExpressionBuilder().buildIntExpr(arg1 + arg2);
@@ -192,6 +246,9 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitMinusExp(Expression expression) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+      return expression;
+    }
     long arg1 = visitExpression(expression.getExpression1()).getIntLiter();
     long arg2 = visitExpression(expression.getExpression2()).getIntLiter();
     return new ExpressionBuilder().buildIntExpr(arg1 - arg2);
@@ -199,6 +256,9 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitGreaterExp(Expression expression) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+      return expression;
+    }
     long arg1 = visitExpression(expression.getExpression1()).getIntLiter();
     long arg2 = visitExpression(expression.getExpression2()).getIntLiter();
     return new ExpressionBuilder().buildBoolExpr(arg1 > arg2);
@@ -206,6 +266,9 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitGreaterEqExp(Expression expression) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+      return expression;
+    }
     long arg1 = visitExpression(expression.getExpression1()).getIntLiter();
     long arg2 = visitExpression(expression.getExpression2()).getIntLiter();
     return new ExpressionBuilder().buildBoolExpr(arg1 >= arg2);
@@ -213,6 +276,9 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitLessExp(Expression expression) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+      return expression;
+    }
     long arg1 = visitExpression(expression.getExpression1()).getIntLiter();
     long arg2 = visitExpression(expression.getExpression2()).getIntLiter();
     return new ExpressionBuilder().buildBoolExpr(arg1 < arg2);
@@ -220,6 +286,9 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitLessEqExp(Expression expression) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+      return expression;
+    }
     long arg1 = visitExpression(expression.getExpression1()).getIntLiter();
     long arg2 = visitExpression(expression.getExpression2()).getIntLiter();
     return new ExpressionBuilder().buildBoolExpr(arg1 <= arg2);
@@ -227,6 +296,9 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitEqExp(Expression expression) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+      return expression;
+    }
     boolean bool1 = visitExpression(expression.getExpression1()).getBoolLiter();
     boolean bool2 = visitExpression(expression.getExpression2()).getBoolLiter();
     return new ExpressionBuilder().buildBoolExpr(Objects.equals(bool1,bool2));
@@ -234,6 +306,9 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitNeqExp(Expression expression) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+      return expression;
+    }
     boolean bool1 = visitExpression(expression.getExpression1()).getBoolLiter();
     boolean bool2 = visitExpression(expression.getExpression2()).getBoolLiter();
     return new ExpressionBuilder().buildBoolExpr(!Objects.equals(bool1,bool2));
@@ -241,6 +316,9 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitAndExp(Expression expression) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+      return expression;
+    }
     boolean bool1 = visitExpression(expression.getExpression1()).getBoolLiter();
     boolean bool2 = visitExpression(expression.getExpression2()).getBoolLiter();
     return new ExpressionBuilder().buildBoolExpr(bool1 && bool2);
@@ -248,6 +326,9 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitOrExp(Expression expression) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+      return expression;
+    }
     boolean bool1 = visitExpression(expression.getExpression1()).getBoolLiter();
     boolean bool2 = visitExpression(expression.getExpression2()).getBoolLiter();
     return new ExpressionBuilder().buildBoolExpr(bool1 || bool2);
@@ -256,7 +337,9 @@ public class Evaluator extends ASTVisitor<Expression> {
   @Override
   public Expression visitExprRHS(AssignRHS rhs) {
     Expression expression = rhs.getExpression1();
-    expression.setExpression(visitExpression(expression));
+    if (!isExpressionIdentOrArrayElem(expression)) {
+      expression.setExpression(visitExpression(expression));
+    }
     return null;
   }
 
@@ -264,13 +347,16 @@ public class Evaluator extends ASTVisitor<Expression> {
   public Expression visitNewPairRHS(AssignRHS rhs) {
     Expression expression1 = rhs.getExpression1();
     Expression expression2 = rhs.getExpression2();
+    if (isExpressionIdentOrArrayElem(expression1) || isExpressionIdentOrArrayElem(expression2)) {
+      return null;
+    }
     expression1.setExpression(visitExpression(expression1));
     expression2.setExpression(visitExpression(expression2));
     return null;
   }
 
   @Override
-  public Expression visitArrayElemLHS(AssignLHS lhs) {
+  public Expression visitArrayElemLHS(AssignLHS lhs) { // how would i check this case
     ArrayElem arrayElem = lhs.getArrayElem();
     return visitExpression(new ExpressionBuilder().buildArrayExpr(arrayElem));
   }
@@ -278,6 +364,9 @@ public class Evaluator extends ASTVisitor<Expression> {
   @Override
   public Expression visitPairElemLHS(AssignLHS lhs) {
     Expression expression = lhs.getPairElem().getExpression();
+    if (isExpressionIdentOrArrayElem(expression)) {
+      return null;
+    }
     expression.setExpression(visitExpression(expression));
     return null;
   }
