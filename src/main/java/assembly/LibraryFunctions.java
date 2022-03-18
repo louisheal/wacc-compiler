@@ -132,6 +132,13 @@ public class LibraryFunctions {
         return params;
     }
 
+    private static List<Param> getConcatParams() {
+        List<Param> params = new ArrayList<>();
+        params.add(new Param(new Type(STRING), "a"));
+        params.add(new Param(new Type(STRING), "b"));
+        return params;
+    }
+
     public enum LFunctions {
         MAX("array_int_f_max", getMaxParams(), new Type(INT)),
         ABS("int_f_abs", getAbsParams(), new Type(INT)),
@@ -148,7 +155,8 @@ public class LibraryFunctions {
         POW("int_int_f_pow", getPowParams(), new Type(INT)),
         CONTAINS("array_int_int_f_contains", getContainsParams(), new Type(BOOL)),
         BSORT("array_int_f_bsort", getBSortParams(), new Type(BOOL)),
-        PARRAY("array_int_f_printArray", getPrintArrayParams(), new Type(BOOL));
+        PARRAY("array_int_f_printArray", getPrintArrayParams(), new Type(BOOL)),
+        CONCAT("string_string_f_concat", getConcatParams(), new Type(STRING));
 
         private final String ident;
         private final List<Param> params;
@@ -252,6 +260,10 @@ public class LibraryFunctions {
                 preFunctions.add(Functions.P_THROW_OVERFLOW_ERROR);
                 preFunctions.add(Functions.P_PRINT_LN);
                 return printArrayInstructions();
+            case CONCAT:
+                preFunctions.add(Functions.P_THROW_OVERFLOW_ERROR);
+                preFunctions.add(Functions.P_CHECK_ARRAY_BOUNDS);
+                return concatInstructions();
             default:
                 return new ArrayList<>();
         }
@@ -1216,6 +1228,116 @@ public class LibraryFunctions {
         instructions.add(new MOV(r4, 1));
         instructions.add(new MOV(r0, new Operand2(r4)));
         instructions.add(new ADD(sp, sp, new Operand2(4)));
+        instructions.add(new POP(pc));
+        instructions.add(new POP(pc));
+        instructions.add(new Directive(LTORG));
+
+        return instructions;
+    }
+
+    private static List<Instruction> concatInstructions() {
+        List<Instruction> instructions = new ArrayList<>();
+
+        instructions.add(new LABEL(CONCAT.getIdent() + ":"));
+        instructions.add(new PUSH(lr));
+        instructions.add(new SUB(sp, sp, new Operand2(12)));
+        instructions.add(new LDR(r4, new Operand2(sp, 16)));
+        instructions.add(new LDR(r4, new Operand2(r4)));
+        instructions.add(new LDR(r5, new Operand2(sp, 20)));
+        instructions.add(new LDR(r5, new Operand2(r5)));
+        instructions.add(new ADD(r4, r4, new Operand2(r5), Flags.S));
+        instructions.add(new Branch("p_throw_overflow_error", Conditionals.VS).setSuffix("L"));
+        instructions.add(new STR(r4, new Operand2(sp, 8)));
+        instructions.add(new ADD(r4, r4, new Operand2(4)));
+        instructions.add(new MOV(r0, new Operand2(r4)));
+        instructions.add(new Branch("malloc").setSuffix("L"));
+        instructions.add(new MOV(r4, new Operand2(r0)));
+        instructions.add(new LDR(r5, new Operand2(sp, 8)));
+        instructions.add(new STR(r5, new Operand2(r4)));
+        instructions.add(new STR(r4, new Operand2(sp, 4)));
+        instructions.add(new LDR(r4, 0));
+        instructions.add(new STR(r4, new Operand2(sp)));
+        instructions.add(new Branch("concatL0"));
+
+        instructions.add(new LABEL("concatL1:"));
+        instructions.add(new ADD(r4, sp, new Operand2(16)));
+        instructions.add(new LDR(r5, new Operand2(sp)));
+        instructions.add(new LDR(r4, new Operand2(r4)));
+        instructions.add(new MOV(r0, new Operand2(r5)));
+        instructions.add(new MOV(r1, new Operand2(r4)));
+        instructions.add(new Branch("p_check_array_bounds").setSuffix("L"));
+        instructions.add(new ADD(r4, r4, new Operand2(4)));
+        instructions.add(new ADD(r4, r4, new Operand2(r5)));
+        instructions.add(new LDR(r4, new Operand2(r4), "SB"));
+        instructions.add(new ADD(r5, sp, new Operand2(4)));
+        instructions.add(new LDR(r6, new Operand2(sp)));
+        instructions.add(new LDR(r5, new Operand2(r5)));
+        instructions.add(new MOV(r0, new Operand2(r6)));
+        instructions.add(new MOV(r1, new Operand2(r5)));
+        instructions.add(new Branch("p_check_array_bounds").setSuffix("L"));
+        instructions.add(new ADD(r5, r5, new Operand2(4)));
+        instructions.add(new ADD(r5, r5, new Operand2(r6)));
+        instructions.add(new STR(r4, new Operand2(r5), "B"));
+        instructions.add(new LDR(r4, new Operand2(sp)));
+        instructions.add(new LDR(r6, 1));
+        instructions.add(new ADD(r4, r4, new Operand2(r6), Flags.S));
+        instructions.add(new Branch("p_throw_overflow_error", Conditionals.VS).setSuffix("L"));
+        instructions.add(new STR(r4, new Operand2(sp)));
+
+        instructions.add(new LABEL("concatL0:"));
+        instructions.add(new LDR(r4, new Operand2(sp)));
+        instructions.add(new LDR(r6, new Operand2(sp, 16)));
+        instructions.add(new LDR(r6, new Operand2(r6)));
+        instructions.add(new CMP(r4, new Operand2(r6)));
+        instructions.add(new MOV(r4, 1, Conditionals.LT));
+        instructions.add(new MOV(r4, 0, Conditionals.GE));
+        instructions.add(new CMP(r4, 1));
+        instructions.add(new Branch("concatL1", Conditionals.EQ));
+        instructions.add(new LDR(r4, 0));
+        instructions.add(new STR(r4, new Operand2(sp)));
+        instructions.add(new Branch("concatL2"));
+
+        instructions.add(new LABEL("concatL3:"));
+        instructions.add(new ADD(r4, sp, new Operand2(20)));
+        instructions.add(new LDR(r6, new Operand2(sp)));
+        instructions.add(new LDR(r4, new Operand2(r4)));
+        instructions.add(new MOV(r0, new Operand2(r6)));
+        instructions.add(new MOV(r1, new Operand2(r4)));
+        instructions.add(new Branch("p_check_array_bounds").setSuffix("L"));
+        instructions.add(new ADD(r4, r4, new Operand2(4)));
+        instructions.add(new ADD(r4, r4, new Operand2(r6)));
+        instructions.add(new LDR(r4, new Operand2(r4), "SB"));
+        instructions.add(new ADD(r6, sp, new Operand2(4)));
+        instructions.add(new LDR(r7, new Operand2(sp)));
+        instructions.add(new LDR(r8, new Operand2(sp, 16)));
+        instructions.add(new LDR(r8, new Operand2(r8)));
+        instructions.add(new ADD(r7, r7, new Operand2(r8), Flags.S));
+        instructions.add(new Branch("p_throw_overflow_error", Conditionals.VS).setSuffix("L"));
+        instructions.add(new LDR(r6, new Operand2(r6)));
+        instructions.add(new MOV(r0, new Operand2(r7)));
+        instructions.add(new MOV(r1, new Operand2(r6)));
+        instructions.add(new Branch("p_check_array_bounds").setSuffix("L"));
+        instructions.add(new ADD(r6, r6, new Operand2(4)));
+        instructions.add(new ADD(r6, r6, new Operand2(r7)));
+        instructions.add(new STR(r4, new Operand2(r6), "B"));
+        instructions.add(new LDR(r4, new Operand2(sp)));
+        instructions.add(new LDR(r7, 1));
+        instructions.add(new ADD(r4, r4, new Operand2(r7), Flags.S));
+        instructions.add(new Branch("p_throw_overflow_error", Conditionals.VS).setSuffix("L"));
+        instructions.add(new STR(r4, new Operand2(sp)));
+
+        instructions.add(new LABEL("concatL2:"));
+        instructions.add(new LDR(r4, new Operand2(sp)));
+        instructions.add(new LDR(r7, new Operand2(sp, 20)));
+        instructions.add(new LDR(r7, new Operand2(r7)));
+        instructions.add(new CMP(r4, new Operand2(r7)));
+        instructions.add(new MOV(r4, 1, Conditionals.LT));
+        instructions.add(new MOV(r4, 0, Conditionals.GE));
+        instructions.add(new CMP(r4, 1));
+        instructions.add(new Branch("concatL3", Conditionals.EQ));
+        instructions.add(new LDR(r4, new Operand2(sp, 4)));
+        instructions.add(new MOV(r0, new Operand2(r4)));
+        instructions.add(new ADD(sp, sp, new Operand2(12)));
         instructions.add(new POP(pc));
         instructions.add(new POP(pc));
         instructions.add(new Directive(LTORG));
