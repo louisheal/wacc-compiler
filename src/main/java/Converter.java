@@ -1016,8 +1016,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     List<Instruction> instructions = new ArrayList<>();
 
-    // LDR rn, =i
-    instructions.add(new Instruction(LDR, rn, currentST.getSPMapping(expression.getExpression1().getIdent())));
+    // ADD rn, sp #i
+    instructions.add(new Instruction(ADD, rn, sp,
+            new Operand2(currentST.getSPMapping(expression.getExpression1().getIdent()))));
 
     /* Mark the register used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rn);
