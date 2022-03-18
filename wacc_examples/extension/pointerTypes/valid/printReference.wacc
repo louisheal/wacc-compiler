@@ -1,0 +1,12 @@
+# basic reference printing
+
+# Output:
+# Printing a reference to a variable gives an address, such as #addrs#
+
+# Program:
+
+begin
+  print "Printing a reference to a variable gives an address, such as " ;
+  int a = 1 ;
+  println &a
+end
