@@ -42,5 +42,28 @@ public class ExtensionTests {
     runTests(examples);
   }
 
+  @Test
+  public void pointerTypesTests() throws IOException {
+    System.setSecurityManager(securityManager);
+
+    File directory = new File("wacc_examples/extension/pointerTypes/valid/");
+    File[] examples = directory.listFiles(folderFilter);
+
+    assert examples != null;
+    runTests(examples);
+  }
+
+  @Test
+  public void standardLibraryTests() throws IOException {
+    System.setSecurityManager(securityManager);
+
+    File directory = new File("wacc_examples/extension/standardLibrary/");
+    File[] examples = directory.listFiles(folderFilter);
+
+    assert examples != null;
+    runTests(examples);
+  }
+
+
 
 }
