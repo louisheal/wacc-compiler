@@ -68,6 +68,18 @@ public class LibraryFunctions {
     return params;
   }
 
+  private static List<Param> getIsUpperParams(){
+    List<Param> params = new ArrayList<>();
+    params.add(new Param(new Type(CHAR), "c"));
+    return params;
+  }
+
+  private static List<Param> getIsLowerParams(){
+    List<Param> params = new ArrayList<>();
+    params.add(new Param(new Type(CHAR), "c"));
+    return params;
+  }
+
 
     private static List<Param> getMinParams() {
         List<Param> params = new ArrayList<>();
@@ -87,6 +99,10 @@ public class LibraryFunctions {
         ISASCII("char_f_isAscii", getIsAsciiParams(), new Type(BOOL)),
 
         ISDIGIT("char_f_isDigit", getIsDigitParams(), new Type(BOOL)),
+
+        ISUPPER("char_f_isUpper", getIsUpperParams(), new Type(BOOL)),
+
+        ISLOWER("char_f_isLower", getIsLowerParams(), new Type(BOOL)),
 
         MIN("array_int_f_min", getMinParams(), new Type(INT));
 
@@ -165,6 +181,10 @@ public class LibraryFunctions {
                 return isAsciiInstructions();
           case ISDIGIT:
                 return isDigitInstructions();
+          case ISLOWER:
+              return isLowerInstructions();
+          case ISUPPER:
+            return  isUpperInstructions();
             default:
                 return new ArrayList<>();
         }
@@ -457,7 +477,85 @@ public class LibraryFunctions {
 
 
     return instructions;
-      }
+    }
+
+  private static List<Instruction> isLowerInstructions() {
+    List<Instruction> instructions = new ArrayList<>();
+    instructions.add(new LABEL("char_f_isLower:"));
+    instructions.add(new PUSH(lr));
+    instructions.add(new SUB(sp, sp ,new Operand2(4)));
+    instructions.add(new LDR(r4, new Operand2(sp, 8), "SB"));
+    instructions.add(new STR(r4, new Operand2(sp)));
+    instructions.add(new LDR(r4, new Operand2(sp)));
+    instructions.add(new LDR(r5, 97));
+    instructions.add(new CMP(r4, new Operand2(r5)));
+    instructions.add(new MOV(r4, 1, Conditionals.GE));
+    instructions.add(new MOV(r4, 0, Conditionals.LT));
+    instructions.add(new LDR(r5, new Operand2(sp)));
+    instructions.add(new LDR(r6, 122));
+    instructions.add(new CMP(r5, new Operand2(r6)));
+    instructions.add(new MOV(r5, 1, Conditionals.LE));
+    instructions.add(new MOV(r5, 0, Conditionals.GT));
+    instructions.add(new BoolOp(BoolOpType.AND, r4, r4, r5));
+    instructions.add(new CMP(r4, 0));
+    instructions.add(new Branch("isLowerL0", Conditionals.EQ));
+    instructions.add(new MOV(r4, 1));
+    instructions.add(new MOV(r0, new Operand2(r4)));
+    instructions.add(new ADD(sp, sp, new Operand2(4)));
+    instructions.add(new POP(pc));
+    instructions.add(new Branch("isLowerL1"));
+    instructions.add(new LABEL("isLowerL0:"));
+    instructions.add(new MOV(r4, 0));
+    instructions.add(new MOV(r0, new Operand2(r4)));
+    instructions.add(new ADD(sp, sp ,new Operand2(4)));
+    instructions.add(new POP(pc));
+    instructions.add(new LABEL("isLowerL1:"));
+    instructions.add(new POP(pc));
+    instructions.add(new Directive(LTORG));
+
+
+    return instructions;
+  }
+
+  private static List<Instruction> isUpperInstructions() {
+    List<Instruction> instructions = new ArrayList<>();
+    instructions.add(new LABEL("char_f_isUpper:"));
+    instructions.add(new PUSH(lr));
+    instructions.add(new SUB(sp, sp ,new Operand2(4)));
+    instructions.add(new LDR(r4, new Operand2(sp, 8), "SB"));
+    instructions.add(new STR(r4, new Operand2(sp)));
+    instructions.add(new LDR(r4, new Operand2(sp)));
+    instructions.add(new LDR(r5, 65));
+    instructions.add(new CMP(r4, new Operand2(r5)));
+    instructions.add(new MOV(r4, 1, Conditionals.GE));
+    instructions.add(new MOV(r4, 0, Conditionals.LT));
+    instructions.add(new LDR(r5, new Operand2(sp)));
+    instructions.add(new LDR(r6, 90));
+    instructions.add(new CMP(r5, new Operand2(r6)));
+    instructions.add(new MOV(r5, 1, Conditionals.LE));
+    instructions.add(new MOV(r5, 0, Conditionals.GT));
+    instructions.add(new BoolOp(BoolOpType.AND, r4, r4, r5));
+    instructions.add(new CMP(r4, 0));
+    instructions.add(new Branch("isUpperL0", Conditionals.EQ));
+    instructions.add(new MOV(r4, 1));
+    instructions.add(new MOV(r0, new Operand2(r4)));
+    instructions.add(new ADD(sp, sp, new Operand2(4)));
+    instructions.add(new POP(pc));
+    instructions.add(new Branch("isUpperL1"));
+    instructions.add(new LABEL("isUpperL0:"));
+    instructions.add(new MOV(r4, 0));
+    instructions.add(new MOV(r0, new Operand2(r4)));
+    instructions.add(new ADD(sp, sp ,new Operand2(4)));
+    instructions.add(new POP(pc));
+    instructions.add(new LABEL("isUpperL1:"));
+    instructions.add(new POP(pc));
+    instructions.add(new Directive(LTORG));
+
+
+    return instructions;
+  }
+
+
 
     private static List<Instruction> maxInstructions() {
         List<Instruction> instructions = new ArrayList<>();
