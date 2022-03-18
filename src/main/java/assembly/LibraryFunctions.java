@@ -80,6 +80,12 @@ public class LibraryFunctions {
     return params;
   }
 
+  private static List<Param> getIsSpaceParams(){
+    List<Param> params = new ArrayList<>();
+    params.add(new Param(new Type(CHAR), "c"));
+    return params;
+  }
+
 
     private static List<Param> getMinParams() {
         List<Param> params = new ArrayList<>();
@@ -103,6 +109,8 @@ public class LibraryFunctions {
         ISUPPER("char_f_isUpper", getIsUpperParams(), new Type(BOOL)),
 
         ISLOWER("char_f_isLower", getIsLowerParams(), new Type(BOOL)),
+
+        ISSPACE("char_f_isSpace", getIsSpaceParams(), new Type(BOOL)),
 
         MIN("array_int_f_min", getMinParams(), new Type(INT));
 
@@ -185,6 +193,8 @@ public class LibraryFunctions {
               return isLowerInstructions();
           case ISUPPER:
             return  isUpperInstructions();
+          case ISSPACE:
+            return isSpaceInstructions();
             default:
                 return new ArrayList<>();
         }
@@ -554,6 +564,37 @@ public class LibraryFunctions {
 
     return instructions;
   }
+
+  private static List<Instruction> isSpaceInstructions() {
+    List<Instruction> instructions = new ArrayList<>();
+    instructions.add(new LABEL("char_f_isSpace:"));
+    instructions.add(new PUSH(lr));
+    instructions.add(new SUB(sp, sp ,new Operand2(4)));
+    instructions.add(new LDR(r4, new Operand2(sp, 8), "SB"));
+    instructions.add(new STR(r4, new Operand2(sp)));
+    instructions.add(new LDR(r4, new Operand2(sp)));
+    instructions.add(new LDR(r5, 32));
+    instructions.add(new CMP(r4, new Operand2(r5)));
+    instructions.add(new MOV(r4, 1, Conditionals.EQ));
+    instructions.add(new MOV(r4, 0, Conditionals.NE));
+    instructions.add(new CMP(r4, 0));
+    instructions.add(new Branch("isSpaceL0", Conditionals.EQ));
+    instructions.add(new MOV(r4, 1));
+    instructions.add(new MOV(r0, new Operand2(r4)));
+    instructions.add(new ADD(sp, sp, new Operand2(4)));
+    instructions.add(new POP(pc));
+    instructions.add(new Branch("isSpaceL1"));
+    instructions.add(new LABEL("isSpaceL0:"));
+    instructions.add(new MOV(r4, 0));
+    instructions.add(new MOV(r0, new Operand2(r4)));
+    instructions.add(new ADD(sp, sp ,new Operand2(4)));
+    instructions.add(new POP(pc));
+    instructions.add(new LABEL("isSpaceL1:"));
+    instructions.add(new POP(pc));
+    instructions.add(new Directive(LTORG));
+
+    return instructions;
+    }
 
 
 
