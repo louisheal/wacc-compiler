@@ -106,11 +106,9 @@ public class Evaluator extends ASTVisitor<Expression> {
   @Override
   public Expression visitWhileStatement(Statement statement) {
     Expression expression = statement.getExpression();
-    System.out.println(expression);
     if (!isExpressionIdentOrArrayElem(expression)) {
       expression.setExpression(visitExpression(expression));
     }
-    System.out.println(expression);
     visitStatement(statement.getStatement1());
     return null;
   }
