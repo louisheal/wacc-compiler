@@ -1,7 +1,7 @@
 #library function that takes a char and returns true if it is a space, false otherwise
 
 begin
-  bool isAlpha(char c) is
+  bool isSpace(char c) is
     int x = ord(c);
     if (x == 32)
     then

@@ -1,7 +1,7 @@
 #library function that takes a char and returns true if it is a digit, false otherwise
 
 begin
-  bool isAlpha(char c) is
+  bool isDigit(char c) is
     int x = ord(c);
     if (x >= 48 && x <= 57)
     then
