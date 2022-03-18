@@ -412,7 +412,8 @@ public class SemanticAnalysis {
     }
 
     if (expression.getExprType() == Expression.ExprType.REFERENCE) {
-      if(expression.getExpression1().getExprType() != Expression.ExprType.IDENT) {
+      if(expression.getExpression1().getExprType() != Expression.ExprType.IDENT &&
+        getExpressionType(expression.getExpression1()).getType() != DEREFERENCE) {
         printSemanticError(expression.getExprType());
       } else if (currentST.getType(expression.getExpression1().getIdent()) == null) {
         errorMsgs.add("Variable not defined: " + expression.getExpression1().getIdent() +
