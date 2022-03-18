@@ -16,6 +16,7 @@ public class Evaluator extends ASTVisitor<Expression> {
     for (Function function : program.getFunctions()) {
       visitFunction(function);
     }
+    System.out.println(program.getStatement());
     visitStatement(program.getStatement());
     return null;
   }
@@ -278,6 +279,13 @@ public class Evaluator extends ASTVisitor<Expression> {
   public Expression visitPairElemLHS(AssignLHS lhs) {
     Expression expression = lhs.getPairElem().getExpression();
     expression.setExpression(visitExpression(expression));
+    return null;
+  }
+
+  @Override
+  public Expression visitConcatStatement(Statement statement) {
+    visitStatement(statement.getStatement1());
+    visitStatement(statement.getStatement2());
     return null;
   }
 }
