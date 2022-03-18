@@ -1,7 +1,7 @@
 #library function that takes a char and returns true if it is an upper case, false otherwise
 
 begin
-  bool isAlpha(char c) is
+  bool isUpper(char c) is
     int x = ord(c);
     if (x >= 65 && x <= 90)
     then
