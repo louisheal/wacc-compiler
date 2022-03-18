@@ -117,3 +117,6 @@ BOOL_LITER: 'true' | 'false' ;
 NULL: 'null' ;
 
 IDENT: [_a-zA-Z] [_a-zA-Z0-9]* ;
+
+//pointer-types
+REFERENCE: '&' ;

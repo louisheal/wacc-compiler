@@ -85,6 +85,8 @@ pairElem: FST expr      #fstElem
 type: baseType
     | arrayType
     | pairType
+    | type REFERENCE
+    | type MULTIPLY
     ;
 
 baseType: INT       #intType
@@ -110,6 +112,8 @@ unaryOper: NOT      #not
          | LEN      #len
          | ORD      #ord
          | CHR      #chr
+         | REFERENCE #reference
+         | MULTIPLY #dereference
          ;
 
 arrayElem: IDENT (SB_OPEN expr SB_CLOSE)+ ;

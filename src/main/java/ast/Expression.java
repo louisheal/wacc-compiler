@@ -133,6 +133,14 @@ public class Expression {
       result.append("(").append(expression1).append(")");
     }
 
+    if (exprType == ExprType.REFERENCE) {
+      result.append("&").append(expression1);
+    }
+
+    if (exprType == ExprType.DEREFERENCE) {
+      result.append("*").append(expression1);
+    }
+
     return result.toString();
   }
 
@@ -233,7 +241,9 @@ public class Expression {
     NEQ,
     AND,
     OR,
-    BRACKETS
+    BRACKETS,
+    REFERENCE,
+    DEREFERENCE
 
   }
 

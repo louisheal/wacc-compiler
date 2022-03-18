@@ -5,6 +5,7 @@ import ast.Type.EType;
 
 import java.util.*;
 
+import static ast.Type.EType.*;
 import static java.lang.System.exit;
 
 public class SemanticAnalysis {
@@ -76,6 +77,9 @@ public class SemanticAnalysis {
       case NEQ:
         errorMsgs.add(e + " operator can only be used on expressions with the same type");
         break;
+      case REFERENCE:
+        errorMsgs.add(e + " operator can only be used on variables (ident expressions)");
+        break;
     }
     errors++;
   }
@@ -111,11 +115,13 @@ public class SemanticAnalysis {
     return ident.toString();
   }
 
-  public Type getExpressionType(Expression expr) {
+  private Type getExpressionType(Expression expr) {
 
     if (expr == null) {
       return null;
     }
+
+    Type nextType;
 
     switch (expr.getExprType()) {
 
@@ -128,7 +134,7 @@ public class SemanticAnalysis {
       case MODULO:
       case PLUS:
       case MINUS:
-        return new Type(EType.INT);
+        return new Type(INT);
 
       case BOOLLITER:
       case NOT:
@@ -140,23 +146,42 @@ public class SemanticAnalysis {
       case NEQ:
       case AND:
       case OR:
-        return new Type(EType.BOOL);
+        return new Type(BOOL);
 
       case CHARLITER:
       case CHR:
-        return new Type(EType.CHAR);
+        return new Type(CHAR);
 
       case STRINGLITER:
-        return new Type(EType.STRING);
+        return new Type(STRING);
 
       case IDENT:
         return currentST.getType(expr.getIdent());
 
       case ARRAYELEM:
-        return currentST.getType(expr.getArrayElem().getIdent()).getArrayType();
+        ArrayElem arrayElem = expr.getArrayElem();
+        Type result = currentST.getType(arrayElem.getIdent());
+        for (int i = 0; i < arrayElem.getExpression().size(); i++) {
+          result = result.getArrayType();
+        }
+        return result;
 
       case BRACKETS:
         return getExpressionType(expr.getExpression1());
+
+      case REFERENCE:
+        nextType = getExpressionType(expr.getExpression1());
+        if(nextType.getType() == DEREFERENCE) {
+          return nextType.getArrayType();
+        }
+        return new Type(REFERENCE, nextType);
+
+      case DEREFERENCE:
+        nextType = getExpressionType(expr.getExpression1());
+        if(nextType.getType() == REFERENCE) {
+          return nextType.getArrayType();
+        }
+        return new Type(DEREFERENCE, nextType);
 
     }
     return null;
@@ -328,8 +353,10 @@ public class SemanticAnalysis {
                        !getExpressionType(expression.getExpression1()).equals(new Type(EType.INT));
     boolean validOrd = expression.getExprType() == Expression.ExprType.ORD &&
                        !getExpressionType(expression.getExpression1()).equals(new Type(EType.CHAR));
+    boolean validDereference = expression.getExprType() == Expression.ExprType.DEREFERENCE &&
+                       !getExpressionType(expression.getExpression1()).getType().equals(EType.REFERENCE);
 
-    if (validNot || validNeg || validLen || validChr || validOrd) {
+    if (validNot || validNeg || validLen || validChr || validOrd || validDereference) {
       printSemanticError(expression.getExprType());
     }
 
@@ -383,6 +410,17 @@ public class SemanticAnalysis {
       errorMsgs.add("Variable not defined: " + expression.getIdent() + "\n In expression: " + expression);
       errors++;
     }
+
+    if (expression.getExprType() == Expression.ExprType.REFERENCE) {
+      if(expression.getExpression1().getExprType() != Expression.ExprType.IDENT) {
+        printSemanticError(expression.getExprType());
+      } else if (currentST.getType(expression.getExpression1().getIdent()) == null) {
+        errorMsgs.add("Variable not defined: " + expression.getExpression1().getIdent() +
+                "\n In expression: " + expression);
+        errors++;
+      }
+    }
+
   }
 
   private boolean invalidAssignment(Type lhs, AssignRHS rhs) {

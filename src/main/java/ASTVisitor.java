@@ -302,6 +302,10 @@ public class ASTVisitor<T> {
                 return visitOrExp(expression);
             case BRACKETS:
                 return visitExpression(expression.getExpression1());
+            case REFERENCE:
+                return visitReferenceExp(expression);
+            case DEREFERENCE:
+                return visitDereferenceExp(expression);
         }
         return null;
     }
@@ -628,6 +632,32 @@ public class ASTVisitor<T> {
      * @return returns the assembly instructions for an or expression
      */
     public T visitOrExp(Expression expression) {
+        return null;
+    }
+
+    /** <p>Visits an reference expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
+     * <p><b>getExpression1()</b> - Returns the argument expression.</p>
+     *
+     * @param expression reference expression
+     * @return returns the assembly instructions for a reference expression
+     */
+    public T visitReferenceExp(Expression expression) {
+        return null;
+    }
+
+    /** <p>Visits an dereference expression.</p>
+     *
+     * <p>Can call:</p>
+     * <p><b>getExprType()</b> - Returns an ExprType enum.</p>
+     * <p><b>getExpression1()</b> - Returns the argument expression.</p>
+     *
+     * @param expression dereference expression
+     * @return returns the assembly instructions for a dereference expression
+     */
+    public T visitDereferenceExp(Expression expression) {
         return null;
     }
 

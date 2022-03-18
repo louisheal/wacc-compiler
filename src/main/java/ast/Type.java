@@ -53,6 +53,11 @@ public class Type {
       result = arrayType + "[]";
     } else if (type == EType.PAIR) {
       result = "(" + fstType + ", " + sndType + ")";
+    } else if (type == EType.REFERENCE) {
+      //reference creates a pointer
+      result = arrayType + "*";
+    } else if (type == EType.DEREFERENCE) {
+      result = arrayType + "&";
     } else {
       result = type.toString();
     }
@@ -78,7 +83,9 @@ public class Type {
     CHAR,
     STRING,
     ARRAY,
-    PAIR
+    PAIR,
+    REFERENCE,
+    DEREFERENCE
 
   }
 

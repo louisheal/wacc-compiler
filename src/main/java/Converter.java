@@ -49,6 +49,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       return null;
     }
 
+    Type nextType;
+
     switch (expr.getExprType()) {
 
       case INTLITER:
@@ -95,6 +97,20 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       case BRACKETS:
         return getExpressionType(expr.getExpression1());
 
+      case REFERENCE:
+        nextType = getExpressionType(expr.getExpression1());
+        if(nextType.getType() == DEREFERENCE) {
+          return nextType.getArrayType();
+        }
+        return new Type(REFERENCE, nextType);
+
+      case DEREFERENCE:
+        nextType = getExpressionType(expr.getExpression1());
+        if(nextType.getType() == REFERENCE) {
+          return nextType.getArrayType();
+        }
+        return new Type(DEREFERENCE, nextType);
+
     }
     return null;
   }
@@ -136,6 +152,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       case PAIR:
       case ARRAY:
       case STRING:
+      case REFERENCE:
+        //TODO: unsure if dereference should also be of size 4
+      case DEREFERENCE:
         return 4;
       case CHAR:
       case BOOL:
@@ -990,10 +1009,13 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   public List<Instruction> visitLenExp(Expression expression) {
     List<Instruction> instructions = translateUnaryExpression(expression);
 
+    /* Allocate a register: rn for this function to use. */
     Register rn = popUnusedRegister();
 
+    // LDR rn, [rn]
     instructions.add(new LDR(rn, new Operand2(rn)));
 
+    /* Mark the register used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rn);
 
     return instructions;
@@ -1009,6 +1031,39 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   public List<Instruction> visitChrExp(Expression expression) {
     // MOV r4, expr
     return translateUnaryExpression(expression);
+  }
+
+  @Override
+  public List<Instruction> visitReferenceExp(Expression expression) {
+    /* Allocate a register: rn for this function to use. */
+    Register rn = popUnusedRegister();
+
+    List<Instruction> instructions = new ArrayList<>();
+
+    // ADD rn, sp #i
+    instructions.add(new ADD(rn, sp,
+            new Operand2(currentST.getSPMapping(expression.getExpression1().getIdent()))));
+
+    /* Mark the register used in the evaluation of this function as no longer in use. */
+    pushUnusedRegister(rn);
+
+    return instructions;
+  }
+
+  @Override
+  public List<Instruction> visitDereferenceExp(Expression expression) {
+    List<Instruction> instructions = translateUnaryExpression(expression);
+
+    /* Allocate a register: rn for this function to use. */
+    Register rn = popUnusedRegister();
+
+    //LDR rn, [rn]
+    instructions.add(new LDR(rn, new Operand2(rn)));
+
+    /* Mark the register used in the evaluation of this function as no longer in use. */
+    pushUnusedRegister(rn);
+
+    return instructions;
   }
 
   @Override
