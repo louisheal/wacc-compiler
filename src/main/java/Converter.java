@@ -426,9 +426,9 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     }
 
     if (sizeOfTypeOnStack(type) == 1) {
-      instructions.add(new STR(rm, new Operand2(rn), "B"));
+      instructions.add(new STR(rn, new Operand2(rm), "B"));
     } else {
-      instructions.add(new STR (rm, new Operand2(rn)));
+      instructions.add(new STR (rn, new Operand2(rm)));
     }
 
     /* Mark registers as no longer in use. */
@@ -560,15 +560,15 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     pushUnusedRegister(rn);
     instructions.addAll(statementOneInstructions);
 
-    // BL Lx+1
-    instructions.add(new Branch(label2).setSuffix("L"));
+    // B Lx+1
+    instructions.add(new Branch(label2));
 
     // Lx:
     instructions.add(new LABEL(label1 + ":"));
 
     instructions.addAll(statementTwoInstructions);
 
-    //Lx+1:
+    // Lx+1:
     instructions.add(new LABEL(label2 + ":"));
 
     return instructions;
