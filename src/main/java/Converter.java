@@ -17,8 +17,7 @@ import static ast.Type.EType.*;
 
 public class Converter extends ASTVisitor<List<Instruction>> {
 
-  /* A list of general purpose registers: r4, r5, r6, r7, r8, r9, r10 and r11. */
-  List<Register> unusedRegisters = initialiseGeneralRegisters();
+  /* A list of general purpose registers: r4, r5, r6, r7, r8, r9, r10 and r11. */ List<Register> unusedRegisters = initialiseGeneralRegisters();
 
   /* Function return registers. */
   private final Register r0 = new Register(0);
@@ -100,14 +99,14 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
       case REFERENCE:
         nextType = getExpressionType(expr.getExpression1());
-        if(nextType.getType() == DEREFERENCE) {
+        if (nextType.getType() == DEREFERENCE) {
           return nextType.getArrayType();
         }
         return new Type(REFERENCE, nextType);
 
       case DEREFERENCE:
         nextType = getExpressionType(expr.getExpression1());
-        if(nextType.getType() == REFERENCE) {
+        if (nextType.getType() == REFERENCE) {
           return nextType.getArrayType();
         }
         return new Type(DEREFERENCE, nextType);
@@ -171,13 +170,14 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
   private int totalBytesInStatement(Statement statement) {
 
-    switch(statement.getStatType()) {
+    switch (statement.getStatType()) {
 
       case DECLARATION:
         return sizeOfTypeOnStack(statement.getLhsType());
 
       case CONCAT:
-        return totalBytesInStatement(statement.getStatement1()) + totalBytesInStatement(statement.getStatement2());
+        return totalBytesInStatement(statement.getStatement1()) + totalBytesInStatement(
+            statement.getStatement2());
 
       case WHILE:
         return totalBytesInStatement(statement.getStatement1()) + maxBeginStatement(statement);
@@ -422,13 +422,14 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     }
 
     if (statement.getLHS().getAssignType() == AssignLHS.LHSType.ARRAYELEM) {
-      type = getExpressionType(new ExpressionBuilder().buildArrayExpr(statement.getLHS().getArrayElem()));
+      type = getExpressionType(
+          new ExpressionBuilder().buildArrayExpr(statement.getLHS().getArrayElem()));
     }
 
     if (sizeOfTypeOnStack(type) == 1) {
       instructions.add(new STR(rn, new Operand2(rm), "B"));
     } else {
-      instructions.add(new STR (rn, new Operand2(rm)));
+      instructions.add(new STR(rn, new Operand2(rm)));
     }
 
     /* Mark registers as no longer in use. */
@@ -439,7 +440,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
   }
 
   @Override
-  public List<Instruction> visitIdentLHS (AssignLHS lhs){
+  public List<Instruction> visitIdentLHS(AssignLHS lhs) {
 
     List<Instruction> instructions = new ArrayList<>();
 
@@ -522,16 +523,16 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     /* Generate instructions for the 'if' clause of the statement and change scope. */
     currentST = new SymbolTable(currentST);
     int temp = spLocation;
-    List<Instruction> statementOneInstructions =
-        new ArrayList<>(visitStatement(statement.getStatement1()));
+    List<Instruction> statementOneInstructions = new ArrayList<>(
+        visitStatement(statement.getStatement1()));
     spLocation = temp;
     currentST = currentST.getParent();
 
     /* Generate instructions for the 'else' clause of the statement and change scope. */
     currentST = new SymbolTable(currentST);
     temp = spLocation;
-    List<Instruction> statementTwoInstructions =
-        new ArrayList<>(visitStatement(statement.getStatement2()));
+    List<Instruction> statementTwoInstructions = new ArrayList<>(
+        visitStatement(statement.getStatement2()));
     spLocation = temp;
     currentST = currentST.getParent();
 
@@ -574,7 +575,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
-  private Boolean expressionContainsIdent(Expression expression){
+  private Boolean expressionContainsIdent(Expression expression) {
     switch (expression.getExprType()) {
       case IDENT:
       case ARRAYELEM:
@@ -599,8 +600,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       case NEQ:
       case AND:
       case OR:
-        return expressionContainsIdent(expression.getExpression1())
-            || expressionContainsIdent(expression.getExpression2());
+        return expressionContainsIdent(expression.getExpression1()) || expressionContainsIdent(
+            expression.getExpression2());
       default:
         return false;
     }
@@ -664,11 +665,11 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       case EQ:
         boolean bool1 = evaluateExpression(expression.getExpression1()).getBoolLiter();
         boolean bool2 = evaluateExpression(expression.getExpression2()).getBoolLiter();
-        return new ExpressionBuilder().buildBoolExpr(Objects.equals(bool1,bool2));
+        return new ExpressionBuilder().buildBoolExpr(Objects.equals(bool1, bool2));
       case NEQ:
         bool1 = evaluateExpression(expression.getExpression1()).getBoolLiter();
         bool2 = evaluateExpression(expression.getExpression2()).getBoolLiter();
-        return new ExpressionBuilder().buildBoolExpr(!Objects.equals(bool1,bool2));
+        return new ExpressionBuilder().buildBoolExpr(!Objects.equals(bool1, bool2));
       case AND:
         bool1 = evaluateExpression(expression.getExpression1()).getBoolLiter();
         bool2 = evaluateExpression(expression.getExpression2()).getBoolLiter();
@@ -909,7 +910,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     String suffix = "";
 
-    if (sizeOfTypeOnStack(getExpressionType(expression)) == 1){
+    if (sizeOfTypeOnStack(getExpressionType(expression)) == 1) {
       suffix = "SB";
     }
 
@@ -951,7 +952,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     return instructions;
   }
 
-  private String getIdentFromLHS(AssignLHS lhs){
+  private String getIdentFromLHS(AssignLHS lhs) {
     switch (lhs.getAssignType()) {
       case ARRAYELEM:
         return lhs.getArrayElem().getIdent();
@@ -1043,7 +1044,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
 
     // ADD rn, sp #i
     instructions.add(new ADD(rn, sp,
-            new Operand2(currentST.getSPMapping(expression.getExpression1().getIdent()))));
+        new Operand2(currentST.getSPMapping(expression.getExpression1().getIdent()))));
 
     /* Mark the register used in the evaluation of this function as no longer in use. */
     pushUnusedRegister(rn);
@@ -1085,7 +1086,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     Register rn = popUnusedRegister();
 
     /* Decides if the compiler should switch to accumulator mode*/
-    if (Objects.equals(rn.toString(), "r10")){
+    if (Objects.equals(rn.toString(), "r10")) {
 
       /* Push result of expression1 in R10 into stack */
       instructions.add(new PUSH(rn));
@@ -1279,7 +1280,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       instructions.add(new MOV(r0, new Operand2(rn)));
 
       // MOV R1, Rn+1
-      instructions.add(new MOV( r1, new Operand2(rm)));
+      instructions.add(new MOV(r1, new Operand2(rm)));
     }
 
     // BL p_check_divide_by_zero
@@ -1537,7 +1538,7 @@ public class Converter extends ASTVisitor<List<Instruction>> {
     int typeSize = 0;
 
     /* If array is not empty get stack size of type. */
-    if(!array.isEmpty()) {
+    if (!array.isEmpty()) {
       typeSize = sizeOfTypeOnStack(getExpressionType(array.get(0)));
     }
 
@@ -1893,7 +1894,8 @@ public class Converter extends ASTVisitor<List<Instruction>> {
       // BL p_print_int
       instructions.add(new Branch("p_print_int").setSuffix("L"));
       predefinedFunctions.add(P_PRINT_INT);
-    } else if (Objects.equals(type, new Type(STRING)) || Objects.equals(type, new Type(ARRAY, new Type(CHAR)))) {
+    } else if (Objects.equals(type, new Type(STRING)) || Objects.equals(type,
+        new Type(ARRAY, new Type(CHAR)))) {
       // BL p_print_string
       instructions.add(new Branch("p_print_string").setSuffix("L"));
       predefinedFunctions.add(P_PRINT_STRING);

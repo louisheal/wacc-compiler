@@ -7,13 +7,10 @@ public class BinOpPrecedenceTest {
   @Test
   public void addThenMultiplyHasCorrectOrdering() {
 
-    String treeResult = "(prog begin (stat (type (baseType int)) x = " +
-            "(assignRHS (expr (expr (intLiter 5)) + " +
-            "(expr (expr (intLiter 3)) * (expr (intLiter 9)))" +
-            "))) end <EOF>)";
-    String program = "begin\n"
-            + "int x = 5 + 3 * 9\n"
-            + "end";
+    String treeResult =
+        "(prog begin (stat (type (baseType int)) x = " + "(assignRHS (expr (expr (intLiter 5)) + "
+            + "(expr (expr (intLiter 3)) * (expr (intLiter 9)))" + "))) end <EOF>)";
+    String program = "begin\n" + "int x = 5 + 3 * 9\n" + "end";
 
     assertEquals(treeResult, Compiler.lexAnalyse(program));
   }
@@ -21,13 +18,10 @@ public class BinOpPrecedenceTest {
   @Test
   public void subtractThenMultiplyHasCorrectOrdering() {
 
-    String treeResult = "(prog begin (stat (type (baseType int)) x = " +
-            "(assignRHS (expr (expr (intLiter 5)) + " +
-            "(expr (expr (intLiter 3)) * (expr (intLiter 9)))" +
-            "))) end <EOF>)";
-    String program = "begin\n"
-            + "int x = 5 + 3 * 9\n"
-            + "end";
+    String treeResult =
+        "(prog begin (stat (type (baseType int)) x = " + "(assignRHS (expr (expr (intLiter 5)) + "
+            + "(expr (expr (intLiter 3)) * (expr (intLiter 9)))" + "))) end <EOF>)";
+    String program = "begin\n" + "int x = 5 + 3 * 9\n" + "end";
 
     assertEquals(treeResult, Compiler.lexAnalyse(program));
   }
@@ -35,13 +29,10 @@ public class BinOpPrecedenceTest {
   @Test
   public void addThenDivideHasCorrectOrdering() {
 
-    String treeResult = "(prog begin (stat (type (baseType int)) x = " +
-            "(assignRHS (expr (expr (intLiter 5)) + " +
-            "(expr (expr (intLiter 9)) / (expr (intLiter 3)))" +
-            "))) end <EOF>)";
-    String program = "begin\n"
-            + "int x = 5 + 9 / 3\n"
-            + "end";
+    String treeResult =
+        "(prog begin (stat (type (baseType int)) x = " + "(assignRHS (expr (expr (intLiter 5)) + "
+            + "(expr (expr (intLiter 9)) / (expr (intLiter 3)))" + "))) end <EOF>)";
+    String program = "begin\n" + "int x = 5 + 9 / 3\n" + "end";
 
     assertEquals(treeResult, Compiler.lexAnalyse(program));
   }
@@ -49,13 +40,10 @@ public class BinOpPrecedenceTest {
   @Test
   public void subtractThenDivideHasCorrectOrdering() {
 
-    String treeResult = "(prog begin (stat (type (baseType int)) x = " +
-            "(assignRHS (expr (expr (intLiter 5)) - " +
-            "(expr (expr (intLiter 9)) / (expr (intLiter 3)))" +
-            "))) end <EOF>)";
-    String program = "begin\n"
-            + "int x = 5 - 9 / 3\n"
-            + "end";
+    String treeResult =
+        "(prog begin (stat (type (baseType int)) x = " + "(assignRHS (expr (expr (intLiter 5)) - "
+            + "(expr (expr (intLiter 9)) / (expr (intLiter 3)))" + "))) end <EOF>)";
+    String program = "begin\n" + "int x = 5 - 9 / 3\n" + "end";
 
     assertEquals(treeResult, Compiler.lexAnalyse(program));
   }

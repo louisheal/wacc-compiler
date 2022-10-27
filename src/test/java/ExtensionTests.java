@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class ExtensionTests {
+
   MySecurityManager securityManager = new MySecurityManager();
 
   int failedTests = 0;
@@ -25,7 +26,8 @@ public class ExtensionTests {
         failedTests++;
       }
     }
-    System.out.println("--------- Tests passed: " + (totalTests - failedTests) + "/" + totalTests + " ---------\n");
+    System.out.println("--------- Tests passed: " + (totalTests - failedTests) + "/" + totalTests
+        + " ---------\n");
     if (failedTests > 0) {
       Assert.fail();
     }
@@ -63,7 +65,6 @@ public class ExtensionTests {
     assert examples != null;
     runTests(examples);
   }
-
 
 
 }

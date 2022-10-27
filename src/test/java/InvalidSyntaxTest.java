@@ -25,7 +25,8 @@ public class InvalidSyntaxTest {
         System.out.print("PASS\n");
       }
     }
-    System.out.println("--------- Tests passed: " + (totalTests - failedTests) + "/" + totalTests + " ---------\n");
+    System.out.println("--------- Tests passed: " + (totalTests - failedTests) + "/" + totalTests
+        + " ---------\n");
     if (failedTests > 0) {
       Assert.fail();
     }

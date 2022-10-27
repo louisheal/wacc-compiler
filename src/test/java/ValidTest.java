@@ -23,7 +23,8 @@ public class ValidTest {
         failedTests++;
       }
     }
-    System.out.println("--------- Tests passed: " + (totalTests - failedTests) + "/" + totalTests + " ---------\n");
+    System.out.println("--------- Tests passed: " + (totalTests - failedTests) + "/" + totalTests
+        + " ---------\n");
     if (failedTests > 0) {
       Assert.fail();
     }
@@ -124,7 +125,6 @@ public class ValidTest {
   public void IOTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-
     File directory = new File("wacc_examples/valid/IO/");
     File[] examples = directory.listFiles(folderFilter);
 
@@ -136,7 +136,6 @@ public class ValidTest {
   public void IOPrintTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-
     File directory = new File("wacc_examples/valid/IO/print");
     File[] examples = directory.listFiles();
 
@@ -147,7 +146,6 @@ public class ValidTest {
   @Test
   public void IOReadTests() throws IOException {
     System.setSecurityManager(securityManager);
-
 
     File directory = new File("wacc_examples/valid/IO/read");
     File[] examples = directory.listFiles();
@@ -260,5 +258,15 @@ public class ValidTest {
     runTests(examples);
   }
 
+  @Test
+  public void functionOverloadingTests() throws IOException {
+    System.setSecurityManager(securityManager);
+
+    File directory = new File("wacc_examples/extension/functionOverloading/");
+    File[] examples = directory.listFiles();
+
+    assert examples != null;
+    runTests(examples);
+  }
 
 }

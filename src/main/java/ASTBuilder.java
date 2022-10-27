@@ -185,11 +185,13 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
     return new Type(Type.EType.ARRAY, (Type) this.visit(ctx.baseType()));
   }
 
-  @Override public Type visitNestedArrayType(BasicParser.NestedArrayTypeContext ctx) {
+  @Override
+  public Type visitNestedArrayType(BasicParser.NestedArrayTypeContext ctx) {
     return new Type(Type.EType.ARRAY, (Type) this.visit(ctx.arrayType()));
   }
 
-  @Override public Type visitPairArrayType(BasicParser.PairArrayTypeContext ctx) {
+  @Override
+  public Type visitPairArrayType(BasicParser.PairArrayTypeContext ctx) {
     return new Type(Type.EType.ARRAY, (Type) this.visit(ctx.pairType()));
   }
 
@@ -451,11 +453,15 @@ public class ASTBuilder extends BasicParserBaseVisitor<Object> {
 
   //REFERENCE
   @Override
-  public Expression.ExprType visitReference(BasicParser.ReferenceContext ctx) { return Expression.ExprType.REFERENCE; }
+  public Expression.ExprType visitReference(BasicParser.ReferenceContext ctx) {
+    return Expression.ExprType.REFERENCE;
+  }
 
   //DEREFERENCE
   @Override
-  public Expression.ExprType visitDereference(BasicParser.DereferenceContext ctx) { return Expression.ExprType.DEREFERENCE; }
+  public Expression.ExprType visitDereference(BasicParser.DereferenceContext ctx) {
+    return Expression.ExprType.DEREFERENCE;
+  }
 
   //BINARY-OP
 

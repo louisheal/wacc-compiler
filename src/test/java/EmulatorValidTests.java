@@ -11,6 +11,7 @@ import java.io.StringReader;
 import java.util.Arrays;
 
 public class EmulatorValidTests {
+
   MySecurityManager securityManager = new MySecurityManager();
 
   int failedTests = 0;
@@ -57,10 +58,11 @@ public class EmulatorValidTests {
       }
       System.out.println("--------------------------------------");
     }
-      System.out.println("--------- Tests passed: " + (totalTests - failedTests) + "/" + totalTests + " ---------\n");
-      if (failedTests > 0) {
-        Assert.fail();
-      }
+    System.out.println("--------- Tests passed: " + (totalTests - failedTests) + "/" + totalTests
+        + " ---------\n");
+    if (failedTests > 0) {
+      Assert.fail();
+    }
   }
 
   public static String assemblyFileToString(File file) throws FileNotFoundException {
@@ -75,7 +77,8 @@ public class EmulatorValidTests {
 
   public static String runEmulatorOnFile(File file) throws IOException {
     //Executes the commands neccessary to receieve the full output of assembly emulator of a .s file
-    String[] commands = {"bash", "-c", "echo ' ' | ./wacc_examples/refEmulate " + file.getPath().replace("\\", "/")};
+    String[] commands = {"bash", "-c",
+        "echo ' ' | ./wacc_examples/refEmulate " + file.getPath().replace("\\", "/")};
     String s;
     StringBuilder sb = new StringBuilder();
     Process p = Runtime.getRuntime().exec(commands);
@@ -89,7 +92,8 @@ public class EmulatorValidTests {
 
   public static String runRefCompilerOnFile(File file) throws IOException {
     //Executes the commands neccessary to receieve the full output of assembly emulator of a .s file
-    String[] commands = {"bash", "-c", "echo ' ' | ./wacc_examples/refCompile -x " + file.getPath().replace("\\", "/")};
+    String[] commands = {"bash", "-c",
+        "echo ' ' | ./wacc_examples/refCompile -x " + file.getPath().replace("\\", "/")};
     String s;
     StringBuilder sb = new StringBuilder();
     Process p = Runtime.getRuntime().exec(commands);
@@ -102,7 +106,8 @@ public class EmulatorValidTests {
 
   public static String getAssemblyCodeFromRefCompiler(File file) throws IOException {
     //Executes the commands neccessary to receieve the assembly code for .wacc file
-    String[] commands = {"bash", "-c", "echo ' ' | ./wacc_examples/refCompile -a " + file.getPath().replace("\\", "/")};
+    String[] commands = {"bash", "-c",
+        "echo ' ' | ./wacc_examples/refCompile -a " + file.getPath().replace("\\", "/")};
     String s;
     StringBuilder sb = new StringBuilder();
     Process p = Runtime.getRuntime().exec(commands);
@@ -150,24 +155,24 @@ public class EmulatorValidTests {
       if (line.contains("Emulation Output")) {
         while ((line = bufferedReader.readLine()) != null) {
           outputExtracted.append(line).append("\n");
+        }
+        break;
       }
-      break;
     }
-  }
 
-  //Removes the last 2 lines which are "------" and exit code
-  String[] lines = outputExtracted.toString().split("\n");
-  String[] linesWithoutExit = Arrays.copyOf(lines, lines.length - 2);
+    //Removes the last 2 lines which are "------" and exit code
+    String[] lines = outputExtracted.toString().split("\n");
+    String[] linesWithoutExit = Arrays.copyOf(lines, lines.length - 2);
 
-  StringBuilder arrayToString = new StringBuilder();
-  for (int i = 0; i < linesWithoutExit.length; i++) {
-    arrayToString.append(linesWithoutExit[i]);
-    if (i != linesWithoutExit.length - 1) {
-      arrayToString.append("\n");
+    StringBuilder arrayToString = new StringBuilder();
+    for (int i = 0; i < linesWithoutExit.length; i++) {
+      arrayToString.append(linesWithoutExit[i]);
+      if (i != linesWithoutExit.length - 1) {
+        arrayToString.append("\n");
+      }
     }
-  }
 
-  return arrayToString.toString();
+    return arrayToString.toString();
   }
 
   public static String extractExpectedOutputFromAssembly(File file) throws IOException {
@@ -305,7 +310,6 @@ public class EmulatorValidTests {
   public void IOPrintTests() throws IOException {
     System.setSecurityManager(securityManager);
 
-
     File directory = new File("wacc_examples/valid/IO/print");
     File[] examples = directory.listFiles();
 
@@ -316,7 +320,6 @@ public class EmulatorValidTests {
   @Test
   public void IOReadTests() throws IOException {
     System.setSecurityManager(securityManager);
-
 
     File directory = new File("wacc_examples/valid/IO/read");
     File[] examples = directory.listFiles();
@@ -335,7 +338,6 @@ public class EmulatorValidTests {
     assert examples != null;
     runTests(examples);
   }
-
 
 
   @Test

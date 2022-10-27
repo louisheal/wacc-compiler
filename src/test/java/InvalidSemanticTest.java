@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class InvalidSemanticTest {
+
   SecurityManagerSemanticCheck securityManager = new SecurityManagerSemanticCheck();
   int failedTests = 0;
   int totalTests = 0;
@@ -24,7 +25,8 @@ public class InvalidSemanticTest {
         System.out.print("PASS\n");
       }
     }
-    System.out.println("--------- Tests passed: " + (totalTests - failedTests) + "/" + totalTests + " ---------\n");
+    System.out.println("--------- Tests passed: " + (totalTests - failedTests) + "/" + totalTests
+        + " ---------\n");
     if (failedTests > 0) {
       Assert.fail();
     }

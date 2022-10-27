@@ -41,16 +41,16 @@ public class Evaluator extends ASTVisitor<Expression> {
   private boolean isExpressionIdentOrArrayElem(Expression expression) {
     if (expression == null) {
       return true;
-    } else if (expression.getExprType() == Expression.ExprType.CHARLITER ||
-        expression.getExprType() == Expression.ExprType.BOOLLITER ||
-        expression.getExprType() == Expression.ExprType.INTLITER ||
-        expression.getExprType() == Expression.ExprType.STRINGLITER) {
+    } else if (expression.getExprType() == Expression.ExprType.CHARLITER
+        || expression.getExprType() == Expression.ExprType.BOOLLITER
+        || expression.getExprType() == Expression.ExprType.INTLITER
+        || expression.getExprType() == Expression.ExprType.STRINGLITER) {
       return false;
     }
 
-    return ((expression.getIdent() != null) || (expression.getArrayElem() != null))
-        || (isExpressionIdentOrArrayElem(expression.getExpression1())
-            && isExpressionIdentOrArrayElem(expression.getExpression2()));
+    return ((expression.getIdent() != null) || (expression.getArrayElem() != null)) || (
+        isExpressionIdentOrArrayElem(expression.getExpression1()) && isExpressionIdentOrArrayElem(
+            expression.getExpression2()));
   }
 
   @Override
@@ -216,7 +216,8 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitDivExp(Expression expression) {
-    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(
+        expression.getExpression2())) {
       return expression;
     }
     long arg1 = visitExpression(expression.getExpression1()).getIntLiter();
@@ -226,7 +227,8 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitMulExp(Expression expression) {
-    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(
+        expression.getExpression2())) {
       return expression;
     }
     long arg1 = visitExpression(expression.getExpression1()).getIntLiter();
@@ -236,7 +238,8 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitModExp(Expression expression) {
-    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(
+        expression.getExpression2())) {
       return expression;
     }
     long arg1 = visitExpression(expression.getExpression1()).getIntLiter();
@@ -246,7 +249,8 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitPlusExp(Expression expression) {
-    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(
+        expression.getExpression2())) {
       return expression;
     }
     long arg1 = visitExpression(expression.getExpression1()).getIntLiter();
@@ -256,7 +260,8 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitMinusExp(Expression expression) {
-    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(
+        expression.getExpression2())) {
       return expression;
     }
     long arg1 = visitExpression(expression.getExpression1()).getIntLiter();
@@ -266,7 +271,8 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitGreaterExp(Expression expression) {
-    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(
+        expression.getExpression2())) {
       return expression;
     }
     long arg1 = visitExpression(expression.getExpression1()).getIntLiter();
@@ -276,7 +282,8 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitGreaterEqExp(Expression expression) {
-    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(
+        expression.getExpression2())) {
       return expression;
     }
     long arg1 = visitExpression(expression.getExpression1()).getIntLiter();
@@ -286,7 +293,8 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitLessExp(Expression expression) {
-    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(
+        expression.getExpression2())) {
       return expression;
     }
     long arg1 = visitExpression(expression.getExpression1()).getIntLiter();
@@ -296,7 +304,8 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitLessEqExp(Expression expression) {
-    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(
+        expression.getExpression2())) {
       return expression;
     }
     long arg1 = visitExpression(expression.getExpression1()).getIntLiter();
@@ -306,22 +315,24 @@ public class Evaluator extends ASTVisitor<Expression> {
 
   @Override
   public Expression visitEqExp(Expression expression) {
-    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(
+        expression.getExpression2())) {
       return expression;
     }
     boolean bool1 = visitExpression(expression.getExpression1()).getBoolLiter();
     boolean bool2 = visitExpression(expression.getExpression2()).getBoolLiter();
-    return new ExpressionBuilder().buildBoolExpr(Objects.equals(bool1,bool2));
+    return new ExpressionBuilder().buildBoolExpr(Objects.equals(bool1, bool2));
   }
 
   @Override
   public Expression visitNeqExp(Expression expression) {
-    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(expression.getExpression2())) {
+    if (isExpressionIdentOrArrayElem(expression.getExpression1()) || isExpressionIdentOrArrayElem(
+        expression.getExpression2())) {
       return expression;
     }
     boolean bool1 = visitExpression(expression.getExpression1()).getBoolLiter();
     boolean bool2 = visitExpression(expression.getExpression2()).getBoolLiter();
-    return new ExpressionBuilder().buildBoolExpr(!Objects.equals(bool1,bool2));
+    return new ExpressionBuilder().buildBoolExpr(!Objects.equals(bool1, bool2));
   }
 
   @Override
@@ -398,7 +409,7 @@ public class Evaluator extends ASTVisitor<Expression> {
   }
 
   @Override
-  public Expression visitArrayElemLHS(AssignLHS lhs) { // how would i check this case
+  public Expression visitArrayElemLHS(AssignLHS lhs) {
     ArrayElem arrayElem = lhs.getArrayElem();
     return visitExpression(new ExpressionBuilder().buildArrayExpr(arrayElem));
   }

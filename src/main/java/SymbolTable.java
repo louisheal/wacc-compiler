@@ -22,14 +22,14 @@ public class SymbolTable {
     return variables.containsKey(ident);
   }
 
-  public Integer getSPMapping (String ident) {
+  public Integer getSPMapping(String ident) {
     if (!variableSPMapping.containsKey(ident) && parent != null) {
       return parent.getSPMapping(ident);
     }
     return variableSPMapping.get(ident) + stackOffset;
   }
 
-  public void setSPMapping (String ident, Integer absoluteSP) {
+  public void setSPMapping(String ident, Integer absoluteSP) {
     variableSPMapping.put(ident, absoluteSP);
   }
 

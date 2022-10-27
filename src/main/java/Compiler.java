@@ -36,7 +36,7 @@ public class Compiler {
 
     return tree;
   }
-  
+
   public static String lexAnalyse(String program) {
     CharStream input = CharStreams.fromString(program);
     return parseTree(tokenize(input));
@@ -101,10 +101,10 @@ public class Compiler {
     List<Instruction> instructions = converter.visitProgram(ast);
 
     String fileNameWithExtension = filename.getFileName().toString();
-    String fileName = fileNameWithExtension.substring(0,fileNameWithExtension.lastIndexOf("."))
-        + ".s";
+    String fileName =
+        fileNameWithExtension.substring(0, fileNameWithExtension.lastIndexOf(".")) + ".s";
     FileWriter binFileWriter = new FileWriter(fileName);
-    for (Instruction instruction: instructions){
+    for (Instruction instruction : instructions) {
       binFileWriter.write(instruction.toString() + '\n');
     }
     binFileWriter.close();

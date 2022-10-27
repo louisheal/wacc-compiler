@@ -171,14 +171,14 @@ public class SemanticAnalysis {
 
       case REFERENCE:
         nextType = getExpressionType(expr.getExpression1());
-        if(nextType.getType() == DEREFERENCE) {
+        if (nextType.getType() == DEREFERENCE) {
           return nextType.getArrayType();
         }
         return new Type(REFERENCE, nextType);
 
       case DEREFERENCE:
         nextType = getExpressionType(expr.getExpression1());
-        if(nextType.getType() == REFERENCE) {
+        if (nextType.getType() == REFERENCE) {
           return nextType.getArrayType();
         }
         return new Type(DEREFERENCE, nextType);
@@ -194,10 +194,9 @@ public class SemanticAnalysis {
         return getExpressionType(rhs.getExpression1());
 
       case ARRAY:
-        if(rhs.getArray().isEmpty()){
+        if (rhs.getArray().isEmpty()) {
           return new Type(EType.ARRAY);
-        }
-        else {
+        } else {
           return new Type(EType.ARRAY, getExpressionType(rhs.getArray().get(0)));
         }
 
@@ -255,8 +254,8 @@ public class SemanticAnalysis {
       case CONCAT:
         return validFunctionReturn(statement.getStatement2());
       case IF:
-        return validFunctionReturn(statement.getStatement1()) &&
-               validFunctionReturn(statement.getStatement2());
+        return validFunctionReturn(statement.getStatement1()) && validFunctionReturn(
+            statement.getStatement2());
       case RETURN:
       case EXIT:
         return true;
@@ -265,18 +264,15 @@ public class SemanticAnalysis {
   }
 
   private boolean bothIntegers(Type t1, Type t2) {
-    return Objects.equals(t1, new Type(EType.INT)) &&
-           Objects.equals(t2, new Type(EType.INT));
+    return Objects.equals(t1, new Type(EType.INT)) && Objects.equals(t2, new Type(EType.INT));
   }
 
   private boolean bothCharacters(Type t1, Type t2) {
-    return Objects.equals(t1, new Type(EType.CHAR)) &&
-           Objects.equals(t2, new Type(EType.CHAR));
+    return Objects.equals(t1, new Type(EType.CHAR)) && Objects.equals(t2, new Type(EType.CHAR));
   }
 
   private boolean bothBooleans(Type t1, Type t2) {
-    return Objects.equals(t1, new Type(EType.BOOL)) &&
-           Objects.equals(t2, new Type(EType.BOOL));
+    return Objects.equals(t1, new Type(EType.BOOL)) && Objects.equals(t2, new Type(EType.BOOL));
   }
 
   public void traverse(Program program) {
@@ -343,18 +339,19 @@ public class SemanticAnalysis {
       return;
     }
 
-    boolean validNot = expression.getExprType() == Expression.ExprType.NOT &&
-                       !getExpressionType(expression.getExpression1()).equals(new Type(EType.BOOL));
-    boolean validNeg = expression.getExprType() == Expression.ExprType.NEG &&
-                       !getExpressionType(expression.getExpression1()).equals(new Type(EType.INT));
-    boolean validLen = expression.getExprType() == Expression.ExprType.LEN &&
-                       getExpressionType(expression.getExpression1()).getType() != EType.ARRAY;
-    boolean validChr = expression.getExprType() == Expression.ExprType.CHR &&
-                       !getExpressionType(expression.getExpression1()).equals(new Type(EType.INT));
-    boolean validOrd = expression.getExprType() == Expression.ExprType.ORD &&
-                       !getExpressionType(expression.getExpression1()).equals(new Type(EType.CHAR));
-    boolean validDereference = expression.getExprType() == Expression.ExprType.DEREFERENCE &&
-                       !getExpressionType(expression.getExpression1()).getType().equals(EType.REFERENCE);
+    boolean validNot = expression.getExprType() == Expression.ExprType.NOT && !getExpressionType(
+        expression.getExpression1()).equals(new Type(EType.BOOL));
+    boolean validNeg = expression.getExprType() == Expression.ExprType.NEG && !getExpressionType(
+        expression.getExpression1()).equals(new Type(EType.INT));
+    boolean validLen = expression.getExprType() == Expression.ExprType.LEN
+        && getExpressionType(expression.getExpression1()).getType() != EType.ARRAY;
+    boolean validChr = expression.getExprType() == Expression.ExprType.CHR && !getExpressionType(
+        expression.getExpression1()).equals(new Type(EType.INT));
+    boolean validOrd = expression.getExprType() == Expression.ExprType.ORD && !getExpressionType(
+        expression.getExpression1()).equals(new Type(EType.CHAR));
+    boolean validDereference =
+        expression.getExprType() == Expression.ExprType.DEREFERENCE && !getExpressionType(
+            expression.getExpression1()).getType().equals(EType.REFERENCE);
 
     if (validNot || validNeg || validLen || validChr || validOrd || validDereference) {
       printSemanticError(expression.getExprType());
@@ -362,62 +359,65 @@ public class SemanticAnalysis {
 
     traverse(expression.getExpression1());
 
-    if (expression.getExprType() == Expression.ExprType.DIVIDE ||
-        expression.getExprType() == Expression.ExprType.MULTIPLY ||
-        expression.getExprType() == Expression.ExprType.MODULO ||
-        expression.getExprType() == Expression.ExprType.MINUS ||
-        expression.getExprType() == Expression.ExprType.PLUS) {
+    if (expression.getExprType() == Expression.ExprType.DIVIDE
+        || expression.getExprType() == Expression.ExprType.MULTIPLY
+        || expression.getExprType() == Expression.ExprType.MODULO
+        || expression.getExprType() == Expression.ExprType.MINUS
+        || expression.getExprType() == Expression.ExprType.PLUS) {
       if (!bothIntegers(getExpressionType(expression.getExpression1()),
-                        getExpressionType(expression.getExpression2()))) {
+          getExpressionType(expression.getExpression2()))) {
         printSemanticError(expression.getExprType());
       }
       traverse(expression.getExpression2());
     }
 
-    if (expression.getExprType() == Expression.ExprType.GT ||
-        expression.getExprType() == Expression.ExprType.GTE ||
-        expression.getExprType() == Expression.ExprType.LT ||
-        expression.getExprType() == Expression.ExprType.LTE) {
+    if (expression.getExprType() == Expression.ExprType.GT
+        || expression.getExprType() == Expression.ExprType.GTE
+        || expression.getExprType() == Expression.ExprType.LT
+        || expression.getExprType() == Expression.ExprType.LTE) {
       if (!bothIntegers(getExpressionType(expression.getExpression1()),
-              getExpressionType(expression.getExpression2())) &&
-          !bothCharacters(getExpressionType(expression.getExpression1()),
-                  getExpressionType(expression.getExpression2()))) {
+          getExpressionType(expression.getExpression2())) && !bothCharacters(
+          getExpressionType(expression.getExpression1()),
+          getExpressionType(expression.getExpression2()))) {
         printSemanticError(expression.getExprType());
       }
       traverse(expression.getExpression2());
     }
 
-    if (expression.getExprType() == Expression.ExprType.EQ ||
-        expression.getExprType() == Expression.ExprType.NEQ) {
-      if (!getExpressionType(expression.getExpression1()).equals(getExpressionType(expression.getExpression2())) &&
-          expression.getExpression1() != null && expression.getExpression2() != null) {
+    if (expression.getExprType() == Expression.ExprType.EQ
+        || expression.getExprType() == Expression.ExprType.NEQ) {
+      if (!getExpressionType(expression.getExpression1()).equals(
+          getExpressionType(expression.getExpression2())) && expression.getExpression1() != null
+          && expression.getExpression2() != null) {
         printSemanticError(expression.getExprType());
       }
       traverse(expression.getExpression2());
     }
 
-    if (expression.getExprType() == Expression.ExprType.AND ||
-            expression.getExprType() == Expression.ExprType.OR) {
+    if (expression.getExprType() == Expression.ExprType.AND
+        || expression.getExprType() == Expression.ExprType.OR) {
       if (!bothBooleans(getExpressionType(expression.getExpression1()),
-              getExpressionType(expression.getExpression2()))) {
+          getExpressionType(expression.getExpression2()))) {
         printSemanticError(expression.getExprType());
       }
       traverse(expression.getExpression2());
     }
 
-    if (expression.getExprType() == Expression.ExprType.IDENT &&
-            currentST.getType(expression.getIdent()) == null) {
-      errorMsgs.add("Variable not defined: " + expression.getIdent() + "\n In expression: " + expression);
+    if (expression.getExprType() == Expression.ExprType.IDENT
+        && currentST.getType(expression.getIdent()) == null) {
+      errorMsgs.add(
+          "Variable not defined: " + expression.getIdent() + "\n In expression: " + expression);
       errors++;
     }
 
     if (expression.getExprType() == Expression.ExprType.REFERENCE) {
-      if(expression.getExpression1().getExprType() != Expression.ExprType.IDENT &&
-        getExpressionType(expression.getExpression1()).getType() != DEREFERENCE) {
+      if (expression.getExpression1().getExprType() != Expression.ExprType.IDENT
+          && getExpressionType(expression.getExpression1()).getType() != DEREFERENCE) {
         printSemanticError(expression.getExprType());
       } else if (currentST.getType(expression.getExpression1().getIdent()) == null) {
-        errorMsgs.add("Variable not defined: " + expression.getExpression1().getIdent() +
-                "\n In expression: " + expression);
+        errorMsgs.add(
+            "Variable not defined: " + expression.getExpression1().getIdent() + "\n In expression: "
+                + expression);
         errors++;
       }
     }
@@ -430,14 +430,13 @@ public class SemanticAnalysis {
       return true;
     }
 
-
     boolean sameType = lhs.equals(getRHSType(rhs));
 
-    boolean emptyArray = rhs.getAssignType() == RHSType.ARRAY &&
-            lhs.getType() == EType.ARRAY;
+    boolean emptyArray = rhs.getAssignType() == RHSType.ARRAY && lhs.getType() == EType.ARRAY;
 
-    boolean charArrayAsString = lhs.equals(new Type(EType.STRING)) &&
-            Objects.equals(getRHSType(rhs), new Type(EType.ARRAY, new Type(EType.CHAR)));
+    boolean charArrayAsString =
+        lhs.equals(new Type(EType.STRING)) && Objects.equals(getRHSType(rhs),
+            new Type(EType.ARRAY, new Type(EType.CHAR)));
 
     boolean nullPair = lhs.getType() == EType.PAIR && rhs.getExpression1() == null;
 
@@ -450,24 +449,25 @@ public class SemanticAnalysis {
 
       case DECLARATION:
 
-        if(statement.getLhsType().getType() == EType.PAIR && expression == null) {
+        if (statement.getLhsType().getType() == EType.PAIR && expression == null) {
           currentST.newVariable(statement.getLhsIdent(), statement.getLhsType());
           traverse(statement.getRHS());
           break;
         }
 
-        if (invalidAssignment(statement.getLhsType(), statement.getRHS()) ||
-                currentST.contains(statement.getLhsIdent())) {
+        if (invalidAssignment(statement.getLhsType(), statement.getRHS()) || currentST.contains(
+            statement.getLhsIdent())) {
           printSemanticError(Error.MISMATCH_TYPE);
           break;
         }
 
         currentST.newVariable(statement.getLhsIdent(), statement.getLhsType());
 
-        if (Objects.equals(getRHSType(statement.getRHS()).getType(), (EType.ARRAY)) &&
-                statement.getRHS().getArray() != null) {
+        if (Objects.equals(getRHSType(statement.getRHS()).getType(), (EType.ARRAY))
+            && statement.getRHS().getArray() != null) {
           for (Expression expression1 : statement.getRHS().getArray()) {
-            if (Objects.equals(getExpressionType(expression1), statement.getLhsType()) && expression1 != null) {
+            if (Objects.equals(getExpressionType(expression1), statement.getLhsType())
+                && expression1 != null) {
               errorMsgs.add("Array Mismatch");
               errors++;
               break;
@@ -489,24 +489,23 @@ public class SemanticAnalysis {
 
       case READ:
 
-        if(statement.getLHS() == null) {
+        if (statement.getLHS() == null) {
           return;
         }
 
-        if(statement.getLHS().getAssignType() != AssignLHS.LHSType.ARRAYELEM &&
-           statement.getLHS().getAssignType() != AssignLHS.LHSType.IDENT &&
-           statement.getLHS().getAssignType() != AssignLHS.LHSType.PAIRELEM) {
+        if (statement.getLHS().getAssignType() != AssignLHS.LHSType.ARRAYELEM
+            && statement.getLHS().getAssignType() != AssignLHS.LHSType.IDENT
+            && statement.getLHS().getAssignType() != AssignLHS.LHSType.PAIRELEM) {
           printSemanticError(Error.NOT_READABLE);
-        } else if (!Objects.equals(getLHSType(statement.getLHS()), new Type(EType.INT)) &&
-                   !Objects.equals(getLHSType(statement.getLHS()), new Type(EType.CHAR))) {
+        } else if (!Objects.equals(getLHSType(statement.getLHS()), new Type(EType.INT))
+            && !Objects.equals(getLHSType(statement.getLHS()), new Type(EType.CHAR))) {
           printSemanticError(Error.NOT_READABLE);
         }
         break;
 
       case FREE:
-        if (expression != null &&
-            getExpressionType(expression).getType() != EType.ARRAY &&
-            getExpressionType(expression).getType() != EType.PAIR) {
+        if (expression != null && getExpressionType(expression).getType() != EType.ARRAY
+            && getExpressionType(expression).getType() != EType.PAIR) {
           printSemanticError(Error.NOT_FREEABLE);
         } else {
           traverse(expression);
@@ -514,24 +513,23 @@ public class SemanticAnalysis {
         break;
 
       case RETURN:
-        if (!Objects.equals(getExpressionType(expression), functionReturnTypes.get(functionIdent)) &&
-                expression != null) {
+        if (!Objects.equals(getExpressionType(expression), functionReturnTypes.get(functionIdent))
+            && expression != null) {
           errorMsgs.add("Function return type does not match");
           errors++;
           break;
         }
       case PRINT:
       case PRINTLN:
-        if(expression != null) {
+        if (expression != null) {
           traverse(expression);
         }
         break;
 
       case EXIT:
-        if(!Objects.equals(getExpressionType(expression), new Type(EType.INT))){
+        if (!Objects.equals(getExpressionType(expression), new Type(EType.INT))) {
           printSemanticError(Error.EXIT_NOT_INT);
-        }
-        else {
+        } else {
           traverse(expression);
         }
         break;
@@ -542,7 +540,7 @@ public class SemanticAnalysis {
         currentST = currentST.getParent();
 
       case WHILE:
-        if(!Objects.equals(getExpressionType(expression), new Type(EType.BOOL))) {
+        if (!Objects.equals(getExpressionType(expression), new Type(EType.BOOL))) {
           printSemanticError(Error.WHILE_NOT_BOOL);
           break;
         }
@@ -563,33 +561,21 @@ public class SemanticAnalysis {
 
   private void traverse(AssignLHS lhs) {
 
-    if (lhs.getAssignType() == AssignLHS.LHSType.IDENT &&
-            currentST.getType(lhs.getIdent()) == null) {
+    if (lhs.getAssignType() == AssignLHS.LHSType.IDENT
+        && currentST.getType(lhs.getIdent()) == null) {
       printSemanticError(Error.UNDEFINED);
     }
 
-    if (lhs.getAssignType() == AssignLHS.LHSType.ARRAYELEM &&
-            currentST.getType(lhs.getArrayElem().getIdent()) == null) {
+    if (lhs.getAssignType() == AssignLHS.LHSType.ARRAYELEM
+        && currentST.getType(lhs.getArrayElem().getIdent()) == null) {
       printSemanticError(Error.UNDEFINED);
     }
 
-    if (lhs.getAssignType() == AssignLHS.LHSType.PAIRELEM &&
-            currentST.getType(lhs.getPairElem().getExpression().getIdent()) == null) {
+    if (lhs.getAssignType() == AssignLHS.LHSType.PAIRELEM
+        && currentST.getType(lhs.getPairElem().getExpression().getIdent()) == null) {
       printSemanticError(Error.UNDEFINED);
     }
 
-  }
-
-  private String getParamTypes(List<Param> params) {
-    StringBuilder result = new StringBuilder();
-    for (int i = 0; i < params.size(); i++) {
-      String functionParam = params.get(i).toString();
-      result.append(functionParam, 0, functionParam.indexOf(','));
-      if (i != params.size() - 1) {
-        result.append("_");
-      }
-    }
-    return result.toString();
   }
 
   private void traverse(AssignRHS rhs) {
@@ -606,12 +592,13 @@ public class SemanticAnalysis {
       }
       for (int i = 0; i < rhs.getArgList().size(); i++) {
         if (!Objects.equals(getExpressionType(rhs.getArgList().get(i)),
-                functionParams.get(getIdentWithParams(rhs)).get(i).getType()) &&
-                rhs.getArgList().get(i) != null) {
-          errorMsgs.add("Type mismatch in call to function!" +
-                  "\n - Expected: " + functionParams.get(getIdentWithParams(rhs)).get(i).getType() +
-                  "\n - Actual: " + rhs.getArgList().get(i) + ":" + getExpressionType(rhs.getArgList().get(i)) +
-                  "\n - In expression: " + rhs);
+            functionParams.get(getIdentWithParams(rhs)).get(i).getType())
+            && rhs.getArgList().get(i) != null) {
+          errorMsgs.add(
+              "Type mismatch in call to function!" + "\n - Expected: " + functionParams.get(
+                  getIdentWithParams(rhs)).get(i).getType() + "\n - Actual: " + rhs.getArgList()
+                  .get(i) + ":" + getExpressionType(rhs.getArgList().get(i))
+                  + "\n - In expression: " + rhs);
           errors++;
         }
       }
@@ -621,13 +608,6 @@ public class SemanticAnalysis {
   }
 
   private enum Error {
-    UNDEFINED,
-    MISMATCH_TYPE,
-    IF_NOT_BOOL,
-    EXIT_NOT_INT,
-    NOT_FREEABLE,
-    WHILE_NOT_BOOL,
-    FUNCTION_NO_RETURN,
-    NOT_READABLE
+    UNDEFINED, MISMATCH_TYPE, IF_NOT_BOOL, EXIT_NOT_INT, NOT_FREEABLE, WHILE_NOT_BOOL, FUNCTION_NO_RETURN, NOT_READABLE
   }
 }
